@@ -1,0 +1,74 @@
+.water-quality {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: 'Poppins', sans-serif;
+  color: #4a4a4a;
+}
+
+.water-quality h1 {
+  color: #ff9966;
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.water-quality p {
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.tip-section {
+  background-color: #fff9f5;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tip-section h2 {
+  color: #ff9966;
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+.cta-section {
+  background-color: #ff9966;
+  color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+  margin-top: 3rem;
+}
+
+.cta-section h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.cta-button {
+  display: inline-block;
+  background-color: white;
+  color: #ff9966;
+  padding: 0.8rem 1.5rem;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.cta-button:hover {
+  background-color: #4a4a4a;
+  color: white;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .water-quality h1 {
+    font-size: 2rem;
+  }
+
+  .tip-section h2 {
+    font-size: 1.5rem;
+  }
+}

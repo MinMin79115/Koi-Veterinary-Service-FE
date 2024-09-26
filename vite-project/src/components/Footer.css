@@ -1,0 +1,80 @@
+.footer {
+  background-color: #ff9966; /* Softer orange background */
+  color: #ffffff; /* White text */
+  padding: 2rem 0 1rem;
+  width: 100%;
+  margin-top: 2rem;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0 3rem;
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  width: 33%;
+}
+
+.footer-logo img {
+  width: 35%;
+  height: 20%;
+  margin-right: 0.5rem;
+}
+
+.footer-logo span {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.footer-nav {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer-nav a {
+  color: #ffffff; /* White text */
+  margin-bottom: 0.5rem;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-nav a:hover,
+.footer-social a:hover {
+  color: #ffe6cc; /* Very light orange on hover */
+}
+
+.footer-social a {
+  color: #ffffff; /* White text */
+  margin-left: 1rem;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-social a:hover {
+  color: #ffe6cc; /* Very light orange on hover */
+}
+
+.footer-bottom {
+  max-width: 1200px;
+  margin: 2rem auto 0;
+  padding: 1rem 2rem 0;
+  border-top: 1px solid #ffe6cc; /* Very light orange border */
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+
+@keyframes ripple {
+  0%, 100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(1.5);
+  }
+}

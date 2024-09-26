@@ -1,0 +1,314 @@
+.home {
+  text-align: center;
+  background-color: #fff9f5; /* Very light orange background */
+  color: #4a4a4a; /* Darker gray text for better readability */
+}
+
+.hero {
+  background: linear-gradient(135deg, #ffa07a, #ffd700); /* Softer orange to gold gradient */
+  color: #4a4a4a;
+  padding: 6rem 2rem;
+  margin-bottom: 3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.hero {
+  background-color: transparent; /* Softer orange background */
+  padding: 4rem 2rem;
+  margin-top: 4rem;
+  border-radius: 12px;
+  color: #ffffff; /* White text */
+}
+
+.hero h1 {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.hero p {
+  font-size: 1.4rem;
+  margin-bottom: 2rem;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.hero img {
+  height: 100%;
+  width: 100%;
+}
+
+.hero .hero-container {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
+.koi-image {
+  flex-basis: 40%;
+  background-color: #ffffff; /* White background */
+  color: #4a4a4a; /* Dark gray text */
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  transition: all 0.3s ease;
+}
+
+.koi-image:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
+}
+
+.featured-sections {
+  display: flex;
+  justify-content: space-between;
+  margin: 4rem auto;
+  gap: 2rem;
+  max-width: 1200px;
+  padding: 0 2rem;
+}
+
+.featured-section {
+  flex-basis: calc(33.333% - 1.33rem);
+  background-color: #ffffff; /* White background */
+  color: #4a4a4a; /* Dark gray text */
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(255, 153, 102, 0.1); /* Softer orange shadow */
+  transition: all 0.3s ease;
+  border: 2px solid #ff9966; /* Softer orange border */
+}
+
+.featured-section:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 12px 20px rgba(255, 153, 102, 0.2); /* Softer orange shadow */
+}
+
+.featured-section h3 {
+  color: #ff9966; /* Softer orange heading */
+  margin-top: 0;
+  font-size: 1.5rem;
+}
+
+.featured-section a {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.7rem 1.2rem;
+  background-color: #ff9966; /* Softer orange button */
+  color: #ffffff; /* White text */
+  border-radius: 50px;
+  transition: all 0.3s ease;
+}
+
+.featured-section a:hover {
+  background-color: #ffb380; /* Lighter soft orange on hover */
+  transform: translateY(-2px);
+}
+
+.koi-facts {
+  background-color: #ff9966; /* Softer orange background */
+  padding: 4rem 2rem;
+  margin-top: 4rem;
+  border-radius: 12px;
+  color: #ffffff; /* White text */
+}
+
+.koi-facts h2 {
+  color: #ffffff; /* White text */
+}
+
+.fact-container {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
+.fact {
+  flex-basis: 30%;
+  background-color: #ffffff; /* White background */
+  color: #4a4a4a; /* Dark gray text */
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  transition: all 0.3s ease;
+}
+
+.fact:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
+}
+
+.fact h3 {
+  color: #ff9966; /* Softer orange heading */
+  margin-bottom: 0.5rem;
+  font-size: 1.3rem;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .hero h1 {
+    font-size: 2.5rem;
+  }
+  
+  .hero p {
+    font-size: 1.2rem;
+  }
+  
+  .featured-sections {
+    flex-direction: column; /* Stack sections vertically */
+  }
+  
+  .featured-section, .fact {
+    flex-basis: 100%; /* Full width for smaller screens */
+  }
+  
+  .koi-image {
+    flex-basis: 100%; /* Full width for smaller screens */
+  }
+  
+  .fact {
+    flex-basis: 100%; /* Full width for smaller screens */
+  }
+}
+
+.schedule-exam {
+  background-color: #ffffff;
+  padding: 2rem;
+  margin: 4rem auto;
+  max-width: 600px;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(255, 153, 102, 0.1);
+  text-align: center;
+}
+
+.schedule-exam h2 {
+  color: #ff9966;
+  margin-bottom: 1.5rem;
+}
+
+.schedule-exam h2:hover {
+  color: #0f0f00;
+}
+
+.schedule-exam a {
+  display: inline-block;
+  padding: 0.8rem 1.5rem;
+  background-color: #ff9966;
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 50px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(255, 153, 102, 0.2);
+}
+
+.schedule-exam a:hover {
+  background-color: #ffb380;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(255, 153, 102, 0.3);
+  color: #333;
+}
+
+.success-message {
+  color: #4CAF50;
+  margin-top: 1rem;
+}
+
+.faq-section {
+  background-color: #f9f9f9; /* Same background as featured sections */
+  border: 1px solid #ddd; /* Light border */
+  border-radius: 5px; /* Rounded corners */
+  padding: 15px; /* Padding inside the FAQ section */
+}
+
+.faq-item {
+  margin-bottom: 15px; /* Space between FAQ items */
+}
+
+.faq-item h4 {
+  margin: 0; /* Remove default margin */
+  cursor: pointer; /* Change cursor to pointer for interactivity */
+  color: #007bff; /* Link color */
+  transition: color 0.3s; /* Smooth color transition */
+}
+
+.faq-item h4:hover {
+  color: #0056b3; /* Darker color on hover */
+}
+
+.faq-item p {
+  margin: 5px 0 0; /* Margin for the answer */
+  color: #555; /* Darker text for answers */
+}
+
+.faq-form {
+  margin-top: 20px; /* Space above the form */
+  padding: 15px; /* Padding inside the form */
+}
+
+/* Styles for form headings */
+.faq-form h3 {
+  margin-bottom: 15px; /* Space below the heading */
+  color: #333; /* Darker text color for the heading */
+}
+
+/* Styles for form labels */
+.faq-form label {
+  display: block; /* Make labels block elements */
+  margin-bottom: 5px; /* Space below labels */
+  font-weight: bold; /* Bold text for labels */
+}
+
+/* Styles for input fields */
+.faq-form input,
+.faq-form textarea {
+  width: 100%; /* Full width */
+  padding: 10px; /* Padding inside the fields */
+  border: 1px solid #ccc; /* Light border */
+  border-radius: 4px; /* Rounded corners */
+  font-size: 16px; /* Font size */
+  transition: border-color 0.3s; /* Smooth transition for border color */
+}
+
+.faq-form textarea {
+  height: 100px; /* Set a height for the textarea */
+  resize: vertical; /* Allow vertical resizing */
+  vertical-align: top; /* Align text to the top */
+  padding-top: 10px; /* Add padding to the top for better spacing */
+}
+
+/* Focus styles for input fields */
+.faq-form input:focus,
+.faq-form textarea:focus {
+  border-color: #e2e9f1; /* Change border color on focus */
+  outline: none; /* Remove default outline */
+}
+
+
+/* Styles for the submit button */
+.faq-form button {
+  margin-top: 10px; /* Space above the button */
+  padding: 10px 15px; /* Padding inside the button */
+  background-color: #ff9966; /* Primary button color */
+  color: white; /* Text color */
+  border: none; /* Remove border */
+  border-radius: 4px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  font-size: 16px; /* Font size */
+  transition: background-color 0.3s; /* Smooth transition for background color */
+}
+
+
+/* Hover styles for the submit button */
+.faq-form button:hover {
+  background-color: #606060; /* Darker color on hover */
+}
