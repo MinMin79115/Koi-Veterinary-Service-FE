@@ -20,8 +20,10 @@ function getItem(label, key, icon, children) {
   };
 }
 
+
 const Manager = () => {
-  
+  const navigate = useNavigate();
+
   const [collapsed, setCollapsed] = useState(false);
   const [selectedKey, setSelectedKey] = useState('dashboard');
   const {
@@ -43,8 +45,6 @@ const Manager = () => {
     setSelectedKey(e.key);
   };
 
-  const navigate = useNavigate();
-
   const renderContent = () => {
     switch (selectedKey) {
       case 'dashboard':
@@ -61,7 +61,6 @@ const Manager = () => {
         return <div>Select an option</div>;
     }
   };
-
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>

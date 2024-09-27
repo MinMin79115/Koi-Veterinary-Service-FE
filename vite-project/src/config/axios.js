@@ -2,7 +2,7 @@ import axios from 'axios';
 import secureLocalStorage from 'react-secure-storage';
 
 const api = axios.create({
-    baseURL: 'http://localhost:8080/api/v1/auth/local',
+    baseURL: 'http://14.225.220.131:8080/api/',
 });
 
 api.interceptors.request.use(config => {

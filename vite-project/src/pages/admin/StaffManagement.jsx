@@ -1,109 +1,124 @@
 import React, { useState, useEffect } from 'react';
 import './StaffManagement.css';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { Button, Table, Modal, Form, Input, InputNumber } from 'antd';
+import { useForm } from 'antd/es/form/Form';
 
 const StaffManagement = () => {
-  const [staff, setStaff] = useState([]);
-  const [newStaff, setNewStaff] = useState({ name: '', position: '', email: '' });
-  const [editingId, setEditingId] = useState(null);
+  const api = 'https://66eec7d23ed5bb4d0bf1f314.mockapi.io/Students';
+
+  const [students, setStudents] = useState([]);
+  const [openModal, setOpenModal] = useState(false);
+  const [form] = useForm();
+  const [submitting, setSubmitting] = useState(false);
+
+  const fetchStudent = async () => {
+    //Lấy dữ liệu từ be
+    const res = await axios.get(api);
+
+    console.log(res.data)
+    setStudents(res.data)
+  }
 
   useEffect(() => {
-    // In a real application, you would fetch staff data from an API here
-    const dummyStaff = [
-      { id: 1, name: 'John Doe', position: 'Veterinarian', email: 'john@example.com' },
-      { id: 2, name: 'Jane Smith', position: 'Technician', email: 'jane@example.com' },
-    ];
-    setStaff(dummyStaff);
+    //Chạy 1 hành động
+    //[] => chạy khi load trang lần đầu
+    //[number] => chạy mỗi khi number thay đổi
+    fetchStudent();
   }, []);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewStaff({ ...newStaff, [name]: value });
-  };
+  const columns = [
+    {
+      title: "ID",
+      dataIndex: "id",
+      key: "id",
+    },
+    {
+      titleName: "Name",
+      dataIndex: "name",
+      key: "name",
+    }, 
+    {
+      titleName: "Phone",
+      dataIndex: "phone",
+      key: "phone",
+    }, 
+    {
+      titleName: "Address",
+      dataIndex: "address",
+      key: "address",
+    },
+  ];
 
-  const handleAddStaff = () => {
-    if (newStaff.name && newStaff.position && newStaff.email) {
-      setStaff([...staff, { ...newStaff, id: Date.now() }]);
-      setNewStaff({ name: '', position: '', email: '' });
+  const handleOpenModal = () => {
+    setOpenModal(true);
+  }
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  }
+
+  const handleSubmitStudent = async (values) => {
+    //Xử lý thông tin student trong Form
+    //Post xuống API
+    console.log(values)
+    try {
+      setSubmitting(true);//loading
+      const res = await axios.post(api, values)
+      //Toast css for beautiful
+      toast.success("Successfully !")
+      setOpenModal(false)
+      form.resetFields()
+      fetchStudent();
+    } catch (err) {
+      toast.error(err)
+    } finally {
+      setSubmitting(false);
     }
-  };
+  }
 
-  const handleEditStaff = (id) => {
-    setEditingId(id);
-    const staffToEdit = staff.find(s => s.id === id);
-    setNewStaff(staffToEdit);
-  };
-
-  const handleUpdateStaff = () => {
-    setStaff(staff.map(s => s.id === editingId ? { ...newStaff, id: editingId } : s));
-    setEditingId(null);
-    setNewStaff({ name: '', position: '', email: '' });
-  };
-
-  const handleDeleteStaff = (id) => {
-    setStaff(staff.filter(s => s.id !== id));
-  };
 
   return (
-    <div className="staff-management">
-      <form className="staff-form">
-        <input
-          type="text"
-          name="name"
-          value={newStaff.name}
-          onChange={handleInputChange}
-          placeholder="Name"
-          required
-        />
-        <input
-          type="text"
-          name="position"
-          value={newStaff.position}
-          onChange={handleInputChange}
-          placeholder="Position"
-          required
-
-        />
-        <input
-          type="email"
-          name="email"
-          value={newStaff.email}
-          onChange={handleInputChange}
-          placeholder="Email"
-          required
-
-        />
-        {editingId ? (
-          <button onClick={handleUpdateStaff}>Update Staff</button>
-        ) : (
-          <button onClick={handleAddStaff}>Add Staff</button>
-        )}
-      </form>
-      <form action="
-      ">
-        <table className="staff-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Position</th>
-            <th>Email</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {staff.map((s) => (
-            <tr key={s.id}>
-              <td>{s.name}</td>
-              <td>{s.position}</td>
-              <td>{s.email}</td>
-              <td>
-                <button onClick={() => handleEditStaff(s.id)}>Edit</button>
-                <button onClick={() => handleDeleteStaff(s.id)}>Delete</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      </form>
+    <div>
+      <Button onClick={handleOpenModal}>Create new student</Button>
+      <Table columns={columns} dataSource={students} />
+      {/* onCancel: Bấm ra ngoài thì hành động được chạy */}
+      {/* onOK: Chạy hàm trong Modal */}
+      <Modal onOk={() => form.submit()} title="Create new Student" open={openModal} onCancel={handleCloseModal}>
+        {/* name: tên biến trùng (phù hợp) với DB */}
+        {/* rule: Định nghĩa validation => [] */}
+        <Form onFinish={handleSubmitStudent} form={form}>
+          <Form.Item label="Staff name" name="name" rules={[
+            {
+              required: true,
+              message: "Please input name !"
+            }
+          ]}>
+            <Input />
+          </Form.Item>
+          <Form.Item label="Staff phone" name="phone" rules={[
+            {
+              required: true,
+              message: "Please input your staff phone!"
+            },
+            {
+              pattern: '^(0[1-9]{1}[0-9]{8}|(84[1-9]{1}[0-9]{8}))$',
+              message: "Invalid format!"
+            }
+          ]}>
+            <Input placeholder='+84' />
+          </Form.Item>
+          <Form.Item label="Adress" name="address" rules={[
+            {
+              required: true,
+              message: "Please input staff's address !"
+            }
+          ]}>
+            <Input />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };

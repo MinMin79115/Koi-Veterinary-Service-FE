@@ -1,14 +1,13 @@
 import React from 'react';
 import { useState } from 'react';
-
 import { Link } from 'react-router-dom';
 import koiImage1 from '../assets/koi-image1.jpg';
 import koiImage2 from '../assets/koi-image2.jpg';
 import koiImage3 from '../assets/koi-image3.jpg';
 import koiImage4 from '../assets/koi-image4.jpg';
 import '../components/Header.css';
-
 import './Home.css';
+
 
 const Home = () => {
 
@@ -55,7 +54,7 @@ const Home = () => {
 
   return (
     <div className="home">
-      
+
       <div className="hero">
         <h1>Discover the Art of KOI Fish Care</h1>
         <p>Create a serene and beautiful pond ecosystem for your KOI</p>
@@ -101,14 +100,14 @@ const Home = () => {
           </div>
           <div className="fact">
             <h3>Fish Physical Exams</h3>
-              <p>All fish seen by our service are given thorough and complete physical exams. All fish are captured in a safe and efficient manner and usually given sedatives to make the experience low stress.
+            <p>All fish seen by our service are given thorough and complete physical exams. All fish are captured in a safe and efficient manner and usually given sedatives to make the experience low stress.
             </p>
             <Link to="/services">Learn More</Link>
 
           </div>
           <div className="fact">
             <h3>Online Consultation</h3>
-            <p>We offer online consultations for those who are unable to bring their fish to us for an exam. We will need photos and any information you would like us to address. 
+            <p>We offer online consultations for those who are unable to bring their fish to us for an exam. We will need photos and any information you would like us to address.
             </p>
             <Link to="/services">Learn More</Link>
           </div>
@@ -120,32 +119,32 @@ const Home = () => {
         <Link to="/booking">Schedule here.</Link>
       </div>
       <div>
-      <div className="faq-section">
-        <h3>Frequently Asked Questions</h3>
-        {faqs.map((faq, index) => (
-          <div className="faq-item" key={index}>
-            <h4>{faq.question}</h4>
-            <p>{faq.answer}</p>
-          </div>
-        ))}
-      </div>
-
-      <form onSubmit={handleAddFAQ} className="faq-form">
-        <h3>Add your FAQ</h3>
-        <div>
-          <label htmlFor="question">Question:</label>
-          <input
-            type="text"
-            id="question"
-            value={newQuestion}
-            onChange={(e) => setNewQuestion(e.target.value)}
-            required
-          />
+        <div className="faq-section">
+          <h3>Frequently Asked Questions</h3>
+          {faqs.map((faq, index) => (
+            <div className="faq-item" key={index}>
+              <h4>{faq.question}</h4>
+              <p>{faq.answer}</p>
+            </div>
+          ))}
         </div>
-        
-        <button type="submit">Add FAQ</button>
-      </form>
-    </div>
+
+        <form onSubmit={handleAddFAQ} className="faq-form">
+          <h3>Add your FAQ</h3>
+          <div>
+            <label htmlFor="question">Question:</label>
+            <input
+              type="text"
+              id="question"
+              value={newQuestion}
+              onChange={(e) => setNewQuestion(e.target.value)}
+              required
+            />
+          </div>
+
+          <button type="submit">Add FAQ</button>
+        </form>
+      </div>
     </div>
   );
 };
