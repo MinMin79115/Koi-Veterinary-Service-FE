@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import './CustomerPage.css'; // Make sure to create this CSS file
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -26,7 +27,8 @@ function CustomerPage() {
     setAddress(user.address);
     setPhoneNumber(user.phone);
     setPassword("***");
-  }, []);
+  }, [user.address, user.fullname, user.phone]);
+
   const handleAvatarChange = (event) => {
     const file = event.target.files[0];
     if (file) {
