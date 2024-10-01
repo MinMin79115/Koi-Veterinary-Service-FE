@@ -57,7 +57,7 @@ function App() {
           <Route index element={<Home />} />
           <Route path="/services" element={<Services />} />
           <Route path="/care-guide" element={<CareGuide />} />
-          <Route path="/water-qua lity" element={<WaterQuality />} />
+          <Route path="/water-quality" element={<WaterQuality />} />
           <Route path="/fish-types" element={<FishTypes />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/customer-profile" element={<CustomerPage />} />
