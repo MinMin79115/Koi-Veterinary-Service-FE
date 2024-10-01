@@ -1,98 +1,15 @@
 .staffProfile {
-<<<<<<< Updated upstream
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-=======
   max-width: 600px;
   margin: 2rem auto;
   padding: 2rem;
   background-color: #ffffff;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
->>>>>>> Stashed changes
   font-family: Arial, sans-serif;
 }
 
 .title {
   color: #333;
-<<<<<<< Updated upstream
-  border-bottom: 2px solid #333;
-  padding-bottom: 10px;
-}
-
-.section {
-  margin-top: 30px;
-}
-
-.sectionTitle {
-  color: #444;
-  margin-bottom: 15px;
-}
-
-.form {
-  display: flex;
-  margin-bottom: 20px;
-}
-
-.input {
-  flex-grow: 1;
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ddd;
-  border-radius: 4px 0 0 4px;
-}
-
-.button {
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 0 4px 4px 0;
-  cursor: pointer;
-}
-
-.button:hover {
-  background-color: #0056b3;
-}
-
-.serviceList {
-  list-style-type: none;
-  padding: 0;
-}
-
-.serviceItem {
-  background-color: #f8f9fa;
-  margin-bottom: 10px;
-  padding: 10px;
-  border-radius: 4px;
-}
-
-.bookingRequest {
-  background-color: #f8f9fa;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 15px;
-  margin-bottom: 15px;
-}
-
-.bookingInfo {
-  margin: 5px 0;
-}
-
-.acceptButton {
-  background-color: #28a745;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.acceptButton:hover {
-  background-color: #218838;
-=======
   text-align: center;
   margin-bottom: 2rem;
 }
@@ -186,5 +103,4 @@
   .staffProfile {
     padding: 1rem;
   }
->>>>>>> Stashed changes
 }
