@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.js';
 import styles from './CustomerPage.module.css';
 
 function CustomerPage() {
@@ -65,75 +66,94 @@ function CustomerPage() {
   }
 
   return (
-    <div className={styles.customerProfile}>
-      <h2 className={styles.title}>Customer Profile</h2>
-      {error && <div className={styles.error}>{error}</div>}
-      {successMessage && <div className={styles.success}>{successMessage}</div>}
-      <div className={styles.profileContent}>
-        <form onSubmit={handleSubmit} className={styles.profileForm}>
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Full Name</label>
-            <input 
-              type="text" 
-              className={styles.formControl} 
-              name="fullName" 
-              value={customer.fullName} 
-              onChange={handleInputChange} 
-              required 
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Email</label>
-            <input 
-              type="email" 
-              className={styles.formControl} 
-              name="email" 
-              value={customer.email} 
-              onChange={handleInputChange} 
-              required 
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Phone Number</label>
-            <input 
-              type="tel" 
-              className={styles.formControl} 
-              name="phoneNumber" 
-              value={customer.phoneNumber} 
-              onChange={handleInputChange} 
-              required 
-              pattern="[0-9]{10}" 
-              title="Please enter a valid 10-digit phone number" 
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Address</label>
-            <input 
-              type="text" 
-              className={styles.formControl} 
-              name="address" 
-              value={customer.address} 
-              onChange={handleInputChange} 
-              required 
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Password</label>
-            <input 
-              type="password" 
-              className={styles.formControl} 
-              name="password" 
-              value={customer.password} 
-              onChange={handleInputChange} 
-              required 
-            />
-          </div>
-          <div className={styles.buttonContainer}>
-            <button className={styles.profileButton} type="submit" disabled={isLoading}>
-              {isLoading ? 'Updating...' : 'Save Changes'}
-            </button>
-          </div>
-        </form>
+    <div className={`bg-white shadow`} id="page-content">
+      <div className={`${styles.padding} m-5`}>
+        <div className={`row container d- flex justify-content-center `}>
+            <div className={`${styles.card} ${styles.userCardFull}`}>
+              <div className={`row ${styles.mL0} ${styles.mR0}`}>
+                <div className={`col-sm-4 ${styles.bgCLiteGreen} ${styles.userProfile}`}>
+                  <div className={`${styles.cardBlock} text-center text-white`}>
+                    <div className={styles.mB25}>
+                      <img src="https://img.icons8.com/bubbles/100/000000/user.png" className={styles.imgRadius} alt="User-Profile" />
+                    </div>
+                    <h6 className={styles.fW600}>{customer.fullName}</h6>
+                    <p>Customer</p>
+                  </div>
+                </div>
+                <div className="col-sm-8">
+                  <div className={styles.cardBlock}>
+                    <h3 className={`mb-2 ${styles.pB5} ${styles.bBDefault} ${styles.fW600}`}>Information</h3>
+                    <form onSubmit={handleSubmit} >
+                      <div className={`row`}>
+                        <div className={`col-md-12`}>
+                          <div className={styles.formGroup}>
+                            <p className={`${styles.mB10} ${styles.fW600}`}>Full Name</p>
+                            <input
+                              type="text"
+                              className={`${styles.formControl} ${styles.textMuted} ${styles.fW400}`}
+                              name="fullName"
+                              value={customer.fullName}
+                              onChange={handleInputChange}
+                              required
+                            />
+                          </div>
+                        </div>
+                        <div className={`col-md-6`}>
+                          <div className={styles.formGroup}>
+                            <p className={`mb-1 ${styles.fW600}`}>Email</p>
+                            <input
+                              type="email"
+                              className={`${styles.formControl} ${styles.textMuted} ${styles.fW400}`}
+                              name="email"
+                              value={customer.email}
+                              onChange={handleInputChange}
+                              required
+                            />
+                          </div>
+                        </div>
+                        <div className={`col-md-6 mx-auto`}>
+                          <div className={styles.formGroup}>
+                            <p className={`mb-1 ${styles.fW600}`}>Phone</p>
+                            <input
+                              type="tel"
+                              className={`${styles.formControl} ${styles.textMuted} ${styles.fW400}`}
+                              name="phoneNumber"
+                              value={customer.phoneNumber}
+                              onChange={handleInputChange}
+                              required
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div className={`row`}>
+                        <div className={`col-md-12`}>
+                          <div className={styles.formGroup}>
+                            <p className={`${styles.mB10} ${styles.fW600}`}>Address</p>
+                            <input
+                              type="text"
+                              className={`${styles.formControl} ${styles.textMuted} ${styles.fW400}`}
+                              name="address"
+                              value={customer.address}
+                              onChange={handleInputChange}
+                              required
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      {error && <div className={styles.error}>{error}</div>}
+                      {successMessage && <div className={styles.success}>{successMessage}</div>}
+                      <div className={styles.mT20}>
+                        <button type="submit" className={styles.updateButton} disabled={isLoading}>
+                          {isLoading ? 'Updating...' : 'Update Profile'}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+        </div>
       </div>
     </div>
   );
