@@ -1,0 +1,157 @@
+.customerProfile {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #ffffff;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  font-family: 'Arial', sans-serif;
+}
+
+.title {
+  color: #333333;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.loading {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #666666;
+}
+
+.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  border: 1px solid #f5c6cb;
+}
+
+.success {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  border: 1px solid #c3e6cb;
+}
+
+.profileContent {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.avatarSection {
+  flex: 0 0 100%;
+  max-width: 200px;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.avatarPreview {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #007bff;
+  margin-bottom: 1rem;
+}
+
+.avatarInput {
+  display: none;
+}
+
+.avatarUploadLabel {
+  background-color: #28a745;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease;
+}
+
+.avatarUploadLabel:hover {
+  background-color: #218838;
+}
+
+.profileForm {
+  flex: 1;
+  min-width: 300px;
+}
+
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  color: #495057;
+}
+
+.formControl {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.formControl:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.buttonContainer {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.profileButton {
+  background-color: #007bff;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.profileButton:hover {
+  background-color: #0056b3;
+}
+
+.profileButton:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5);
+}
+
+.profileButton:active {
+  background-color: #004085;
+}
+
+.profileButton:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .customerProfile {
+    padding: 1rem;
+  }
+  
+  .avatarSection {
+    max-width: 100%;
+    margin-bottom: 1rem;
+  }
+}

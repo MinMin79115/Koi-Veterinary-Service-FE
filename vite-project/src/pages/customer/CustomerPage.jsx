@@ -1,79 +1,140 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import './CustomerPage.css';
 import { useLocation } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import styles from './CustomerPage.module.css';
 
 function CustomerPage() {
-
   const location = useLocation();
+  const [customer, setCustomer] = useState({
+    fullName: '',
+    address: '',
+    phoneNumber: '',
+    email: '',
+    password: ''
+  });
+  const [avatar, setAvatar] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     if (location.hash === '#profile') {
       window.scrollTo(0, 180);
     }
+    const user = JSON.parse(sessionStorage.getItem("userToken"));
+    if (user) {
+      setCustomer({
+        fullName: user.fullname,
+        address: user.address,
+        phoneNumber: user.phone,
+        email: user.email,
+        password: "***"
+      });
+      setIsLoading(false);
+    }
   }, [location]);
 
-  const [avatar, setAvatar] = useState(null);
-  const [fullName, setFullName] = useState('');
-  const [address, setAddress] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [password, setPassword] = useState('');
-  const user = JSON.parse(sessionStorage.getItem("userToken"));
-  useEffect(() => {
-    setFullName(user.fullname);
-    setAddress(user.address);
-    setPhoneNumber(user.phone);
-    setPassword("***");
-  }, [user.address, user.fullname, user.phone]);
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setCustomer(prevState => ({
+      ...prevState,
+      [name]: value
+    }));
+  };
 
-  const handleAvatarChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => setAvatar(e.target.result);
-      reader.readAsDataURL(file);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccessMessage('');
+    try {
+      setIsLoading(true);
+      // Here you would typically send the updated information to the server
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulating API call
+      console.log('Updated customer information:', customer);
+      setSuccessMessage('Profile updated successfully!');
+    } catch {
+      setError('Failed to update profile. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  if (isLoading) {
+    return <div className={styles.loading}>Loading...</div>;
+  }
+
   return (
-    <div className="customer-page">
-      <div className="stats">
-      <div className="avatar-section">
-            <img src={avatar || '/default-avatar.png'} alt="Avatar" className="avatar-preview" />
-            <input type="file" id="avatar-upload" accept="image/*" onChange={handleAvatarChange} />
+    <div className={styles.customerProfile}>
+      <h2 className={styles.title}>Customer Profile</h2>
+      {error && <div className={styles.error}>{error}</div>}
+      {successMessage && <div className={styles.success}>{successMessage}</div>}
+      <div className={styles.profileContent}>
+        <form onSubmit={handleSubmit} className={styles.profileForm}>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Full Name</label>
+            <input 
+              type="text" 
+              className={styles.formControl} 
+              name="fullName" 
+              value={customer.fullName} 
+              onChange={handleInputChange} 
+              required 
+            />
           </div>
-          <div className='justify-content-center align-items-center d-flex '>
-                <label htmlFor="avatar-upload" className="avatar-upload-label my-3">Change Avatar</label>
-                
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Email</label>
+            <input 
+              type="email" 
+              className={styles.formControl} 
+              name="email" 
+              value={customer.email} 
+              onChange={handleInputChange} 
+              required 
+            />
           </div>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Phone Number</label>
+            <input 
+              type="tel" 
+              className={styles.formControl} 
+              name="phoneNumber" 
+              value={customer.phoneNumber} 
+              onChange={handleInputChange} 
+              required 
+              pattern="[0-9]{10}" 
+              title="Please enter a valid 10-digit phone number" 
+            />
+          </div>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Address</label>
+            <input 
+              type="text" 
+              className={styles.formControl} 
+              name="address" 
+              value={customer.address} 
+              onChange={handleInputChange} 
+              required 
+            />
+          </div>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Password</label>
+            <input 
+              type="password" 
+              className={styles.formControl} 
+              name="password" 
+              value={customer.password} 
+              onChange={handleInputChange} 
+              required 
+            />
+          </div>
+          <div className={styles.buttonContainer}>
+            <button className={styles.profileButton} type="submit" disabled={isLoading}>
+              {isLoading ? 'Updating...' : 'Save Changes'}
+            </button>
+          </div>
+        </form>
       </div>
-      <div className="customer-profile">
-        <h1 className='text-center'>My Profile</h1>
-        <div className="profile-content">
-          <form className="profile-form">
-            <div className="form-customer">
-              <label htmlFor="fullName">Full Name</label>
-              <input type="text" id="fullName" name="fullname" value={fullName} onChange={(e) => setFullName(e.target.value)} />
-            </div>
-            <div className="form-customer">
-              <label htmlFor="address">Address</label>
-              <input type="text" id="address" name="address" value={address} onChange={(e) => setAddress(e.target.value)} />
-            </div>
-            <div className="form-customer">
-              <label htmlFor="phoneNumber">Phone Number</label>
-              <input type="tel" id="phoneNumber" name="phone" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
-            </div>
-            <div className="form-customer">
-              <label htmlFor="password">Password</label>
-              <input type="password" id="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-            </div>
-            <button type="submit" className="save-button">Save Changes</button>
-          </form>
-        </div>
-      </div>
-      
     </div>
   );
 }
