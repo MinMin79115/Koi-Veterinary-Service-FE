@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import styles from './StaffProfile.module.css';
 import axios from 'axios';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import styles from './StaffProfile.module.css';
 
 const StaffProfile = () => {
   const [loggedInStaff, setLoggedInStaff] = useState({
@@ -8,7 +9,8 @@ const StaffProfile = () => {
     name: '',
     phone: '',
     address: '',
-    role: ''
+    role: '',
+    email: ''
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -46,8 +48,6 @@ const StaffProfile = () => {
     setError('');
     setSuccessMessage('');
     try {
-      // Here you would typically send the updated information to the server
-      // For now, we'll just simulate an API call with a timeout
       setIsLoading(true);
       await new Promise(resolve => setTimeout(resolve, 1000));
       console.log('Updated staff information:', loggedInStaff);
@@ -65,72 +65,95 @@ const StaffProfile = () => {
 
   return (
     <div className={styles.staffProfile}>
-      <h1 className={styles.title}>Staff Profile</h1>
-
+      <h2 className={styles.title}>Staff Profile</h2>
       {error && <div className={styles.error}>{error}</div>}
       {successMessage && <div className={styles.success}>{successMessage}</div>}
-
-      <form onSubmit={handleSubmit} className={styles.staffForm}>
-        <div className={styles.formGroup}>
-          <label htmlFor="id">ID:</label>
-          <input
-            type="text"
-            id="id"
-            name="id"
-            value={loggedInStaff.id}
-            readOnly
-            className={styles.readOnlyInput}
-          />
+      <div className="row">
+        <div className="col-md-4">
+          <div className={styles.avatarSection}>
+            <img 
+              src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" 
+              alt="Staff" 
+              className={styles.avatarPreview} 
+            />
+          </div>
         </div>
-        <div className={styles.formGroup}>
-          <label htmlFor="name">Name:</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={loggedInStaff.name}
-            onChange={handleInputChange}
-            required
-          />
+        <div className="col-md-8">
+          <form onSubmit={handleSubmit}>
+            <div className="row">
+              <div className="col-md-6 mb-3">
+                <label className={styles.labels}>Name</label>
+                <input 
+                  type="text" 
+                  className={styles.formControl} 
+                  name="name" 
+                  value={loggedInStaff.name} 
+                  onChange={handleInputChange} 
+                  required 
+                />
+              </div>
+              <div className="col-md-6 mb-3">
+                <label className={styles.labels}>Staff ID</label>
+                <input 
+                  type="text" 
+                  className={`${styles.formControl} ${styles.readOnlyInput}`} 
+                  value={loggedInStaff.id} 
+                  readOnly 
+                />
+              </div>
+            </div>
+            <div className="mb-3">
+              <label className={styles.labels}>Email</label>
+              <input 
+                type="email" 
+                className={styles.formControl} 
+                name="email" 
+                value={loggedInStaff.email} 
+                onChange={handleInputChange} 
+                required 
+              />
+            </div>
+            <div className="mb-3">
+              <label className={styles.labels}>Phone Number</label>
+              <input 
+                type="tel" 
+                className={styles.formControl} 
+                name="phone" 
+                value={loggedInStaff.phone} 
+                onChange={handleInputChange} 
+                required 
+                pattern="[0-9]{10}" 
+                title="Please enter a valid 10-digit phone number" 
+              />
+            </div>
+            <div className="mb-3">
+              <label className={styles.labels}>Address</label>
+              <input 
+                type="text" 
+                className={styles.formControl} 
+                name="address" 
+                value={loggedInStaff.address} 
+                onChange={handleInputChange} 
+                required 
+              />
+            </div>
+            <div className="mb-3">
+              <label className={styles.labels}>Role</label>
+              <input 
+                type="text" 
+                className={`${styles.formControl} ${styles.readOnlyInput}`} 
+                value={loggedInStaff.role} 
+                readOnly 
+              />
+            </div>
+            <div className="text-center mt-4">
+              <button className={styles.profileButton} type="submit" disabled={isLoading}>
+                {isLoading ? 'Updating...' : 'Save Changes'}
+              </button>
+            </div>
+          </form>
         </div>
-        <div className={styles.formGroup}>
-          <label htmlFor="phone">Phone:</label>
-          <input
-            type="tel"
-            id="phone"
-            name="phone"
-            value={loggedInStaff.phone}
-            onChange={handleInputChange}
-            required
-            pattern="[0-9]{10}"
-            title="Please enter a valid 10-digit phone number"
-          />
-        </div>
-        <div className={styles.formGroup}>
-          <label htmlFor="address">Address:</label>
-          <textarea
-            id="address"
-            name="address"
-            value={loggedInStaff.address}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-        <div className={styles.formGroup}>
-          <label htmlFor="role">Role:</label>
-          <input
-            type="text"
-            id="role"
-            name="role"
-            value={loggedInStaff.role}
-            readOnly
-            className={styles.readOnlyInput}
-          />
-        </div>
-        <button type="submit" className={styles.submitButton} disabled={isLoading}>
-          {isLoading ? 'Updating...' : 'Update Profile'}
-        </button>
-      </form>
+      </div>
     </div>
   );
 };

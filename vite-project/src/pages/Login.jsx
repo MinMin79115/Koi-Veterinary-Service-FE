@@ -35,7 +35,7 @@ const Login = () => {
       const {role} = response.data
       const userProfile = response.data;
       sessionStorage.setItem("userToken",JSON.stringify(userProfile))
-      if(role === 'CUSTOMER' || role === null){
+      if(role === 'CUSTOMER' || role ==='VETERIAN' || role === null ){
         navigate('/')
       }else if(role === 'ADMIN'){
         navigate('/manager')
