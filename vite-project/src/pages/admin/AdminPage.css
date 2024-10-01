@@ -1,0 +1,33 @@
+.admin-container {
+    padding: 20px; /* Add padding around the container */
+    background-color: #f9f9f9; /* Light background color */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.admin-avatar {
+    width: 100px; /* Set width for the avatar */
+    height: 100px; /* Set height for the avatar */
+    border-radius: 50%; /* Make the avatar circular */
+    margin-bottom: 15px; /* Space below the avatar */
+}
+
+.admin-info {
+    font-size: 16px; /* Font size for the info text */
+    color: #333; /* Dark text color */
+}
+
+.admin-role {
+    font-weight: bold; /* Bold for the role */
+    color: #007bff; /* Blue color for the role */
+}
+
+.dashboard-container {
+    padding: 20px; /* Add padding around the container */
+    background-color: #f9f9f9; /* Light background color */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+
+

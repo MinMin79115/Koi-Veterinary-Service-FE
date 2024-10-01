@@ -1,0 +1,61 @@
+.about-us {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.about-us h1 {
+  color: #ff9966;
+  margin-bottom: 2rem;
+}
+
+.vet-container {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.vet-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  width: 300px;
+  transition: transform 0.3s ease;
+}
+
+.vet-card:hover {
+  transform: translateY(-5px);
+}
+
+.vet-card img {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 1rem;
+}
+
+.vet-card h2 {
+  color: #ff9966;
+  margin-bottom: 0.5rem;
+}
+
+.vet-card p {
+  color: #4a4a4a;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .vet-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .vet-card {
+    width: 100%;
+    max-width: 300px;
+  }
+}

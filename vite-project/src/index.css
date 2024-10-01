@@ -1,0 +1,34 @@
+body {
+  background-color: #fff9f5; /* Very light orange background */
+  color: #4a4a4a;
+  /* ... keep other styles ... */
+}
+
+.main-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+h1, h2, h3 {
+  color: #ff9966; /* Softer orange for headings */
+}
+
+a {
+  color: #ff9966; /* Softer orange for links */
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: #ffb380; /* Lighter soft orange on hover */
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
