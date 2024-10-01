@@ -1,8 +1,15 @@
+<<<<<<< Updated upstream
+=======
+// eslint-disable-next-line no-unused-vars
+>>>>>>> Stashed changes
 import React, { useState, useEffect } from 'react';
 import './CustomerPage.css'; // Make sure to create this CSS file
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+<<<<<<< Updated upstream
 import './CustomerPage.css';
+=======
+>>>>>>> Stashed changes
 import { useLocation } from 'react-router-dom';
 
 function CustomerPage() {
@@ -26,7 +33,12 @@ function CustomerPage() {
     setAddress(user.address);
     setPhoneNumber(user.phone);
     setPassword("***");
+<<<<<<< Updated upstream
   }, []);
+=======
+  }, [user.address, user.fullname, user.phone]); // Added missing dependencies
+
+>>>>>>> Stashed changes
   const handleAvatarChange = (event) => {
     const file = event.target.files[0];
     if (file) {
