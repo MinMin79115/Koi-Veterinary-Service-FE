@@ -4,9 +4,9 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { Button, Table, Modal, Form, Input, Popconfirm } from 'antd';
 import { useForm } from 'antd/es/form/Form';
-
+import api from '../../config/axios';
 const ServiceManagement = () => {
-    const api = 'https://66eec7d23ed5bb4d0bf1f314.mockapi.io/Services';
+    // const api = 'https://66eec7d23ed5bb4d0bf1f314.mockapi.io/Services';
 
     const [services, setServices] = useState([]);
     const [openModal, setOpenModal] = useState(false);
@@ -127,7 +127,7 @@ const ServiceManagement = () => {
 
     return (
         <div>
-            <Button onClick={handleOpenModal}>Create new staff</Button>
+            <Button onClick={handleOpenModal}>Create new service</Button>
             <Input
                 placeholder="Search name"
                 prefix={<searchOutlined />}
@@ -137,7 +137,7 @@ const ServiceManagement = () => {
             <Table dataSource={filteredData} columns={columns} />
             {/* onCancel: Bấm ra ngoài thì hành động được chạy */}
             {/* onOK: Chạy hàm trong Modal */}
-            <Modal onOk={() => form.submit()} title="Create new service" open={openModal} onCancel={handleCloseModal}>
+            <Modal onOk={() => form.submit()} title="Services" open={openModal} onCancel={handleCloseModal}>
                 {/* name: tên biến trùng (phù hợp) với DB */}
                 {/* rule: Định nghĩa validation => [] */}
                 <Form onFinish={handleSubmitServices} form={form}>

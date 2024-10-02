@@ -10,7 +10,7 @@ import FishTypes from './pages/about/FishTypes';
 import Contact from './pages/about/Contact';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import CustomerPage from './pages/customer/customerPage';
+import CustomerPage from './pages/customer/CustomerPage';
 import StaffPage from './pages/admin/StaffProfile';
 import Booking from './pages/service/Booking';
 import Services from './pages/service/Services';
@@ -19,7 +19,7 @@ import AboutUs from './pages/about/AboutUs'; // Add this line
 import StaffManagement from './pages/admin/StaffManagement';
 import NotFound from './pages/NotFound';
 import BookingPage from './pages/admin/BookingPage';
-
+import ServiceManagement from './pages/admin/ServiceManagement';
 function App() {
   return (
     <Router>
@@ -48,6 +48,7 @@ function App() {
                   <Route path="/booking" element={<Booking />} />
                   <Route path="/about" element={<AboutUs />} />
                   <Route path="/booking-detail" element={<BookingPage/>}/>
+                  <Route path="/service-management" element={<ServiceManagement/>}/>
                 </Routes>
               </main>
             </div>
@@ -65,6 +66,7 @@ function App() {
           <Route path="/booking" element={<Booking />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/booking-detail" element={<BookingPage/>}/>
+          <Route path="/service-management" element={<ServiceManagement/>}/>
         </Route>
 
         {/* NotFound route without Header and Footer */}

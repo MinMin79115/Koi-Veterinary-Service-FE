@@ -9,24 +9,30 @@ import { Col, Row } from 'react-bootstrap';
 const Register = () => {
   const navigate = useNavigate()
 
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    phone: '',
-    fullname: ''
-  });
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [fullname, setFullname] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    const values = formData;
+    e.preventDefault();
+    if (password !== confirmPassword) {
+      toast.error("Passwords don't match!");
+      return;
+    }
+    const values = {
+      username,
+      email,
+      phone,
+      fullname,
+      password,
+      confirmPassword
+    };
+    
     try {
-      const response = await api.post('register', values)
+      const response = await api.post('auth/register', values)
       console.log(response);
       toast.success('Register Success !')
       navigate('/login')
@@ -48,8 +54,8 @@ const Register = () => {
                     type="text"
                     id="username"
                     name="username"
-                    value={formData.username}
-                    onChange={handleChange}
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     required
                   />
                 </div>
@@ -61,8 +67,8 @@ const Register = () => {
                     type="text"
                     id="fullname"
                     name="fullname"
-                    value={formData.fullname}
-                    onChange={handleChange}
+                    value={fullname}
+                    onChange={(e) => setFullname(e.target.value)}
                     required
                   />
                 </div>
@@ -74,8 +80,8 @@ const Register = () => {
                 type="email"
                 id="email"
                 name="email"
-                value={formData.email}
-                onChange={handleChange}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
@@ -85,8 +91,8 @@ const Register = () => {
                 type="number"
                 id="phone"
                 name="phone"
-                value={formData.phone}
-                onChange={handleChange}
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
                 placeholder='+84'
                 required
               />
@@ -99,8 +105,8 @@ const Register = () => {
                     type="password"
                     id="password"
                     name="password"
-                    value={formData.password}
-                    onChange={handleChange}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     required
                   />
                 </div>
@@ -112,8 +118,8 @@ const Register = () => {
                     type="password"
                     id="confirmPassword"
                     name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                     required
                   />
                 </div>

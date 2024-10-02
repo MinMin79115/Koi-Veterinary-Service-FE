@@ -12,18 +12,15 @@ const Login = () => {
   const navigate = useNavigate();
 
   
-  const [formData, setFormData] = useState({
-    phone: '',
-    password: ''
-  });
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const values = formData
+    const values = {
+      username,
+      password
+    }
     // Set the boolean value in secureLocalStorage
     //Lấy token
     //Check token exist
@@ -31,9 +28,10 @@ const Login = () => {
     //try catch finally
     //navigate to customer page
     try{
-      const response = await api.post('login', values);
-      const {role} = response.data
+      const response = await api.post('auth/login', values);
+      const {role, token} = response.data
       const userProfile = response.data;
+      sessionStorage.setItem("token",token)
       sessionStorage.setItem("userToken",JSON.stringify(userProfile))
       if(role === 'CUSTOMER' || role ==='VETERIAN' || role === null ){
         navigate('/')
@@ -57,7 +55,7 @@ const Login = () => {
         const token = credential.accessToken;
         // The signed-in user info.
         const user = result.user;
-        secureLocalStorage.setItem("userToken",token)
+        sessionStorage.setItem("userToken",token)
         // IdP data available using getAdditionalUserInfo(result)
         navigate("/")
       }).catch((error) => {
@@ -82,13 +80,13 @@ const Login = () => {
           <h2>Welcome Back</h2>
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-group">
-              <label htmlFor="phone">Username</label>
+              <label htmlFor="username">Username</label>
               <input
                 type="text"
-                id="phone"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
+                id="username"
+                name="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 required
               />
             </div>
@@ -98,8 +96,8 @@ const Login = () => {
                 type="password"
                 id="password"
                 name="password"
-                value={formData.password}
-                onChange={handleChange}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>

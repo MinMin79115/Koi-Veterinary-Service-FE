@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.js';
 import styles from './CustomerPage.module.css';
-
+import api from '../../api/axios';
 function CustomerPage() {
   const location = useLocation();
   const [customer, setCustomer] = useState({
@@ -14,6 +14,7 @@ function CustomerPage() {
     email: '',
     password: ''
   });
+  
   const [avatar, setAvatar] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -30,7 +31,7 @@ function CustomerPage() {
         address: user.address,
         phoneNumber: user.phone,
         email: user.email,
-        password: "***"
+        password: "********"
       });
       setIsLoading(false);
     }
@@ -51,7 +52,7 @@ function CustomerPage() {
     try {
       setIsLoading(true);
       // Here you would typically send the updated information to the server
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulating API call
+      await api.put(`api/customers/${customer.id}`, customer);
       console.log('Updated customer information:', customer);
       setSuccessMessage('Profile updated successfully!');
     } catch {
