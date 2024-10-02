@@ -34,7 +34,11 @@ const StaffProfile = () => {
     setSuccessMessage('');
     try {
       setIsLoading(true);
-      await api.put(`api/customers/${staffs.id}`, staffs);
+      await api.put(`api/customers/${staffs.id}`, staffs, {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`
+        }
+      });
       console.log('Updated staff information:', staffs);
       setSuccessMessage('Profile updated successfully!');
     } catch {

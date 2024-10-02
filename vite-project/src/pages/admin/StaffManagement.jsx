@@ -48,10 +48,21 @@ const StaffManagement = () => {
   const handleSubmitStaffs = async (values) => {
     //Xử lý thông tin trong Form
     //Post xuống API
-    console.log(values)
+    const valuesStaff = {
+      username: values.phone,
+      name: values.name,
+      phone: values.phone,
+      address: values.address,
+      password: "123456"
+    }
+    console.log(valuesStaff)
     try {
       setSubmitting(true);//loading
-      const res = await api.post('api/customers', values)
+      const res = await api.post('api/customers', valuesStaff, {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`
+        }
+      })
       //Toast css for beautiful
       toast.success("Successfully !")
       setOpenModal(false)

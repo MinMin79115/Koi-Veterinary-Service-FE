@@ -4,6 +4,7 @@ import './Booking.css';
 import { toast } from 'react-toastify';
 
 const Booking = () => {
+  const location = useLocation();
   const [type, setType] = useState('');
   const [service, setService] = useState('');
   const [slot, setSlot] = useState('');
@@ -19,8 +20,23 @@ const Booking = () => {
     '4pm-5pm': 'Dr. Anna Taylor',
   };
 
+  const fetchServices = async () => {
+    try {
+      const response = await api.get('api/services', {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`
+        }
+      });
+      setServices(response.data);
+    } catch (error) {
+      toast.error('Error fetching services:', error.response.data);
+    }
+  }
 
-  const location = useLocation();
+
+  useEffect(() => {
+    fetchServices();
+  }, []);
 
   useEffect(() => {
     if (location.hash === '#booking') {

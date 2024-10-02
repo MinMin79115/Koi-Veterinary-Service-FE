@@ -5,13 +5,12 @@ import './Auth.css';
 import { googleProvider } from '../config/firebase';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import api from '../config/axios';
-import secureLocalStorage from 'react-secure-storage';
 import { toast } from 'react-toastify';
 
 const Login = () => {
   const navigate = useNavigate();
 
-  
+  const [phone, setPhone] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -19,6 +18,7 @@ const Login = () => {
     e.preventDefault()
     const values = {
       username,
+      // phone,
       password
     }
     // Set the boolean value in secureLocalStorage
@@ -29,6 +29,8 @@ const Login = () => {
     //navigate to customer page
     try{
       const response = await api.post('auth/login', values);
+      // const response = await api.post('login', values);
+
       const {role, token} = response.data
       const userProfile = response.data;
       sessionStorage.setItem("token",token)
@@ -90,6 +92,17 @@ const Login = () => {
                 required
               />
             </div>
+            {/* <div className="form-group">
+              <label htmlFor="phone">Phone</label>
+              <input
+                type="text"
+                id="phone"
+                name="phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                required
+              />
+            </div> */}
             <div className="form-group">
               <label htmlFor="password">Password</label>
               <input
