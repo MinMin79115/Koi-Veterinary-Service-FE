@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import './StaffManagement.css';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { Button, Table, Modal, Form, Input, Popconfirm } from 'antd';
@@ -7,7 +6,6 @@ import { useForm } from 'antd/es/form/Form';
 import api from '../../config/axios';
 
 const StaffManagement = () => {
-  // const api = 'https://66eec7d23ed5bb4d0bf1f314.mockapi.io/Students';
 
   const [staffs, setStaffs] = useState([]);
   const [openModal, setOpenModal] = useState(false);
@@ -127,7 +125,11 @@ const StaffManagement = () => {
   //Delete staff
   const handleDelete = async (id) => {
     try {
-      await api.delete(`api/customers/${id}`);
+      await api.delete(`api/customers/${id}`, {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`
+        }
+      });
       toast.success("Delete successfully!");
       fetchStaffs();
     } catch (err) {
@@ -143,7 +145,7 @@ const StaffManagement = () => {
         placeholder="Search name"
         prefix={<searchOutlined />}
         onChange={(e) => handleSearch(e.target.value)}
-        style={{ margin: 16}}
+        style={{ margin: 16, width: '60%'}}
       />
       <Table dataSource={filteredData} columns={columns} />
       {/* onCancel: Bấm ra ngoài thì hành động được chạy */}

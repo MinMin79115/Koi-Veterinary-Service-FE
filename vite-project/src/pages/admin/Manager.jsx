@@ -4,14 +4,19 @@ import {
   PieChartOutlined,
   BarChartOutlined,
   UserOutlined,
+  CustomerServiceOutlined,
 } from '@ant-design/icons';
 import { Breadcrumb, Layout, Menu, theme } from 'antd';
 import StaffManagement from './StaffManagement';
 import Dashboard from './Dashboard';
 import AdminProfile from './AdminPage';
 import FAQManagement from './FAQ';
+import ServiceManagement from './ServiceManagement';
 const { Header, Content, Sider } = Layout;
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { logout } from '../../redux/features/userSlider';
+
 function getItem(label, key, icon, children) {
   return {
     key,
@@ -24,7 +29,7 @@ function getItem(label, key, icon, children) {
 
 const Manager = () => {
   const navigate = useNavigate();
-  
+  const dispatch = useDispatch();
   const [collapsed, setCollapsed] = useState(false);
   const [selectedKey, setSelectedKey] = useState('dashboard');
   const {
@@ -35,6 +40,7 @@ const Manager = () => {
     getItem('Dasboard', 'dashboard', <BarChartOutlined />),
     getItem('Manage Staff', 'staff', <PieChartOutlined />),
     getItem('Manage FAQ', 'faq', <DesktopOutlined />),
+    getItem('Manage Service', 'service', <CustomerServiceOutlined />),
     getItem('User', 'sub1', <UserOutlined />, [
       getItem('Profile', 'profile'),
       getItem('Logout', 'logout'),
@@ -54,9 +60,13 @@ const Manager = () => {
         return <StaffManagement />;
       case 'faq':
         return <FAQManagement />;
+      case 'service':
+        return <ServiceManagement />;
       case 'profile':
         return <AdminProfile />;
       case 'logout':
+        dispatch(logout())
+        sessionStorage.clear()
         return navigate('/login');
       default:
         return <div>Select an option</div>;
@@ -78,7 +88,7 @@ const Manager = () => {
         <Content style={{ margin: '0 16px' }}>
           <Breadcrumb style={{ margin: '16px 0' }}>
             <Breadcrumb.Item>Manager</Breadcrumb.Item>
-            <Breadcrumb.Item>{selectedKey === 'dashboard' ? 'Dashboard' : selectedKey === 'staff' ? 'Staff Management' : selectedKey === 'faq' ? 'FAQ Management' : 'User Profile'}</Breadcrumb.Item>
+            <Breadcrumb.Item>{selectedKey === 'dashboard' ? 'Dashboard' : selectedKey === 'staff' ? 'Staff Management' : selectedKey === 'faq' ? 'FAQ Management' : selectedKey === 'service' ? 'Service Management' : 'User Profile'}</Breadcrumb.Item>
           </Breadcrumb>
           <div
             style={{

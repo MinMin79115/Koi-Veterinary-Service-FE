@@ -4,10 +4,12 @@ import secureLocalStorage from "react-secure-storage";
 import koiLogo from '../assets/koi-logo.png'; // Import the image
 import './Header.css';
 import { FaRegUserCircle } from "react-icons/fa";
+import { logout } from '../redux/features/userSlider';
+import { useDispatch } from 'react-redux';
 
 const Header = () => {
+  const dispatch = useDispatch();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
@@ -23,6 +25,7 @@ const Header = () => {
   const handleLogout = () => {
     // Clear all items from secureLocalStorage
     sessionStorage.clear();
+    dispatch(logout())
     // Update state to reflect that the user is logged out
     setIsLoggedIn(false); // Update state on logout
     // Redirect to login page

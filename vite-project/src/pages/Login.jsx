@@ -6,10 +6,15 @@ import { googleProvider } from '../config/firebase';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import api from '../config/axios';
 import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { login } from '../redux/features/userSlider';
 
 const Login = () => {
-  const navigate = useNavigate();
 
+  //Lưu data vào redux: useDispatch,
+  //Lấy dữ liệu: useSelector,
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [phone, setPhone] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -17,8 +22,8 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     const values = {
-      username,
-      // phone,
+      // username,
+      phone,
       password
     }
     // Set the boolean value in secureLocalStorage
@@ -28,9 +33,9 @@ const Login = () => {
     //try catch finally
     //navigate to customer page
     try{
-      const response = await api.post('auth/login', values);
-      // const response = await api.post('login', values);
-
+      // const response = await api.post('auth/login', values);
+      const response = await api.post('login', values);
+      dispatch(login(response.data))
       const {role, token} = response.data
       const userProfile = response.data;
       sessionStorage.setItem("token",token)
@@ -81,7 +86,7 @@ const Login = () => {
         <div className="auth-form-container">
           <h2>Welcome Back</h2>
           <form onSubmit={handleSubmit} className="auth-form">
-            <div className="form-group">
+            {/* <div className="form-group">
               <label htmlFor="username">Username</label>
               <input
                 type="text"
@@ -91,8 +96,8 @@ const Login = () => {
                 onChange={(e) => setUsername(e.target.value)}
                 required
               />
-            </div>
-            {/* <div className="form-group">
+            </div> */}
+            <div className="form-group">
               <label htmlFor="phone">Phone</label>
               <input
                 type="text"
@@ -102,7 +107,7 @@ const Login = () => {
                 onChange={(e) => setPhone(e.target.value)}
                 required
               />
-            </div> */}
+            </div>
             <div className="form-group">
               <label htmlFor="password">Password</label>
               <input
