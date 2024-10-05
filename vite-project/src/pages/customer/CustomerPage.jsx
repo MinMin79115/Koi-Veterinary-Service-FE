@@ -6,9 +6,11 @@ import 'bootstrap/dist/js/bootstrap.js';
 import styles from './CustomerPage.module.css';
 import api from '../../config/axios';
 import { toast } from 'react-toastify';
+import { useSelector } from 'react-redux';
 
 function CustomerPage() {
   const location = useLocation();
+  const user = useSelector((state) => state.user)
   const [customer, setCustomer] = useState({
     fullName: '',
     address: '',
@@ -27,7 +29,7 @@ function CustomerPage() {
   }, [location]);
 
   useEffect(() => {
-    const user = JSON.parse(sessionStorage.getItem("userToken"));
+    // const user = JSON.parse(sessionStorage.getItem("userToken"));
     if (user) {
       setCustomer({
         fullName: user.fullname,
@@ -76,6 +78,7 @@ function CustomerPage() {
   }
 
   return (
+
     <div className={`bg-white shadow`} id="page-content">
       <div className={`${styles.padding} m-5`}>
         <div className={`row container d- flex justify-content-center `}>

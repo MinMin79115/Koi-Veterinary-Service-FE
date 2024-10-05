@@ -5,9 +5,10 @@ import koiLogo from '../assets/koi-logo.png'; // Import the image
 import './Header.css';
 import { FaRegUserCircle } from "react-icons/fa";
 import { logout } from '../redux/features/userSlider';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 const Header = () => {
+  const user = useSelector((state) => state.user); 
   const dispatch = useDispatch();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -18,8 +19,8 @@ const Header = () => {
     // if (checkLogin) {
     //   setIsLoggedIn(true);
     // }
-    const token = sessionStorage.getItem("userToken"); // Adjust the key as needed
-    setIsLoggedIn(!!token); // Set true if token exists
+    // Adjust the key as needed
+    setIsLoggedIn(!!user); // Set true if token exists
   }, []);
 
   const handleLogout = () => {

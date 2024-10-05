@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import "react-toastify/dist/ReactToastify.css";
 import { Link, useNavigate } from 'react-router-dom';
 import './Auth.css';
@@ -6,7 +6,7 @@ import { googleProvider } from '../config/firebase';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import api from '../config/axios';
 import { toast } from 'react-toastify';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { login } from '../redux/features/userSlider';
 
 const Login = () => {
@@ -15,6 +15,7 @@ const Login = () => {
   //Lấy dữ liệu: useSelector,
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
   const [phone, setPhone] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -33,7 +34,7 @@ const Login = () => {
     //try catch finally
     //navigate to customer page
     try{
-      // const response = await api.post('auth/login', values);
+      // const response = await api.post('login', values);
       const response = await api.post('login', values);
       dispatch(login(response.data))
       const {role, token} = response.data

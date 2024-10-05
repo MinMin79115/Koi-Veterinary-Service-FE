@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { toast } from 'react-toastify';
 import { Button, Table, Modal, Form, Input, Popconfirm } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 import api from '../../config/axios';
+import { useDispatch, useSelector } from 'react-redux';
 
 const ServiceManagement = () => {
     const api = 'https://66eec7d23ed5bb4d0bf1f314.mockapi.io/Students';
@@ -15,11 +17,12 @@ const ServiceManagement = () => {
     const [submitting, setSubmitting] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [editingService, setEditingService] = useState(null);
+    const dispatch = useDispatch();
 
     const fetchServices = async () => {
         //Lấy dữ liệu từ be
         try {
-            //   const response = await api.get('api/services', {
+            //   const response = await api.get('services', {
             //     headers: {
             //       Authorization: `Bearer ${sessionStorage.getItem('token')}`
             //     }
@@ -84,9 +87,12 @@ const ServiceManagement = () => {
         try {
             //   await axios.put(`api/services/${editingService.id}`, {
             //     name: editingService.name,
+            //     description: values.description
+
             //   });
             const res = await axios.put(`${api}/${editingService.id}`, {
                 name: values.name,
+                description: values.description
             });
             toast.success('Service updated successfully');
             fetchServices();
@@ -135,11 +141,16 @@ const ServiceManagement = () => {
             key: "name",
         },
         {
+            title: "Description",
+            dataIndex: "description",
+            key: "description",
+        },
+        {
             title: "Action",
             render: (_, record) => (
                 <div>
                     <>
-                        <Button type="primary" onClick={() => handleOpenModalEdit(record)} style={{ marginRight: 8 }}>
+                        <Button className='mx-1' type="primary" onClick={() => handleOpenModalEdit(record)} style={{ marginRight: 8 }}>
                             Edit Service
                         </Button>
                         <Popconfirm
@@ -181,20 +192,36 @@ const ServiceManagement = () => {
                     ]}>
                         <Input />
                     </Form.Item>
+                    <Form.Item label="Description" name="description" rules={[
+                        {
+                            required: true,
+                            message: "Please input description !"
+                        }
+                    ]}>
+                        <Input />
+                    </Form.Item>
                 </Form>
             </Modal>
             <Modal onOk={() => form.submit()} title="Edit service" open={openModalEdit} onCancel={handleCloseModal}>
                 {/* name: tên biến trùng (phù hợp) với DB */}
                 {/* rule: Định nghĩa validation => [] */}
                 <Form onFinish={updateService} form={form}>
-                    <Form.Item label="Service name" name="name" rules={[
-                        {
-                            required: true,
-                            message: "Please input name !"
-                        }
-                    ]}>
-                        <Input />
-                    </Form.Item>
+                        <Form.Item label="Service name" name="name" rules={[
+                            {
+                                required: true,
+                                message: "Please input name !"
+                            }
+                        ]}>
+                            <Input />
+                        </Form.Item>
+                        <Form.Item label="Description...." name="description" rules={[
+                            {
+                                required: true,
+                                message: "Please input description !"
+                            }
+                        ]}>
+                            <Input.TextArea rows={4} />
+                        </Form.Item>
                 </Form>
             </Modal>
         </div>

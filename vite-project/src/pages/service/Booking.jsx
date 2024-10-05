@@ -1,72 +1,146 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import './Booking.css';
 import { toast } from 'react-toastify';
+import axios from 'axios'
+import api from '../../config/axios';
+import { useSelector } from 'react-redux';
 
 const Booking = () => {
+  const apiDoctors = 'https://66fb49048583ac93b40b4dc0.mockapi.io/Doctors';
+  const apiService = 'https://66ff9fda4da5bd23755149e9.mockapi.io/Service';
+  const user = useSelector(state => state.user);
+  const navigate = useNavigate();
   const location = useLocation();
-  const [type, setType] = useState('');
-  const [service, setService] = useState('');
+  const [type, setType] = useState([]);
+  const [services, setServices] = useState([]);
   const [slot, setSlot] = useState('');
-  const [doctor, setDoctor] = useState('');
+  const [doctors, setDoctors] = useState([]);
+  const [selectedDoctor, setSelectedDoctor] = useState('');
+  const [selectedService, setSelectedService] = useState('');
+  const [availableTypes, setAvailableTypes] = useState([]);
+  const [values, setValues] = useState({
+    service_name: '',
+    type: type,
+    slot: '',
+    doctor_name: ''
+  })
 
-  const doctors = {
-    '9am-10am': 'Dr. John Smith',
-    '10am-11am': 'Dr. Emily Johnson',
-    '11am-12pm': 'Dr. Michael Brown',
-    '1pm-2pm': 'Dr. Sarah Davis',
-    '2pm-3pm': 'Dr. Lisa Wilson',
-    '3pm-4pm': 'Dr. David Lee',
-    '4pm-5pm': 'Dr. Anna Taylor',
-  };
+  const fetchDoctors = async () => {
+    try {
+      // const response = await api.get('api/doctors', {
+      //   headers: {
+      //     Authorization: `Bearer ${sessionStorage.getItem('token')}`
+      //   }
+      // })
+      const response = await axios.get(apiDoctors);
+      console.log(response.data);
+      setDoctors(response.data);
+    } catch (error) {
+      toast.error('Error fetching doctors:', error.response.data);
+    }
+  }
 
   const fetchServices = async () => {
     try {
-      const response = await api.get('api/services', {
-        headers: {
-          Authorization: `Bearer ${sessionStorage.getItem('token')}`
-        }
-      });
+      // const response = await api.get('api/services', {
+      //   headers: {
+      //     Authorization: `Bearer ${sessionStorage.getItem('token')}`
+      //   }
+      // });
+
+      const response = await axios.get(apiService);
+      {
+        response.data.map((service) => (
+          service.type = ['online', 'offline', 'at home']
+        ))
+      }
+      console.log(response.data)
+      console.log(type)
       setServices(response.data);
     } catch (error) {
       toast.error('Error fetching services:', error.response.data);
     }
   }
 
-
   useEffect(() => {
     fetchServices();
+    fetchDoctors();
   }, []);
 
   useEffect(() => {
     if (location.hash === '#booking') {
       window.scrollTo(90, 200);
     }
+
   }, [location]);
 
-  useEffect(() => {
-    // Set default type to "online-type" if the selected service is "interview"
-    if (service === "interview") {
-      setType("online-type");
-    } else if (service === "pond-quality") {
-      setType('at-home-type'); // Reset type if the service is not "interview"
-    } else {
-      setType('');
-    }
-  }, [service]);
+  const handleServiceChange = (e) => {
+    const serviceName = e.target.value;
+    setValues(prevValues => ({ ...prevValues, service_name: serviceName }));
+    setSelectedService(serviceName);
 
-  const handleSubmit = (e) => {
+    const selectedServiceObj = services.find(service => service.name === serviceName);
+    if (selectedServiceObj) {
+      setAvailableTypes(selectedServiceObj.type);
+      if (selectedServiceObj.type.length === 1) {
+        setType(selectedServiceObj.type[0]);
+        setValues(prevValues => ({ ...prevValues, type: selectedServiceObj.type[0] }));
+      } else {
+        setType('');
+        setValues(prevValues => ({ ...prevValues, type: '' }));
+      }
+    } else {
+      setAvailableTypes([]);
+      setType('');
+      setValues(prevValues => ({ ...prevValues, type: '' }));
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Booking submitted:', { type, service });
-    toast.success('Booking submitted successfully!');
-    setType('');
-    setService('');
+    if (user) {
+      //request all information of this booking
+      // form to booking detail and booking management
+      try {
+        // const response = await api.post(apiService, { type, service })
+        const response = await api.post('booking',values);
+        //   headers:
+        //   {
+        //     Authorization: `Bearer ${sessionStorage.getItem('token')}`
+        //   }
+        // });
+        console.log('Booking submitted:', values);
+        toast.success('Booking submitted successfully!');
+        setType('');
+        setServices('');
+        navigate("/booking-detail")
+      } catch (error) {
+        toast.error(error.response.data);
+      }
+    } else {
+      toast.error('Please login to book a service')
+      navigate("/login")
+    }
+
   };
 
   const handleSlotChange = (e) => {
-    const selectedSlot = e.target.value;
-    setSlot(selectedSlot);
-    setDoctor(doctors[selectedSlot] || ''); // Set doctor based on selected slot
+    const selectedValue = e.target.value;
+    if (selectedValue) {
+      const [selectedSlot, selectedDoctorName] = selectedValue.split('|');
+      setValues(prevValues => ({
+        ...prevValues,
+        slot: selectedSlot,
+        doctor_name: selectedDoctorName
+      }));
+      setSlot(selectedSlot);
+      setSelectedDoctor(selectedDoctorName);
+    } else {
+      setSlot('');
+      setSelectedDoctor('');
+      setValues(prevValues => ({ ...prevValues, slot: '', doctor_name: '' }));
+    }
   };
 
   return (
@@ -77,57 +151,77 @@ const Booking = () => {
           <label htmlFor="service">Services:</label>
           <select
             id="service"
-            value={service}
-            onChange={(e) => setService(e.target.value)}
+            value={selectedService}
+            onChange={handleServiceChange}
             required
           >
             <option value="">Select a service</option>
-            <option value="pond-quality">Pond Quality</option>
-            <option value="fish-health-check">Fish Health Check</option>
-            <option value="interview">Interview</option>
+            {services.map((service) => (
+              <option key={service.id} value={service.name}>
+                {service.name}
+              </option>
+            ))}
           </select>
         </div>
-        <div className="form-group-booking">
-          <label htmlFor="service-type">Service Type:</label>
-          <select
-            id="type"
-            value={type}
-            onChange={(e) => setType(e.target.value)}
-            required
-          >
-            <option value="online-type" disabled={service === "pond-quality"} >Online</option>
-            <option value="offline-type" disabled={service === "interview" || service === "pond-quality"}>At center</option>
-            <option value="at-home-type" disabled={service === "interview"}>At home</option>
-          </select>
-        </div>
+        {/* check availableType not null to choose type */}
+        {/* if availableType length = 1, show only 1 option */}
+        {/* if availableType length > 1, show all option */}
+        {availableTypes.length > 0 && (
+          <div className="form-group-booking">
+            <label htmlFor="services-type">Service Type:</label>
+            <select
+              id="type"
+              value={type}
+              onChange={(e) => {
+                setType(e.target.value);
+                setValues(prevValues => ({ ...prevValues, type: e.target.value }));
+              }}
+              required
+            >
+              {availableTypes.length === 1 ? (
+                <option value={availableTypes[0]}>{availableTypes[0]}</option>
+              ) : (
+                <>
+                  <option value="">Select a type</option>
+                  {availableTypes.map((serviceType) => (
+                    <option key={serviceType} value={serviceType}>
+                      {serviceType}
+                    </option>
+                  ))}
+                </>
+              )}
+            </select>
+          </div>
+        )}
+        {/* when I choose slot the docter name of this slot 
+        will be set in handleSlotChange func to show in screen */}
         <div className="form-group-booking">
           <label htmlFor="slot">Slot:</label>
           <select
             id="slot"
-            value={slot}
+            value={`${slot}|${selectedDoctor}`}
             onChange={handleSlotChange}
             required
           >
             <option value="">Select a Slot</option>
-            <option value="9am-10am">9:00 AM - 10:00 AM</option>
-            <option value="10am-11am">10:00 AM - 11:00 AM</option>
-            <option value="11am-12pm">11:00 AM - 12:00 PM</option>
-            <option value="1pm-2pm">1:00 PM - 2:00 PM</option>
-            <option value="2pm-3pm">2:00 PM - 3:00 PM</option>
-            <option value="3pm-4pm">3:00 PM - 4:00 PM</option>
-            <option value="4pm-5pm">4:00 PM - 5:00 PM</option>
-          </select>
+            {doctors.map((doctor) => (
+              <option key={doctor.id} value={`${doctor.workTime}|${doctor.name}`}>
+                {doctor.workTime}
+              </option>
+            ))}
 
-          {doctor && (
+          </select>
+          {/* Show doctor name when I have choosen slot above */}
+          {doctors && (
             <div className="form-group-booking">
               <div className="doctor">
-              <label htmlFor="doctor-information">Your doctor:</label>
-              <p>{doctor}</p>
-            </div>
+                <label htmlFor="doctor-information">Your doctor:</label>
+                <p>{selectedDoctor}</p>
+              </div>
             </div>
           )}
         </div>
-
+        {/* If user == null return /login page to confirm booking */}
         <button type="submit" className="submit-btn">Book Now</button>
       </form>
     </div>

@@ -6,6 +6,7 @@ import { useForm } from 'antd/es/form/Form';
 import api from '../../config/axios';
 
 const StaffManagement = () => {
+  const api = 'https://66eec7d23ed5bb4d0bf1f314.mockapi.io/Students';
 
   const [staffs, setStaffs] = useState([]);
   const [openModal, setOpenModal] = useState(false);
@@ -17,12 +18,14 @@ const StaffManagement = () => {
   const fetchStaffs = async () => {
     //Lấy dữ liệu từ be
     try {
-      const response = await api.get('api/customers', {
-        headers: {
-          Authorization: `Bearer ${sessionStorage.getItem('token')}`
-        }
-      });
-      setStaffs(response.data);
+      // const response = await api.get('customers', {
+      //   headers: {
+      //     Authorization: `Bearer ${sessionStorage.getItem('token')}`
+      //   }
+      // });
+      const res = await axios.get(api)
+      console.log(res.data)
+      setStaffs(res.data);
     } catch (error) {
       toast.error('Error fetching staffs:', error.response.data);
     }
@@ -56,11 +59,12 @@ const StaffManagement = () => {
     console.log(valuesStaff)
     try {
       setSubmitting(true);//loading
-      const res = await api.post('api/customers', valuesStaff, {
-        headers: {
-          Authorization: `Bearer ${sessionStorage.getItem('token')}`
-        }
-      })
+      // const res = await api.post('api/customers', valuesStaff, {
+      //   headers: {
+      //     Authorization: `Bearer ${sessionStorage.getItem('token')}`
+      //   }
+      // })
+      const res = await axios.post(api, valuesStaff)
       //Toast css for beautiful
       toast.success("Successfully !")
       setOpenModal(false)
@@ -125,11 +129,12 @@ const StaffManagement = () => {
   //Delete staff
   const handleDelete = async (id) => {
     try {
-      await api.delete(`api/customers/${id}`, {
-        headers: {
-          Authorization: `Bearer ${sessionStorage.getItem('token')}`
-        }
-      });
+      // await api.delete(`api/customers/${id}`, {
+      //   headers: {
+      //     Authorization: `Bearer ${sessionStorage.getItem('token')}`
+      //   }
+      // });
+      await axios.delete(`${api}/${id}`)
       toast.success("Delete successfully!");
       fetchStaffs();
     } catch (err) {

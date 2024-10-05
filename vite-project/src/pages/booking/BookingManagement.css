@@ -1,0 +1,22 @@
+.table-responsive {
+    overflow-x: auto;
+}
+
+.column-border {
+    border-right: 1px solid #dee2e6;
+}
+
+@media (max-width: 768px) {
+    .ant-table-cell {
+        padding: 8px 4px !important;
+    }
+
+    .btn {
+        padding: 4px 8px;
+        font-size: 12px;
+    }
+
+    .badge {
+        font-size: 10px;
+    }
+}

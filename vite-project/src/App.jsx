@@ -1,7 +1,5 @@
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { toast } from 'react-toastify'; // Make sure to import toast
-
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -13,15 +11,16 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import CustomerPage from './pages/customer/CustomerPage';
 import StaffPage from './pages/admin/StaffProfile';
+// import VeterianPage from '.pages/admin/VeterianProfile'
 import Booking from './pages/service/Booking';
 import Services from './pages/service/Services';
 import Manager from './pages/admin/Manager';
 import AboutUs from './pages/about/AboutUs'; // Add this line
 import StaffManagement from './pages/admin/StaffManagement';
 import NotFound from './pages/NotFound';
-import BookingPage from './pages/admin/BookingPage';
+import BookingManagement from './pages/booking/BookingManagement';
 import ServiceManagement from './pages/admin/ServiceManagement';
-
+import BookingDetail from './pages/booking/BookingDetail';
 function App() {
   const ProtectedRoute = ({ children }) => {
     const user = useSelector((state) => state.user);
@@ -34,7 +33,26 @@ function App() {
 
   const ProtectedRouteCustomer = ({ children }) => {
     const user = useSelector((state) => state.user);
-    if (user && user?.role === 'CUSTOMER' || user?.role === null ) {
+    if (user && user?.role === 'CUSTOMER') {
+      return children;
+    }else{
+      alert('You dont have permission to access this page');
+    }
+    return <Navigate to="/" />;
+  }
+
+  const ProtectedRouteStaff = ({ children }) => {
+    const user = useSelector((state) => state.user);
+    if (user && user?.role === 'STAFF') {
+      return children;
+    }
+    alert('You dont have permission to access this page');
+    return <Navigate to="/" />;
+  }
+
+  const ProtectedRouteVeterian = ({ children }) => {
+    const user = useSelector((state) => state.user);
+    if (user && user?.role === 'VETERIAN') {
       return children;
     }
     alert('You dont have permission to access this page');
@@ -48,6 +66,9 @@ function App() {
         <Route path='/manager' element={<ProtectedRoute><Manager /></ProtectedRoute>} />
         <Route path="/staff-management" element={<ProtectedRoute><StaffManagement /></ProtectedRoute>} />
         <Route path="/service-management" element={<ProtectedRoute><ServiceManagement/></ProtectedRoute>}/>
+        {/* <Route path="/booking-management" element={<ProtectedRouteStaff><BookingManagement/></ProtectedRouteStaff>}/> */}
+        <Route path="/booking-management" element={<BookingManagement/>} />
+
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         {/* Routes with Header and Footer */}
@@ -64,10 +85,11 @@ function App() {
                   <Route path="/fish-types" element={<FishTypes />} />
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/customer-profile" element={<ProtectedRouteCustomer><CustomerPage /></ProtectedRouteCustomer>} />
-                  <Route path="/staff-profile" element={<ProtectedRouteCustomer><StaffPage /></ProtectedRouteCustomer>} />
+                  <Route path="/staff-profile" element={<ProtectedRouteStaff><StaffPage /></ProtectedRouteStaff>} />
+                  {/* <Route path="/veterian-profile" element={<ProtectedRouteVeterian><VeterianPage/></ProtectedRouteVeterian>}/> */}
                   <Route path="/booking" element={<Booking />} />
+                  <Route path="/booking-detail" element={<BookingDetail />} />
                   <Route path="/about" element={<AboutUs />} />
-                  <Route path="/booking-detail" element={<BookingPage/>}/>
                 </Routes>
               </main>
             </div>
@@ -83,8 +105,8 @@ function App() {
           <Route path="/customer-profile" element={<ProtectedRouteCustomer><CustomerPage /></ProtectedRouteCustomer>} />
           <Route path="/staff-profile" element={<ProtectedRouteCustomer><StaffPage /></ProtectedRouteCustomer>} />
           <Route path="/booking" element={<Booking />} />
+          <Route path="/booking-detail" element={<BookingDetail />} />
           <Route path="/about" element={<AboutUs />} />
-          <Route path="/booking-detail" element={<BookingPage/>}/>
         </Route>
 
         {/* NotFound route without Header and Footer */}

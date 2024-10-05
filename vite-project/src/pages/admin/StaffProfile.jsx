@@ -7,7 +7,9 @@ const StaffProfile = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-  const [staffs, setStaffs] = useState({});
+  // const api = 'https://66fb5c648583ac93b40b8727.mockapi.io/staffs';
+
+  const [staffs, setStaffs] = useState([]);
 
   useEffect(() => {
     fetchStaffs();
