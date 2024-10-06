@@ -62,9 +62,9 @@
 }
 
 .submit-btn:hover {
-  background-color: #ffb380;
-  transform: translateY(-2px);
-  color: #333;
+  background-color: black;
+  transform: translateY(-1px);
+  color: #ffffff;
 }
 
 .form-group-booking .doctor {

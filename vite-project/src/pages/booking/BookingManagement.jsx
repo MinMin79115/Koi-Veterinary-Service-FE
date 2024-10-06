@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Table, Button } from 'antd';
-import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined, CloseCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './BookingManagement.css';
 
@@ -8,7 +8,15 @@ const BookingPage = () => {
     const [bookingRequests, setBookingRequests] = useState([
         { id: '1', customerName: 'HungDung', service: 'Interview', status: 'Pending' },
         { id: '2', customerName: 'hd', service: 'Health Checking', status: 'Pending' },
-        { id: '3', customerName: 'mt', service: 'Pond Checking', status: 'Pending' }
+        { id: '3', customerName: 'mt', service: 'Pond Checking', status: 'Pending' },
+        { id: '4', customerName: 'mt', service: 'Pond Checking', status: 'Pending' },
+        { id: '5', customerName: 'mt', service: 'Pond Checking', status: 'Pending' },
+        { id: '6', customerName: 'mt', service: 'Pond Checking', status: 'Pending' },
+        { id: '7', customerName: 'mt', service: 'Pond Checking', status: 'Pending' },
+        { id: '8', customerName: 'mt', service: 'Pond Checking', status: 'Pending' },
+        { id: '9', customerName: 'mt', service: 'Pond Checking', status: 'Pending' },
+        { id: '10', customerName: 'mt', service: 'Pond Checking', status: 'Pending' },
+        
     ]);
 
     const columns = [
@@ -57,7 +65,7 @@ const BookingPage = () => {
                 <div className="d-flex flex-column flex-md-row justify-content-center">
                     <Button 
                         type="primary" 
-                        className="btn btn-success mb-2 mb-md-0 me-md-2 d-flex justify-content-center" 
+                        className="btn btn-success d-flex justify-content-center" 
                         icon={<CheckCircleOutlined />} 
                         onClick={() => handleConfirmBooking(record.id)}
                     >
@@ -65,11 +73,19 @@ const BookingPage = () => {
                     </Button>
                     <Button 
                         type="primary" 
-                        className="btn btn-danger d-flex justify-content-center"
+                        className="btn btn-warning d-flex justify-content-center mb-2 mb-md-0 mx-md-2"
                         icon={<CloseCircleOutlined />} 
                         onClick={() => handleRejectBooking(record.id)}
                     >
                         Reject
+                    </Button>
+                    <Button 
+                        type="primary" 
+                        className="btn btn-danger d-flex justify-content-center"
+                        icon={<DeleteOutlined />} 
+                        onClick={() => handleDeleteBooking(record.id)}
+                    >
+                        Delete
                     </Button>
                 </div>
             )
@@ -86,6 +102,10 @@ const BookingPage = () => {
         setBookingRequests(bookingRequests.map(request => 
             request.id === id ? { ...request, status: 'Rejected'} : request
         ));
+    };
+
+    const handleDeleteBooking = (id) => {
+        setBookingRequests(bookingRequests.filter(request => request.id !== id));
     };
 
     return (

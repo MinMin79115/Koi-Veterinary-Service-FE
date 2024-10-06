@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios'; // Import axios
 import { toast } from 'react-toastify'; // Import toast if you're using it
+import 'bootstrap/dist/css/bootstrap.min.css';
 import koiImage1 from '../assets/koi-image1.jpg';
 import koiImage2 from '../assets/koi-image2.jpg';
 import koiImage3 from '../assets/koi-image3.jpg';
 import koiImage4 from '../assets/koi-image4.jpg';
-import '../components/Header.css';
 import './Home.css';
 
 const Home = () => {
@@ -17,6 +17,7 @@ const Home = () => {
     try {
       const response = await axios.get('https://66fa96f0afc569e13a9c5417.mockapi.io/FAQ');
       // Sort FAQs by id in descending order and take the first 5
+      //To hard to remember :<
       const sortedFaqs = response.data.sort((a, b) => b.id - a.id).slice(0, 5);
       setFaqs(sortedFaqs);
     } catch (error) {
@@ -109,35 +110,69 @@ const Home = () => {
         <Link to="/booking">Schedule here.</Link>
       </div>
       <div>
-        <div className="faq-section">
-          <h3>Frequently Asked Questions</h3>
-          {faqs && faqs.length > 0 ? (
-            faqs.map((faq) => (
-              <div className="faq-item" key={faq.id}>
-                <h4>{faq.Question}</h4>
-                <p>{faq.Answer || 'No answer yet'}</p>
+        <div className="container mt-5">
+          <div className="row">
+            <div className="col-lg-12">
+              <div className="faq-section">
+                <h2 className="mb-4">Frequently Asked Questions</h2>
+                {faqs && faqs.length > 0 ? (
+                  <div className="accordion" id="faqAccordion">
+                    {faqs.map((faq, index) => (
+                      <div className="accordion-item" key={faq.id}>
+                        <h2 className="accordion-header" id={`heading${index}`}>
+                          <button 
+                            className="accordion-button collapsed" 
+                            type="button" 
+                            data-bs-toggle="collapse" 
+                            data-bs-target={`#collapse${index}`} 
+                            aria-expanded="false" 
+                            aria-controls={`collapse${index}`}
+                          >
+                            {faq.Question}
+                          </button>
+                        </h2>
+                        <div 
+                          id={`collapse${index}`} 
+                          className="accordion-collapse collapse" 
+                          aria-labelledby={`heading${index}`} 
+                          data-bs-parent="#faqAccordion"
+                        >
+                          <div className="accordion-body">
+                            {faq.Answer || 'No answer yet'}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted">No FAQs available</p>
+                )}
               </div>
-            ))
-          ) : (
-            <p>No FAQs available</p>
-          )}
-        </div>
-
-        <form onSubmit={handleAddFAQ} className="faq-form">
-          <h3>Add your FAQ</h3>
-          <div>
-            <label htmlFor="question">Question:</label>
-            <input
-              type="text"
-              id="question"
-              value={newQuestion}
-              onChange={(e) => setNewQuestion(e.target.value)}
-              required
-            />
+            </div>
+            
+            <div className="col-12 mt-5">
+              <div className="card">
+                <div className="card-body">
+                  <h3 className="card-title">Add your FAQ</h3>
+                  <form onSubmit={handleAddFAQ}>
+                    <div className="mb-3">
+                      <label htmlFor="question" className="form-label">Question:</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="question"
+                        value={newQuestion}
+                        onChange={(e) => setNewQuestion(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <button type="submit" className="button">Add FAQ</button>
+                  </form>
+                </div>
+              </div>
+            </div>
           </div>
-
-          <button type="submit">Add FAQ</button>
-        </form>
+        </div>
       </div>
     </div>
   );

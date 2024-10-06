@@ -8,7 +8,7 @@ import api from '../../config/axios';
 import { useDispatch, useSelector } from 'react-redux';
 
 const ServiceManagement = () => {
-    const api = 'https://66eec7d23ed5bb4d0bf1f314.mockapi.io/Students';
+    const api = 'https://66ff9fda4da5bd23755149e9.mockapi.io/Service';
 
     const [services, setServices] = useState([]);
     const [openModal, setOpenModal] = useState(false);

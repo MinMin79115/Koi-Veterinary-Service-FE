@@ -34,7 +34,7 @@ const Login = () => {
     //try catch finally
     //navigate to customer page
     try{
-      // const response = await api.post('login', values);
+      // const response = await api.post('auth/login', values);
       const response = await api.post('login', values);
       dispatch(login(response.data))
       const {role, token} = response.data
@@ -63,7 +63,7 @@ const Login = () => {
         const token = credential.accessToken;
         // The signed-in user info.
         const user = result.user;
-        sessionStorage.setItem("userToken",token)
+        sessionStorage.setItem("userToken",(user))
         // IdP data available using getAdditionalUserInfo(result)
         navigate("/")
       }).catch((error) => {

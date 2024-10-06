@@ -67,7 +67,6 @@ function App() {
         <Route path="/staff-management" element={<ProtectedRoute><StaffManagement /></ProtectedRoute>} />
         <Route path="/service-management" element={<ProtectedRoute><ServiceManagement/></ProtectedRoute>}/>
         {/* <Route path="/booking-management" element={<ProtectedRouteStaff><BookingManagement/></ProtectedRouteStaff>}/> */}
-        <Route path="/booking-management" element={<BookingManagement/>} />
 
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -89,7 +88,9 @@ function App() {
                   {/* <Route path="/veterian-profile" element={<ProtectedRouteVeterian><VeterianPage/></ProtectedRouteVeterian>}/> */}
                   <Route path="/booking" element={<Booking />} />
                   <Route path="/booking-detail" element={<BookingDetail />} />
+                  <Route path="/booking-management" element={<BookingManagement />} />
                   <Route path="/about" element={<AboutUs />} />
+
                 </Routes>
               </main>
             </div>
@@ -102,10 +103,11 @@ function App() {
           <Route path="/water-quality" element={<WaterQuality />} />
           <Route path="/fish-types" element={<FishTypes />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/customer-profile" element={<ProtectedRouteCustomer><CustomerPage /></ProtectedRouteCustomer>} />
-          <Route path="/staff-profile" element={<ProtectedRouteCustomer><StaffPage /></ProtectedRouteCustomer>} />
+          <Route path="/customer-profile" element={<CustomerPage />} />
+          <Route path="/staff-profile" element={<StaffPage />} />
           <Route path="/booking" element={<Booking />} />
           <Route path="/booking-detail" element={<BookingDetail />} />
+          <Route path="/booking-management" element={<BookingManagement />} />
           <Route path="/about" element={<AboutUs />} />
         </Route>
 
