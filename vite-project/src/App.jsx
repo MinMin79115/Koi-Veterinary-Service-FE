@@ -43,7 +43,7 @@ function App() {
 
   const ProtectedRouteStaff = ({ children }) => {
     const user = useSelector((state) => state.user);
-    if (user && user?.role === 'STAFF') {
+    if (user && user?.role === 'STAFF' || user?.role === null) {
       return children;
     }
     alert('You dont have permission to access this page');

@@ -63,7 +63,8 @@ const Login = () => {
         const token = credential.accessToken;
         // The signed-in user info.
         const user = result.user;
-        sessionStorage.setItem("userToken",(user))
+        sessionStorage.setItem("user",(user))
+        sessionStorage.setItem("userToken",(token))
         // IdP data available using getAdditionalUserInfo(result)
         navigate("/")
       }).catch((error) => {

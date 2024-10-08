@@ -8,17 +8,17 @@ import { logout } from '../redux/features/userSlider';
 import { useDispatch, useSelector } from 'react-redux';
 
 const Header = () => {
-  const user = useSelector((state) => state.user); 
+  const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     // Check login status using token from secureLocalStorage
-    // const checkLogin = secureLocalStorage.getItem("checkLogin");
-    // if (checkLogin) {
-    //   setIsLoggedIn(true);
-    // }
+    const checkLogin = sessionStorage.getItem("userToken");
+    if (checkLogin) {
+      setIsLoggedIn(true);
+    }
     // Adjust the key as needed
     setIsLoggedIn(!!user); // Set true if token exists
   }, []);
@@ -56,9 +56,9 @@ const Header = () => {
           {isLoggedIn ? (
             <>
               <Link to="/customer-profile#profile" className='auth-user user-icon'>
-              <i>
-              <FaRegUserCircle /> 
-              </i>
+                <i>
+                  <FaRegUserCircle />
+                </i>
               </Link>
               <Link to="/" onClick={handleLogout} className='auth-button '>Logout</Link>
             </>

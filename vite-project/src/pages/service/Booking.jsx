@@ -5,6 +5,8 @@ import { toast } from 'react-toastify';
 import axios from 'axios'
 import api from '../../config/axios';
 import { useSelector } from 'react-redux';
+import { Form, DatePicker } from 'antd';
+import moment from 'moment';
 
 const Booking = () => {
   const apiDoctors = 'https://66fb49048583ac93b40b4dc0.mockapi.io/Doctors';
@@ -24,7 +26,9 @@ const Booking = () => {
     type: type,
     slot: '',
     doctor_name: ''
-  })
+  });
+  const [selectedDateTime, setSelectedDateTime] = useState(null);
+  const [isInterviewService, setIsInterviewService] = useState(false);
 
   const fetchDoctors = async () => {
     try {
@@ -79,6 +83,7 @@ const Booking = () => {
     const serviceName = e.target.value;
     setValues(prevValues => ({ ...prevValues, service_name: serviceName }));
     setSelectedService(serviceName);
+    setIsInterviewService(serviceName.toLowerCase() === 'interview');
 
     const selectedServiceObj = services.find(service => service.name === serviceName);
     if (selectedServiceObj) {
@@ -104,7 +109,7 @@ const Booking = () => {
       // form to booking detail and booking management
       try {
         // const response = await api.post(apiService, { type, service })
-        const response = await api.post('booking',values);
+        const response = await api.post('booking', values);
         //   headers:
         //   {
         //     Authorization: `Bearer ${sessionStorage.getItem('token')}`
@@ -143,10 +148,28 @@ const Booking = () => {
     }
   };
 
+  const handleDateTimeChange = (value) => {
+    setSelectedDateTime(value);
+    if (value) {
+      const formattedDateTime = value.format('YYYY-MM-DD HH:mm');
+      setValues(prevValues => ({
+        ...prevValues,
+        slot: formattedDateTime,
+      }));
+    } else {
+      setValues(prevValues => ({ ...prevValues, slot: '' }));
+    }
+  };
+
+  const disabledDate = (current) => {
+    // Can't select days before today and today
+    return current && current < moment().endOf('day');
+  };
+
   return (
     <div className="booking-container">
       <h2>Book a Service</h2>
-      <form onSubmit={handleSubmit} className="booking-form">
+      <Form onSubmit={handleSubmit} className="booking-form">
         <div className="form-group-booking">
           <label htmlFor="service">Services:</label>
           <select
@@ -196,23 +219,38 @@ const Booking = () => {
         {/* when I choose slot the docter name of this slot 
         will be set in handleSlotChange func to show in screen */}
         <div className="form-group-booking">
-          <label htmlFor="slot">Slot:</label>
-          <select
-            id="slot"
-            value={`${slot}|${selectedDoctor}`}
-            onChange={handleSlotChange}
-            required
-          >
-            <option value="">Select a Slot</option>
-            {doctors.map((doctor) => (
-              <option key={doctor.id} value={`${doctor.workTime}|${doctor.name}`}>
-                {doctor.workTime}
-              </option>
-            ))}
-
-          </select>
+        <label htmlFor="slot">Slot:</label>
+        {isInterviewService ? (
+            <Form.Item
+              name="workTime"
+              label="Select Date and Time"
+              rules={[{ required: true, message: 'Please select the date and time!' }]}
+            >
+              <DatePicker
+                showTime={{ format: 'HH:mm' }}
+                format="YYYY-MM-DD HH:mm"
+                disabledDate={disabledDate}
+                onChange={handleDateTimeChange}
+                value={selectedDateTime}
+              />
+            </Form.Item>
+          ) : (
+            <select
+              id="slot"
+              value={`${slot}|${selectedDoctor}`}
+              onChange={handleSlotChange}
+              required
+            >
+              <option value="">Select a Slot</option>
+              {doctors.map((doctor) => (
+                <option key={doctor.id} value={`${doctor.workTime}|${doctor.name}`}>
+                  {doctor.workTime}
+                </option>
+              ))}
+            </select>
+          )}
           {/* Show doctor name when I have choosen slot above */}
-          {doctors && (
+          {selectedDoctor && !isInterviewService && (
             <div className="form-group-booking">
               <div className="doctor">
                 <label htmlFor="doctor-information">Your doctor:</label>
@@ -223,7 +261,7 @@ const Booking = () => {
         </div>
         {/* If user == null return /login page to confirm booking */}
         <button type="submit" className="submit-btn">Book Now</button>
-      </form>
+      </Form>
     </div>
   );
 };
