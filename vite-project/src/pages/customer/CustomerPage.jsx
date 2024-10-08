@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.js';
 import styles from './CustomerPage.module.css';
 import api from '../../config/axios';
 import { toast } from 'react-toastify';
@@ -11,15 +10,7 @@ import { useSelector } from 'react-redux';
 function CustomerPage() {
   const location = useLocation();
   const user = useSelector((state) => state.user)
-  const [customer, setCustomer] = useState({
-    fullName: '',
-    address: '',
-    phoneNumber: '',
-    email: '',
-    password: ''
-  });
-
-  const [avatar, setAvatar] = useState(null);
+  const [customer, setCustomer] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -28,18 +19,16 @@ function CustomerPage() {
     }
   }, [location]);
 
+
+  const fetchCustomer = async () =>{
+    const userToken = JSON.parse(sessionStorage.getItem('userToken'));
+    setCustomer(userToken);
+  }
+
   useEffect(() => {
     // const user = JSON.parse(sessionStorage.getItem("userToken"));
-    if (user) {
-      setCustomer({
-        fullName: user.fullname,
-        address: user.address,
-        phoneNumber: user.phone,
-        email: user.email,
-        password: "********"
-      });
-      setIsLoading(false);
-    }
+    fetchCustomer();
+    setIsLoading(false);
   }, []);
 
   const handleInputChange = (e) => {
@@ -54,20 +43,21 @@ function CustomerPage() {
     e.preventDefault();
     try {
       setIsLoading(true);
-      // Here you would typically send the updated information to the server
-      const response = await api.put(`api/customers/${customer.id}`, customer, {
+      const token = sessionStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+      await api.put(`customers/${customer.id}`, customer, {
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem('token')}`
+          Authorization: `Bearer ${token}`
         }
       });
-      console.log('Updated customer information:', response);
+      console.log('Updated customer information:', response.data);
       toast.success('Profile updated successfully!');
-      
-    } catch {
-      toast.error('Failed to update profile. Please try again.');
-      setTimeout(() => {
-        window.location.reload(false);
-      }, 1500);
+      // Optionally update the Redux store or local state here
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast.error(error.response?.data?.message || 'Failed to update profile. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -89,7 +79,7 @@ function CustomerPage() {
                   <div className={styles.mB25}>
                     <img src="https://img.icons8.com/bubbles/100/000000/user.png" className={styles.imgRadius} alt="User-Profile" />
                   </div>
-                  <h6 className={styles.fW600}>{customer.fullName}</h6>
+                  <h6 className={styles.fW600}>{customer.fullname}</h6>
                   <p>Customer</p>
                 </div>
               </div>
@@ -104,8 +94,8 @@ function CustomerPage() {
                           <input
                             type="text"
                             className={`${styles.formControl} ${styles.textMuted} ${styles.fW400}`}
-                            name="fullName"
-                            value={customer.fullName}
+                            name="fullname"
+                            value={customer.fullname}
                             onChange={handleInputChange}
                             required
                           />
@@ -130,8 +120,8 @@ function CustomerPage() {
                           <input
                             type="tel"
                             className={`${styles.formControl} ${styles.textMuted} ${styles.fW400}`}
-                            name="phoneNumber"
-                            value={customer.phoneNumber}
+                            name="phone"
+                            value={customer.phone}
                             onChange={handleInputChange}
                             required
                           />
@@ -153,6 +143,7 @@ function CustomerPage() {
                         </div>
                       </div>
                     </div>
+                    
                     <div className={styles.mT20}>
                       <button type="submit" className={styles.updateButton} disabled={isLoading}>
                         {isLoading ? 'Updating...' : 'Update Profile'}

@@ -23,8 +23,8 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     const values = {
-      // username,
-      phone,
+      username,
+      // phone,
       password
     }
     // Set the boolean value in secureLocalStorage
@@ -34,12 +34,12 @@ const Login = () => {
     //try catch finally
     //navigate to customer page
     try{
-      // const response = await api.post('auth/login', values);
-      const response = await api.post('login', values);
+      const response = await api.post('auth/login', values);
+      // const response = await api.post('login', values);
       dispatch(login(response.data))
-      const {role, token} = response.data
+      const {role, accessToken} = response.data
       const userProfile = response.data;
-      sessionStorage.setItem("token",token)
+      sessionStorage.setItem("token",accessToken)
       sessionStorage.setItem("userToken",JSON.stringify(userProfile))
       if(role === 'CUSTOMER' || role ==='VETERIAN' || role === null ){
         navigate('/')
@@ -88,7 +88,7 @@ const Login = () => {
         <div className="auth-form-container">
           <h2>Welcome Back</h2>
           <form onSubmit={handleSubmit} className="auth-form">
-            {/* <div className="form-group">
+            <div className="form-group">
               <label htmlFor="username">Username</label>
               <input
                 type="text"
@@ -98,8 +98,8 @@ const Login = () => {
                 onChange={(e) => setUsername(e.target.value)}
                 required
               />
-            </div> */}
-            <div className="form-group">
+            </div>
+            {/* <div className="form-group">
               <label htmlFor="phone">Phone</label>
               <input
                 type="text"
@@ -109,7 +109,7 @@ const Login = () => {
                 onChange={(e) => setPhone(e.target.value)}
                 required
               />
-            </div>
+            </div> */}
             <div className="form-group">
               <label htmlFor="password">Password</label>
               <input

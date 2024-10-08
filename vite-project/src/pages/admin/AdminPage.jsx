@@ -43,7 +43,7 @@ export default function AdminPage() {
                     <MDBCardText>Full Name</MDBCardText>
                   </MDBCol>
                   <MDBCol sm="9">
-                    <MDBCardText className="text-muted">{profile.fullName}</MDBCardText>
+                    <MDBCardText className="text-muted">{profile.fullname}</MDBCardText>
                   </MDBCol>
                 </MDBRow>
                 <hr />
@@ -62,15 +62,6 @@ export default function AdminPage() {
                   </MDBCol>
                   <MDBCol sm="9">
                     <MDBCardText className="text-muted">{profile.phone}</MDBCardText>
-                  </MDBCol>
-                </MDBRow>
-                <hr />
-                <MDBRow>
-                  <MDBCol sm="3">
-                    <MDBCardText>Mobile</MDBCardText>
-                  </MDBCol>
-                  <MDBCol sm="9">
-                  <MDBCardText className="text-muted">{profile.phone}</MDBCardText>
                   </MDBCol>
                 </MDBRow>
                 <hr />

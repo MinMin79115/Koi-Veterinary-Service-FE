@@ -8,7 +8,7 @@ import api from '../../config/axios';
 import { useDispatch, useSelector } from 'react-redux';
 
 const ServiceManagement = () => {
-    const api = 'https://66ff9fda4da5bd23755149e9.mockapi.io/Service';
+    // const api = 'https://66ff9fda4da5bd23755149e9.mockapi.io/Service';
 
     const [services, setServices] = useState([]);
     const [openModal, setOpenModal] = useState(false);
@@ -22,12 +22,12 @@ const ServiceManagement = () => {
     const fetchServices = async () => {
         //Lấy dữ liệu từ be
         try {
-            //   const response = await api.get('services', {
-            //     headers: {
-            //       Authorization: `Bearer ${sessionStorage.getItem('token')}`
-            //     }
-            //   });
-            const response = await axios.get(api);
+              const response = await api.get('services', {
+                headers: {
+                  Authorization: `Bearer ${sessionStorage.getItem('token')}`
+                }
+              });
+            // const response = await axios.get(api);
             setServices(response.data);
         } catch (error) {
             toast.error('Error fetching services:', error.response.data);
@@ -61,15 +61,14 @@ const ServiceManagement = () => {
     const handleSubmitService = async (values) => {
         //Xử lý thông tin trong Form
         //Post xuống API
-        console.log(valuesService)
         try {
             setSubmitting(true);//loading
-            //   const res = await api.post('api/services', values, {
-            //     headers: {
-            //       Authorization: `Bearer ${sessionStorage.getItem('token')}`
-            //     }
-            //   })
-            const res = await axios.post(api, values);
+              const response = await api.post('services', values, {
+                headers: {
+                  Authorization: `Bearer ${sessionStorage.getItem('token')}`
+                }
+              })
+           // const res = await axios.post(api, values);
             //Toast css for beautiful
             toast.success("Successfully !")
             setOpenModal(false)
@@ -85,15 +84,18 @@ const ServiceManagement = () => {
     //update service
     const updateService = async (values) => {
         try {
-            //   await axios.put(`api/services/${editingService.id}`, {
-            //     name: editingService.name,
+              await api.put(`services/${editingService.serviceId}`, {
+                serviceName: values.serviceName,
+                serviceDescription: values.serviceDescription
+              }, {
+                headers: {
+                    Authorization: `Bearer ${sessionStorage.getItem('token')}`
+                  }
+              });
+            // // const res = await axios.put(`${api}/${editingService.id}`, {
+            //     name: values.name,
             //     description: values.description
-
-            //   });
-            const res = await axios.put(`${api}/${editingService.id}`, {
-                name: values.name,
-                description: values.description
-            });
+            // });
             toast.success('Service updated successfully');
             fetchServices();
             setOpenModalEdit(false);
@@ -106,12 +108,12 @@ const ServiceManagement = () => {
     //Delete service
     const handleDelete = async (id) => {
         try {
-            //   await api.delete(`api/services/${id}`, {
-            //     headers: {
-            //       Authorization: `Bearer ${sessionStorage.getItem('token')}`
-            //     }
-            //   });
-            const res = await axios.delete(`${api}/${id}`);
+              await api.delete(`services/${id}`, {
+                headers: {
+                  Authorization: `Bearer ${sessionStorage.getItem('token')}`
+                }
+              });
+            // const res = await axios.delete(`${api}/${id}`);
             toast.success("Delete successfully!");
             fetchServices();
         } catch (err) {
@@ -125,25 +127,25 @@ const ServiceManagement = () => {
     };
 
     const filteredData = services.filter(item =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase())
+        item.serviceName.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
 
     const columns = [
         {
             title: "ID",
-            dataIndex: "id",
-            key: "id",
+            dataIndex: "serviceId",
+            key: "serviceId",
         },
         {
             title: "Service Name",
-            dataIndex: "name",
-            key: "name",
+            dataIndex: "serviceName",
+            key: "serviceName",
         },
         {
             title: "Description",
-            dataIndex: "description",
-            key: "description",
+            dataIndex: "serviceDescription",
+            key: "serviceDescription",
         },
         {
             title: "Action",
@@ -155,7 +157,7 @@ const ServiceManagement = () => {
                         </Button>
                         <Popconfirm
                             title="Are you sure you want to delete this question?"
-                            onConfirm={() => handleDelete(record.id)}
+                            onConfirm={() => handleDelete(record.serviceId)}
                             okText="Yes"
                             cancelText="No"
                         >
@@ -177,14 +179,18 @@ const ServiceManagement = () => {
                 onChange={(e) => handleSearch(e.target.value)}
                 style={{ margin: 16, width: '60%' }}
             />
-            <Table dataSource={filteredData} columns={columns} />
+            <Table 
+            dataSource={filteredData} 
+            columns={columns}                                     
+            pagination={{ pageSize: 5 }}         
+            />
             {/* onCancel: Bấm ra ngoài thì hành động được chạy */}
             {/* onOK: Chạy hàm trong Modal */}
             <Modal onOk={() => form.submit()} title="Create new service" open={openModal} onCancel={handleCloseModal}>
                 {/* name: tên biến trùng (phù hợp) với DB */}
                 {/* rule: Định nghĩa validation => [] */}
                 <Form onFinish={handleSubmitService} form={form}>
-                    <Form.Item label="Service name" name="name" rules={[
+                    <Form.Item label="Service name" name="serviceName" rules={[
                         {
                             required: true,
                             message: "Please input name !"
@@ -192,7 +198,7 @@ const ServiceManagement = () => {
                     ]}>
                         <Input />
                     </Form.Item>
-                    <Form.Item label="Description" name="description" rules={[
+                    <Form.Item label="Description" name="serviceDescription" rules={[
                         {
                             required: true,
                             message: "Please input description !"
@@ -206,7 +212,7 @@ const ServiceManagement = () => {
                 {/* name: tên biến trùng (phù hợp) với DB */}
                 {/* rule: Định nghĩa validation => [] */}
                 <Form onFinish={updateService} form={form}>
-                        <Form.Item label="Service name" name="name" rules={[
+                        <Form.Item label="Service name" name="serviceName" rules={[
                             {
                                 required: true,
                                 message: "Please input name !"
@@ -214,7 +220,7 @@ const ServiceManagement = () => {
                         ]}>
                             <Input />
                         </Form.Item>
-                        <Form.Item label="Description...." name="description" rules={[
+                        <Form.Item label="Description...." name="serviceDescription" rules={[
                             {
                                 required: true,
                                 message: "Please input description !"

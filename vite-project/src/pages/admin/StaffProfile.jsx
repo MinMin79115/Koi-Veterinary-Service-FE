@@ -16,17 +16,6 @@ const StaffProfile = () => {
   const fetchStaffs = async () => {
     const userToken = JSON.parse(sessionStorage.getItem('userToken'));
     setStaffs(userToken);
-    // try {
-    //   const response = await api.get(`api/staffs/${userToken}`, {
-    //     headers: {
-    //       Authorization: `Bearer ${sessionStorage.getItem('token')}`
-    //     }
-    //   });
-    //   setStaffs(response.data);
-    // } catch (error) {
-    //   toast.error('Failed to fetch staff information. Please try again.');
-    // }
-
   };
 
   const handleInputChange = (e) => {
@@ -40,7 +29,7 @@ const StaffProfile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.put(`api/customers/${staffs.id}`, staffs, {
+      await api.put(`customers/${staffs.id}`, staffs, {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem('token')}`
         }

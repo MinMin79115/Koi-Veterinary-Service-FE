@@ -3,10 +3,10 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { Button, Table, Modal, Form, Input, Popconfirm } from 'antd';
 import { useForm } from 'antd/es/form/Form';
-import api from '../../config/axios';
+import api from '../../config/axios'
 
 const StaffManagement = () => {
-  const api = 'https://66eec7d23ed5bb4d0bf1f314.mockapi.io/Students';
+  //const api = 'https://66eec7d23ed5bb4d0bf1f314.mockapi.io/Students';
 
   const [staffs, setStaffs] = useState([]);
   const [openModal, setOpenModal] = useState(false);
@@ -18,14 +18,14 @@ const StaffManagement = () => {
   const fetchStaffs = async () => {
     //Lấy dữ liệu từ be
     try {
-      // const response = await api.get('customers', {
-      //   headers: {
-      //     Authorization: `Bearer ${sessionStorage.getItem('token')}`
-      //   }
-      // });
-      const res = await axios.get(api)
-      console.log(res.data)
-      setStaffs(res.data);
+      const response = await api.get('customers', {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`
+        }
+      });
+      // const res = await axios.get(api)
+      console.log(response.data)
+      setStaffs(response.data);
     } catch (error) {
       toast.error('Error fetching staffs:', error.response.data);
     }
@@ -51,7 +51,7 @@ const StaffManagement = () => {
     //Post xuống API
     const valuesStaff = {
       username: values.phone,
-      name: values.name,
+      fullname: values.fullname,
       phone: values.phone,
       address: values.address,
       password: "123456"
@@ -59,12 +59,12 @@ const StaffManagement = () => {
     console.log(valuesStaff)
     try {
       setSubmitting(true);//loading
-      // const res = await api.post('api/customers', valuesStaff, {
-      //   headers: {
-      //     Authorization: `Bearer ${sessionStorage.getItem('token')}`
-      //   }
-      // })
-      const res = await axios.post(api, valuesStaff)
+      const res = await api.post('auth/addstaff', valuesStaff, {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`
+        }
+      })
+      // const res = await axios.post(api, valuesStaff)
       //Toast css for beautiful
       toast.success("Successfully !")
       setOpenModal(false)
@@ -83,7 +83,7 @@ const StaffManagement = () => {
   };
 
   const filteredData = staffs.filter(item =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+    item.fullname.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
 
@@ -95,8 +95,8 @@ const StaffManagement = () => {
     },
     {
       title: "Full Name",
-      dataIndex: "name",
-      key: "name",
+      dataIndex: "fullname",
+      key: "fullname",
     },
     {
       title: "Phone",
@@ -129,12 +129,12 @@ const StaffManagement = () => {
   //Delete staff
   const handleDelete = async (id) => {
     try {
-      // await api.delete(`api/customers/${id}`, {
-      //   headers: {
-      //     Authorization: `Bearer ${sessionStorage.getItem('token')}`
-      //   }
-      // });
-      await axios.delete(`${api}/${id}`)
+      await api.delete(`customers/${id}`, {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`
+        }
+      });
+      // await axios.delete(`${api}/${id}`)
       toast.success("Delete successfully!");
       fetchStaffs();
     } catch (err) {
@@ -159,7 +159,7 @@ const StaffManagement = () => {
         {/* name: tên biến trùng (phù hợp) với DB */}
         {/* rule: Định nghĩa validation => [] */}
         <Form onFinish={handleSubmitStaffs} form={form}>
-          <Form.Item label="Staff name" name="name" rules={[
+          <Form.Item label="Staff name" name="fullname" rules={[
             {
               required: true,
               message: "Please input name !"
