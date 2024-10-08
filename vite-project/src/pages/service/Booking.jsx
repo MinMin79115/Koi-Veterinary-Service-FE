@@ -2,74 +2,72 @@ import React, { useState, useEffect } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import './Booking.css';
 import { toast } from 'react-toastify';
-import axios from 'axios'
 import api from '../../config/axios';
 import { useSelector } from 'react-redux';
 import { Form, DatePicker } from 'antd';
 import moment from 'moment';
 
 const Booking = () => {
-  const apiDoctors = 'https://66fb49048583ac93b40b4dc0.mockapi.io/Doctors';
-  const apiService = 'https://66ff9fda4da5bd23755149e9.mockapi.io/Service';
   const user = useSelector(state => state.user);
   const navigate = useNavigate();
   const location = useLocation();
-  const [type, setType] = useState([]);
+  const [booking, setBooking] = useState([]);
+  const [type, setType] = useState('');
   const [services, setServices] = useState([]);
   const [slot, setSlot] = useState('');
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState('');
   const [selectedService, setSelectedService] = useState('');
-  const [availableTypes, setAvailableTypes] = useState([]);
+  const [availableTypes, setAvailableTypes] = useState(["Online", "At Center", "At Home"]);
   const [values, setValues] = useState({
     service_name: '',
     type: type,
     slot: '',
-    doctor_name: ''
+    doctor_name: '',
+    workTime: ''
   });
   const [selectedDateTime, setSelectedDateTime] = useState(null);
   const [isInterviewService, setIsInterviewService] = useState(false);
 
-  const fetchDoctors = async () => {
+  const fetchBookings = async () => {
     try {
-      // const response = await api.get('api/doctors', {
+      // const response = await api.get('booking', {
       //   headers: {
       //     Authorization: `Bearer ${sessionStorage.getItem('token')}`
       //   }
       // })
-      const response = await axios.get(apiDoctors);
+      // const response = await axios.get(apiDoctors);
+      const response = await api.get('booking', {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`
+        }
+      });
       console.log(response.data);
-      setDoctors(response.data);
+      setBooking(response.data);
     } catch (error) {
-      toast.error('Error fetching doctors:', error.response.data);
+      toast.error('Error fetching bookings:', error.response.data);
     }
   }
 
   const fetchServices = async () => {
+    //Lấy dữ liệu từ be
     try {
-      // const response = await api.get('api/services', {
-      //   headers: {
-      //     Authorization: `Bearer ${sessionStorage.getItem('token')}`
-      //   }
-      // });
-
-      const response = await axios.get(apiService);
-      {
-        response.data.map((service) => (
-          service.type = ['online', 'offline', 'at home']
-        ))
-      }
-      console.log(response.data)
-      console.log(type)
-      setServices(response.data);
+          const response = await api.get('services', {
+            headers: {
+              Authorization: `Bearer ${sessionStorage.getItem('token')}`
+            }
+          });
+        // const response = await axios.get(api);
+        console.log(response.data)
+        setServices(response.data);
     } catch (error) {
-      toast.error('Error fetching services:', error.response.data);
+        toast.error('Error fetching services:', error.response.data);
     }
-  }
+}
 
   useEffect(() => {
     fetchServices();
-    fetchDoctors();
+    // fetchDoctors();
   }, []);
 
   useEffect(() => {
@@ -83,10 +81,10 @@ const Booking = () => {
     const serviceName = e.target.value;
     setValues(prevValues => ({ ...prevValues, service_name: serviceName }));
     setSelectedService(serviceName);
-    setIsInterviewService(serviceName.toLowerCase() === 'interview');
+    setIsInterviewService(serviceName.toLowerCase() === 'online consulting');
 
-    const selectedServiceObj = services.find(service => service.name === serviceName);
-    if (selectedServiceObj) {
+    const selectedServiceObj = services.find(service => service.serviceName === serviceName);
+    if (selectedServiceObj && Array.isArray(selectedServiceObj.type)) {
       setAvailableTypes(selectedServiceObj.type);
       if (selectedServiceObj.type.length === 1) {
         setType(selectedServiceObj.type[0]);
@@ -180,8 +178,8 @@ const Booking = () => {
           >
             <option value="">Select a service</option>
             {services.map((service) => (
-              <option key={service.id} value={service.name}>
-                {service.name}
+              <option key={service.serviceId} value={service.serviceName}>
+                {service.serviceName}
               </option>
             ))}
           </select>
@@ -189,9 +187,8 @@ const Booking = () => {
         {/* check availableType not null to choose type */}
         {/* if availableType length = 1, show only 1 option */}
         {/* if availableType length > 1, show all option */}
-        {availableTypes.length > 0 && (
           <div className="form-group-booking">
-            <label htmlFor="services-type">Service Type:</label>
+            <label htmlFor="type">Type:</label>
             <select
               id="type"
               value={type}
@@ -200,22 +197,15 @@ const Booking = () => {
                 setValues(prevValues => ({ ...prevValues, type: e.target.value }));
               }}
               required
-            >
-              {availableTypes.length === 1 ? (
-                <option value={availableTypes[0]}>{availableTypes[0]}</option>
-              ) : (
-                <>
-                  <option value="">Select a type</option>
-                  {availableTypes.map((serviceType) => (
-                    <option key={serviceType} value={serviceType}>
-                      {serviceType}
-                    </option>
-                  ))}
-                </>
-              )}
+            > 
+              <option value="">Select a type</option>
+              {availableTypes.map((serviceType) => (
+                <option key={serviceType} value={serviceType}>
+                  {serviceType}
+                </option>
+              ))}
             </select>
           </div>
-        )}
         {/* when I choose slot the docter name of this slot 
         will be set in handleSlotChange func to show in screen */}
         <div className="form-group-booking">

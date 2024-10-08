@@ -12,6 +12,7 @@ import './Home.css';
 const Home = () => {
   const [faqs, setFaqs] = useState([]);
   const [newQuestion, setNewQuestion] = useState('');
+  const [openIndex, setOpenIndex] = useState(null);
 
   const fetchFaqs = async () => {
     try {
@@ -41,6 +42,10 @@ const Home = () => {
       // Clear input fields
       setNewQuestion('');
     }
+  };
+
+  const toggleAccordion = (index) => {
+    setOpenIndex(openIndex === index ? null : index);
   };
 
   return (
@@ -121,21 +126,15 @@ const Home = () => {
                       <div className="accordion-item" key={faq.id}>
                         <h2 className="accordion-header" id={`heading${index}`}>
                           <button 
-                            className="accordion-button collapsed" 
+                            className={`accordion-button ${openIndex === index ? '' : 'collapsed'}`}
                             type="button" 
-                            data-bs-toggle="collapse" 
-                            data-bs-target={`#collapse${index}`} 
-                            aria-expanded="false" 
-                            aria-controls={`collapse${index}`}
+                            onClick={() => toggleAccordion(index)}
                           >
                             {faq.Question}
                           </button>
                         </h2>
                         <div 
-                          id={`collapse${index}`} 
-                          className="accordion-collapse collapse" 
-                          aria-labelledby={`heading${index}`} 
-                          data-bs-parent="#faqAccordion"
+                          className={`accordion-collapse collapse ${openIndex === index ? 'show' : ''}`}
                         >
                           <div className="accordion-body">
                             {faq.Answer || 'No answer yet'}

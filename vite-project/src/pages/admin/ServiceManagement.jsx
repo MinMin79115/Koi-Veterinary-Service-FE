@@ -136,22 +136,27 @@ const ServiceManagement = () => {
             title: "ID",
             dataIndex: "serviceId",
             key: "serviceId",
+            width: "5%",
         },
         {
             title: "Service Name",
             dataIndex: "serviceName",
             key: "serviceName",
+            width: "20%",
         },
         {
             title: "Description",
             dataIndex: "serviceDescription",
             key: "serviceDescription",
+            width: "40%",
         },
         {
             title: "Action",
+            className: "text-center",
             render: (_, record) => (
                 <div>
                     <>
+                        <div className='d-flex justify-content-center'>
                         <Button className='mx-1' type="primary" onClick={() => handleOpenModalEdit(record)} style={{ marginRight: 8 }}>
                             Edit Service
                         </Button>
@@ -159,10 +164,11 @@ const ServiceManagement = () => {
                             title="Are you sure you want to delete this question?"
                             onConfirm={() => handleDelete(record.serviceId)}
                             okText="Yes"
-                            cancelText="No"
-                        >
-                            <Button type="primary" danger>Delete</Button>
-                        </Popconfirm>
+                                cancelText="No"
+                            >
+                                <Button type="primary" danger>Delete</Button>
+                            </Popconfirm>
+                        </div>
                     </>
                 </div>
             )

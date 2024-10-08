@@ -9,8 +9,7 @@ import { useSelector } from 'react-redux';
 
 function CustomerPage() {
   const location = useLocation();
-  const user = useSelector((state) => state.user)
-  const [customer, setCustomer] = useState([]);
+  const [customer, setCustomer] = useState({});
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {

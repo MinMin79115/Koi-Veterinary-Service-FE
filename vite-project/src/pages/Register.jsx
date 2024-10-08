@@ -33,7 +33,7 @@ const Register = () => {
     
     try {
       // const response = await api.post('auth/register', values)
-      const response = await api.post('register', values)
+      const response = await api.post('auth/register', values)
       console.log(response);
       toast.success('Register Success !')
       navigate('/login')
