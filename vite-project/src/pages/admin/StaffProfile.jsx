@@ -3,46 +3,76 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from './StaffProfile.module.css';
 import api from '../../config/axios';
 import { toast } from 'react-toastify';
+import { useSelector } from 'react-redux';
 
 const StaffProfile = () => {
-  // const api = 'https://66fb5c648583ac93b40b8727.mockapi.io/staffs';
 
-  const [staffs, setStaffs] = useState([]);
+  const user = useSelector((state) => state.user);
+  const [staff, setStaff] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+  useEffect(() => {
+    if (location.hash === '#profile') {
+      window.scrollTo(0, 180);
+    }
+  }, [location]);
+
+  const fetchStaff = async () => {
+    setIsLoading(true);
+    try {
+      const response = await api.get(`customers/${user.id}`);
+      setStaff(response.data);
+      console.log('Fetched staff data:', response.data);
+    } catch (error) {
+      console.error('Error fetching customer data:', error);
+      toast.error('Failed to load customer data. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   useEffect(() => {
-    fetchStaffs();
-  }, []);
-
-  const fetchStaffs = async () => {
-    const userToken = JSON.parse(sessionStorage.getItem('userToken'));
-    setStaffs(userToken);
-  };
+    if (user && user.id) {
+      fetchStaff();
+    }
+  }, [user]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setStaffs(prevState => ({
-      ...prevState,
-      [name]: value
-    }));
+    setStaff(prevState => {
+      const newState = { ...prevState, [name]: value };
+      console.log('Updated staff state:', newState);
+      return newState;
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.put(`customers/${staffs.id}`, staffs, {
+    
+      console.log('Submitting staff data:', staff);
+      const response = await api.put(`customers/${staff.id}`, {
+        ...staff,
+        fullname: staff.fullname // Explicitly include fullname
+      }, {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem('token')}`
         }
       });
-      console.log('Updated staff information:', staffs);
-    } catch {
+      console.log('Server response:', response.data);
+      toast.success('Update successful.');
+      fetchStaff(); // Refresh the data after update
+    } catch (error) {
+      console.error('Error updating profile:', error);
       toast.error('Failed to update profile. Please try again.');
     }
   };
 
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
-    <div className={`${styles.staffProfile} container mt-5`}>
+    <>
       <h2 className={`${styles.title} text-center mb-4`}>Profile</h2>
       <div className="row">
         <div className="col-md-4">
@@ -52,8 +82,7 @@ const StaffProfile = () => {
               alt="Staff"
               className={`${styles.avatarPreview} img-fluid rounded-circle mb-3`}
             />
-            <h4>{staffs.name}</h4>
-            <p className="text-muted">Staff</p>
+            <h4>{staff.fullname}</h4>
           </div>
         </div>
         <div className="col-md-8">
@@ -64,8 +93,8 @@ const StaffProfile = () => {
                 <input
                   type="text"
                   className={styles.formControl}
-                  name="name"
-                  value={staffs.name}
+                  name="fullname"
+                  value={staff.fullname || ""}
                   onChange={handleInputChange}
                   required
                 />
@@ -75,7 +104,7 @@ const StaffProfile = () => {
                 <input
                   type="text"
                   className={`${styles.formControl} ${styles.readOnlyInput}`}
-                  value={staffs.id}
+                  value={staff.id}
                   readOnly
                 />
               </div>
@@ -86,17 +115,7 @@ const StaffProfile = () => {
                 type="email"
                 className={styles.formControl}
                 name="email"
-                value={staffs.email}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-            <div className="mb-3">
-              <label className={styles.labels}>Password</label>
-              <input
-                className={styles.formControl}
-                name="password"
-                value={staffs.password}
+                value={staff.email}
                 onChange={handleInputChange}
                 required
               />
@@ -107,7 +126,7 @@ const StaffProfile = () => {
                 type="tel"
                 className={styles.formControl}
                 name="phone"
-                value={staffs.phone}
+                value={staff.phone}
                 onChange={handleInputChange}
                 required
                 pattern="[0-9]{10}"
@@ -120,20 +139,21 @@ const StaffProfile = () => {
                 type="text"
                 className={styles.formControl}
                 name="address"
-                value={staffs.address}
+                value={staff.address}
                 onChange={handleInputChange}
                 required
               />
             </div>
 
             <div className="text-center mt-4">
-              <button className={`${styles.profileButton} btn btn-primary`} type="submit" >
+              <button className={`${styles.profileButton}`} type="submit" >
+                Update
               </button>
             </div>
           </form>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

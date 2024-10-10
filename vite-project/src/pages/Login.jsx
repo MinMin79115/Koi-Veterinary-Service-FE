@@ -15,7 +15,6 @@ const Login = () => {
   //Lấy dữ liệu: useSelector,
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.user);
   const [phone, setPhone] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -122,7 +121,7 @@ const Login = () => {
               />
             </div>
             <div className='form-button-login'> 
-              <button type="submit" className="auth-button">Log In</button>
+              <button type="submit" id="loginButton" className="auth-button">Log In</button>
               <button type="button" onClick={handleLoginGoogle} className="auth-button">Google</button>
             </div>
           </form>

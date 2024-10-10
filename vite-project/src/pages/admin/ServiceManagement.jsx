@@ -48,7 +48,7 @@ const ServiceManagement = () => {
     //setting information of object has been choosen to be edited
     const handleOpenModalEdit = (record) => {
         setEditingService(record);
-        form.setFieldsValue({ name: record.name || '' });
+        form.setFieldsValue({ serviceName: record.serviceName || '' });
         setOpenModalEdit(true);
     };
 

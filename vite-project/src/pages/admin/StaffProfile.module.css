@@ -75,16 +75,17 @@
 }
 
 .profileButton:hover {
-  background-color: #0056b3;
+  background-color: #010c17;
+  color: #fff;
 }
 
 .profileButton:focus {
   outline: none;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem rgb(250, 82, 3);
 }
 
 .profileButton:active {
-  background-color: #004085;
+  background-color: #fc5d01;
 }
 
 .profileButton:disabled {

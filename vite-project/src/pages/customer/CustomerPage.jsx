@@ -11,6 +11,7 @@ function CustomerPage() {
   const location = useLocation();
   const [customer, setCustomer] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  const user = useSelector((state) => state.user);
 
   useEffect(() => {
     if (location.hash === '#profile') {
@@ -19,16 +20,24 @@ function CustomerPage() {
   }, [location]);
 
 
-  const fetchCustomer = async () =>{
-    const userToken = JSON.parse(sessionStorage.getItem('userToken'));
-    setCustomer(userToken);
+  const fetchCustomer = async () => {
+    try {
+      const response = await api.get(`customers/${user.id}`);
+      setCustomer(response.data);
+    } catch (error) {
+      console.error('Error fetching customer data:', error);
+      toast.error('Failed to load customer data. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   useEffect(() => {
-    // const user = JSON.parse(sessionStorage.getItem("userToken"));
-    fetchCustomer();
+    if (user && user.id) {
+      fetchCustomer();
+    }
     setIsLoading(false);
-  }, []);
+  }, [user]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -46,7 +55,7 @@ function CustomerPage() {
       if (!token) {
         throw new Error('No authentication token found');
       }
-      await api.put(`customers/${customer.id}`, customer, {
+      const response = await api.put(`customers/${user.id}`, customer, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -79,7 +88,6 @@ function CustomerPage() {
                     <img src="https://img.icons8.com/bubbles/100/000000/user.png" className={styles.imgRadius} alt="User-Profile" />
                   </div>
                   <h6 className={styles.fW600}>{customer.fullname}</h6>
-                  <p>Customer</p>
                 </div>
               </div>
               <div className="col-sm-8">
@@ -127,6 +135,18 @@ function CustomerPage() {
                         </div>
                       </div>
                     </div>
+                    <div className={`col-md-12`}>
+                        <div className={styles.formGroup}>
+                          <p className={`mb-1 ${styles.fW600}`}>Password</p>
+                          <input
+                            className={`${styles.formControl} ${styles.textMuted} ${styles.fW400}`}
+                            name="password"
+                            value={customer.password}
+                            onChange={handleInputChange}
+                            required
+                          />
+                        </div>
+                      </div>
                     <div className={`row`}>
                       <div className={`col-md-12`}>
                         <div className={styles.formGroup}>
