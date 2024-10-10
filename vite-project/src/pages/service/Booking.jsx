@@ -6,68 +6,93 @@ import api from '../../config/axios';
 import { useSelector } from 'react-redux';
 import { Form, DatePicker } from 'antd';
 import moment from 'moment';
+import session from 'redux-persist/lib/storage/session';
 
 const Booking = () => {
   const user = useSelector(state => state.user);
   const navigate = useNavigate();
   const location = useLocation();
-  const [booking, setBooking] = useState([]);
-  const [type, setType] = useState('');
+  const [slots, setSlots] = useState([]); // Change this line
   const [services, setServices] = useState([]);
-  const [slot, setSlot] = useState('');
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState('');
   const [selectedService, setSelectedService] = useState('');
-  const [availableTypes, setAvailableTypes] = useState(["Online", "At Center", "At Home"]);
+  const [selectedSlot, setSelectedSlot] = useState({
+    slotId: '',
+    startTime: '',
+    endTime: '',
+    slotDate: ''
+  })
   const [values, setValues] = useState({
-    service_name: '',
-    type: type,
-    slot: '',
-    doctor_name: '',
-    workTime: ''
+    serviceId: '',
+    slotId: '',
+    doctorId: '',
+    time: {
+      startTime: '',
+      endTime: '',
+      slotDate: ''
+    },
   });
   const [selectedDateTime, setSelectedDateTime] = useState(null);
-  const [isInterviewService, setIsInterviewService] = useState(false);
+  const [isInterviewService, setIsInterviewService] = useState(false)
+  //Hàm validate chọn time
+  const validateTimeRange = (_, value) => {
+    if (!value) {
+      return Promise.reject(new Error('Please select the date and time!'));
+    }
 
-  const fetchBookings = async () => {
+    const time = moment(value);
+    const startTime1 = moment('07:00', 'HH:mm');
+    const endTime1 = moment('10:00', 'HH:mm');
+    const startTime2 = moment('14:00', 'HH:mm');
+    const endTime2 = moment('18:00', 'HH:mm');
+
+    if (
+      (time.isBetween(startTime1, endTime1, 'minute', '[)')) || // 7 AM - 10 AM
+      (time.isBetween(startTime2, endTime2, 'minute', '[)') // 2 PM - 5 PM
+      )
+    ){
+      
+        return Promise.resolve();
+      
+    } 
+    return Promise.reject(new Error('Time must be between 7 AM - 10 AM or 14 PM - 18 PM!'));
+  };
+
+  const fetchSlots = async () => {
     try {
-      // const response = await api.get('booking', {
-      //   headers: {
-      //     Authorization: `Bearer ${sessionStorage.getItem('token')}`
-      //   }
-      // })
-      // const response = await axios.get(apiDoctors);
-      const response = await api.get('booking', {
+      const token = sessionStorage.getItem('token')
+      const response = await api.get('bookings/timeslots', {
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem('token')}`
+          Authorization: `Bearer ${token}`
         }
       });
       console.log(response.data);
-      setBooking(response.data);
+      setSlots(response.data); 
     } catch (error) {
-      toast.error('Error fetching bookings:', error.response.data);
+      toast.error('Error fetching slots:', error.response.data);
     }
   }
 
   const fetchServices = async () => {
     //Lấy dữ liệu từ be
     try {
-          const response = await api.get('services', {
-            headers: {
-              Authorization: `Bearer ${sessionStorage.getItem('token')}`
-            }
-          });
-        // const response = await axios.get(api);
-        console.log(response.data)
-        setServices(response.data);
+      const response = await api.get('bookings/services', {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`
+        }
+      });
+      // const response = await axios.get(api);
+      console.log(response.data)
+      setServices(response.data);
     } catch (error) {
-        toast.error('Error fetching services:', error.response.data);
+      toast.error('Error fetching services:', error.response.data);
     }
-}
+  }
 
   useEffect(() => {
     fetchServices();
-    // fetchDoctors();
+    fetchSlots();
   }, []);
 
   useEffect(() => {
@@ -77,28 +102,6 @@ const Booking = () => {
 
   }, [location]);
 
-  const handleServiceChange = (e) => {
-    const serviceName = e.target.value;
-    setValues(prevValues => ({ ...prevValues, service_name: serviceName }));
-    setSelectedService(serviceName);
-    setIsInterviewService(serviceName.toLowerCase() === 'online consulting');
-
-    const selectedServiceObj = services.find(service => service.serviceName === serviceName);
-    if (selectedServiceObj && Array.isArray(selectedServiceObj.type)) {
-      setAvailableTypes(selectedServiceObj.type);
-      if (selectedServiceObj.type.length === 1) {
-        setType(selectedServiceObj.type[0]);
-        setValues(prevValues => ({ ...prevValues, type: selectedServiceObj.type[0] }));
-      } else {
-        setType('');
-        setValues(prevValues => ({ ...prevValues, type: '' }));
-      }
-    } else {
-      setAvailableTypes([]);
-      setType('');
-      setValues(prevValues => ({ ...prevValues, type: '' }));
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -106,16 +109,14 @@ const Booking = () => {
       //request all information of this booking
       // form to booking detail and booking management
       try {
-        // const response = await api.post(apiService, { type, service })
-        const response = await api.post('booking', values);
-        //   headers:
-        //   {
-        //     Authorization: `Bearer ${sessionStorage.getItem('token')}`
-        //   }
-        // });
+        const response = await api.post('bookings', values, {
+          headers:
+          {
+            Authorization: `Bearer ${sessionStorage.getItem('token')}`
+          }
+        });
         console.log('Booking submitted:', values);
         toast.success('Booking submitted successfully!');
-        setType('');
         setServices('');
         navigate("/booking-detail")
       } catch (error) {
@@ -129,33 +130,71 @@ const Booking = () => {
   };
 
   const handleSlotChange = (e) => {
-    const selectedValue = e.target.value;
-    if (selectedValue) {
-      const [selectedSlot, selectedDoctorName] = selectedValue.split('|');
+    const slotId = e.target.value;
+    console.log(slotId)
+      // const [selectedSlot, selectedDoctorName] = selectedValue.split('|');
+      setSelectedSlot(slotId);
       setValues(prevValues => ({
         ...prevValues,
-        slot: selectedSlot,
-        doctor_name: selectedDoctorName
+        slotId: slotId,
       }));
-      setSlot(selectedSlot);
-      setSelectedDoctor(selectedDoctorName);
-    } else {
-      setSlot('');
-      setSelectedDoctor('');
-      setValues(prevValues => ({ ...prevValues, slot: '', doctor_name: '' }));
-    }
+      console.log(values)
+      // setValues(prevValues => ({
+      //   ...prevValues,
+      //   slot: selectedSlot,
+      //   doctor_name: selectedDoctorName
+      // }));
+      // setSlot(selectedSlot);
+      // setSelectedDoctor(selectedDoctorName);
   };
+
+  const handleServiceChange = (e) => {
+    const selectedService = e.target.value;
+    setSelectedService(selectedService);
+    if (selectedService) {
+      const [serviceName, servicesDetailId, serviceTypeName] = selectedService.split(' || ');
+      console.log('Selected Service:', serviceName, 'ServicesDetailId:', servicesDetailId);
+      setValues(prevValues => ({
+        ...prevValues,
+        servicesDetailId: servicesDetailId
+      }));
+      
+      // Assuming 'Online Consulting' is the name for interview services
+      setIsInterviewService(serviceTypeName === 'Online');
+    } else {
+      setValues(prevValues => ({
+        ...prevValues,
+        servicesDetailId: ''
+      }));
+      setIsInterviewService(false);
+    }
+  }
 
   const handleDateTimeChange = (value) => {
     setSelectedDateTime(value);
     if (value) {
-      const formattedDateTime = value.format('YYYY-MM-DD HH:mm');
+      const startTime = value.format('HH:mm');
+      //2 để tiếng phỏng vấn online hoặc khám online
+      const endTime = value.clone().add(2, 'hours').format('HH:mm');
+      const slotDate = value.format('YYYY-MM-DD');
+      
       setValues(prevValues => ({
         ...prevValues,
-        slot: formattedDateTime,
+        time: {
+          startTime: startTime,
+          endTime: endTime,
+          slotDate: slotDate,
+        }
       }));
+      
+      console.log('Start Time:', startTime);
+      console.log('End Time:', endTime);
+      console.log('Slot Date:', slotDate);
     } else {
-      setValues(prevValues => ({ ...prevValues, slot: '' }));
+      setValues(prevValues => ({ 
+        ...prevValues, 
+        time: {},
+      }));
     }
   };
 
@@ -172,49 +211,28 @@ const Booking = () => {
           <label htmlFor="service">Services:</label>
           <select
             id="service"
+            name='servicesDetailId'
             value={selectedService}
             onChange={handleServiceChange}
             required
           >
             <option value="">Select a service</option>
             {services.map((service) => (
-              <option key={service.serviceId} value={service.serviceName}>
-                {service.serviceName}
+              <option key={service.servicesDetailId} value={`${service.serviceId.serviceName} || ${service.servicesDetailId} || ${service.serviceTypeId.service_typeName}`}>
+                {service.serviceId.serviceName} - {service.serviceTypeId.service_typeName}
               </option>
             ))}
           </select>
         </div>
-        {/* check availableType not null to choose type */}
-        {/* if availableType length = 1, show only 1 option */}
-        {/* if availableType length > 1, show all option */}
-          <div className="form-group-booking">
-            <label htmlFor="type">Type:</label>
-            <select
-              id="type"
-              value={type}
-              onChange={(e) => {
-                setType(e.target.value);
-                setValues(prevValues => ({ ...prevValues, type: e.target.value }));
-              }}
-              required
-            > 
-              <option value="">Select a type</option>
-              {availableTypes.map((serviceType) => (
-                <option key={serviceType} value={serviceType}>
-                  {serviceType}
-                </option>
-              ))}
-            </select>
-          </div>
         {/* when I choose slot the docter name of this slot 
         will be set in handleSlotChange func to show in screen */}
         <div className="form-group-booking">
-        <label htmlFor="slot">Slot:</label>
-        {isInterviewService ? (
+          <label htmlFor="slot">Slot:</label>
+          {isInterviewService ? (
             <Form.Item
-              name="workTime"
+              name="dateTime"
               label="Select Date and Time"
-              rules={[{ required: true, message: 'Please select the date and time!' }]}
+              rules={[{ required: true, message: 'Please select the date and time!' },  { validator: validateTimeRange }]}
             >
               <DatePicker
                 showTime={{ format: 'HH:mm' }}
@@ -227,20 +245,21 @@ const Booking = () => {
           ) : (
             <select
               id="slot"
-              value={`${slot}|${selectedDoctor}`}
+              name='slotId'
+              // value={`${slot}|${selectedDoctor}`}
+              value={selectedSlot}
               onChange={handleSlotChange}
               required
             >
               <option value="">Select a Slot</option>
-              {doctors.map((doctor) => (
-                <option key={doctor.id} value={`${doctor.workTime}|${doctor.name}`}>
-                  {doctor.workTime}
+              {slots.map((slot) => ( // Change this line
+                <option key={slot.slotId} value={`${slot.slotId}`}>
+                  {slot.startTime} - {slot.endTime} in {slot.slotDate}
                 </option>
               ))}
             </select>
           )}
-          {/* Show doctor name when I have choosen slot above */}
-          {selectedDoctor && !isInterviewService && (
+          {selectedDoctor && (
             <div className="form-group-booking">
               <div className="doctor">
                 <label htmlFor="doctor-information">Your doctor:</label>

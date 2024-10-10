@@ -48,7 +48,6 @@ const StaffProfile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-    
       console.log('Submitting staff data:', staff);
       const response = await api.put(`customers/${staff.id}`, {
         ...staff,
