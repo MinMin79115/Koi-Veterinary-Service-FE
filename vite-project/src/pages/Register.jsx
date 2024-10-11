@@ -126,7 +126,7 @@ const Register = () => {
                 </div>
               </Col>
             </Row>
-            <button type="submit" className="auth-button">Register</button>
+            <button type="submit" id="registerButton" className="auth-button">Register</button>
           </form>
           <p className="auth-link">
             Already have an account? <Link to="/login">Log in</Link>

@@ -74,3 +74,20 @@
 .form-group-booking p{
   color: #0eb33f;
 }
+
+select option {
+  font-weight: normal;
+  padding-left: 15px;
+}
+
+.card-body {
+  padding: 2rem;
+}
+
+.form-label {
+  font-weight: 500;
+}
+
+.form-select, .form-control {
+  border-radius: 0.5rem;
+}
