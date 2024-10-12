@@ -22,6 +22,7 @@ const Booking = () => {
     servicesDetailId: '',
     slotId: '',
   });
+  const [selectedDateTime, setSelectedDateTime] = useState('')
   const [isInterviewService, setIsInterviewService] = useState(false)
   //Hàm validate chọn time
   const validateTimeRange = (_, value) => {

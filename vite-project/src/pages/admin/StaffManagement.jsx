@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { Button, Table, Modal, Form, Input, Popconfirm } from 'antd';
+import { Button, Table, Modal, Form, Input, Popconfirm, Select } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 import api from '../../config/axios'
 
@@ -13,6 +13,7 @@ const StaffManagement = () => {
   const [form] = useForm();
   const [submitting, setSubmitting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const roles = [{ role: 'STAFF' }, { role: 'VETERINARIAN' }];
 
   
   const fetchStaffs = async () => {
@@ -49,22 +50,22 @@ const StaffManagement = () => {
   const handleSubmitStaffs = async (values) => {
     //Xử lý thông tin trong Form
     //Post xuống API
-    const valuesStaff = {
+    const valuesToSend = {
       username: values.phone,
       fullname: values.fullname,
       phone: values.phone,
       address: values.address,
-      password: "123456"
+      password: "123456",
+      role: values.role
     }
-    console.log(valuesStaff)
+    console.log(valuesToSend)
     try {
       setSubmitting(true);//loading
-      const res = await api.post('auth/addstaff', valuesStaff, {
+      const res = await api.post('auth/addstaff', valuesToSend, {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem('token')}`
         }
       })
-      // const res = await axios.post(api, valuesStaff)
       //Toast css for beautiful
       toast.success("Successfully !")
       setOpenModal(false)
@@ -107,6 +108,11 @@ const StaffManagement = () => {
       title: "Address",
       dataIndex: "address",
       key: "address",
+    },
+    {
+      title: "Role",
+      dataIndex: "role",
+      key: "role",
     },
     {
       title: "Action",
@@ -186,6 +192,24 @@ const StaffManagement = () => {
             }
           ]}>
             <Input />
+          </Form.Item>
+          <Form.Item 
+            label="Role" 
+            name="role" 
+            rules={[
+              {
+                required: true,
+                message: "Please select a role!"
+              }
+            ]}
+          >
+            <Select>
+              {roles.map((role, index) => (
+                <Select.Option key={index} value={role.role}>
+                  {role.role}
+                </Select.Option>
+              ))}
+            </Select>
           </Form.Item>
         </Form>
       </Modal>
