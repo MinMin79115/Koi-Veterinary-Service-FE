@@ -40,7 +40,7 @@ const Login = () => {
       const userProfile = response.data;
       sessionStorage.setItem("token",accessToken)
       sessionStorage.setItem("userToken",JSON.stringify(userProfile))
-      if(role === 'CUSTOMER' || role ==='VETERIAN' || role === null ){
+      if(role === 'CUSTOMER' || role ==='VETERINARIAN' || role === null ){
         navigate('/')
       }else if(role === 'ADMIN'){
         navigate('/manager')

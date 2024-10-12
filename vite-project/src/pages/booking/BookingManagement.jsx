@@ -3,6 +3,7 @@ import { Table, Button } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './BookingManagement.css';
+import api from '../../config/axios'
 
 const BookingPage = () => {
     const [bookingRequests, setBookingRequests] = useState([
@@ -52,7 +53,7 @@ const BookingPage = () => {
             align: 'center',
             className: 'column-border',
             render: (status) => (
-                <span className={`badge ${status === 'Pending' ? 'bg-warning' : status === 'Accepted' ? 'bg-success' : 'bg-danger'} d-flex justify-content-center`}>
+                <span className={`badge ${status === 'Pending' ? 'bg-warning' : status === 'Accepted' ? 'bg-success' : 'bg-danger'} d-flex justify-content-center py-2 fst-italic`}>
                     {status}
                 </span>
             ),
@@ -64,26 +65,18 @@ const BookingPage = () => {
             render: (_, record) => (
                 <div className="d-flex flex-column flex-md-row justify-content-center">
                     <Button 
-                        type="primary" 
-                        className="btn btn-success d-flex justify-content-center" 
+                        type='none'
+                        className="btn-custom btn btn-success d-flex justify-content-center mx-auto" 
                         icon={<CheckCircleOutlined />} 
-                        onClick={() => handleConfirmBooking(record.id)}
+                        onClick={() => handleConfirmBooking(record)}
                     >
                         Confirm
                     </Button>
                     <Button 
-                        type="primary" 
-                        className="btn btn-warning d-flex justify-content-center mb-2 mb-md-0 mx-md-2"
-                        icon={<CloseCircleOutlined />} 
-                        onClick={() => handleRejectBooking(record.id)}
-                    >
-                        Reject
-                    </Button>
-                    <Button 
-                        type="primary" 
-                        className="btn btn-danger d-flex justify-content-center"
+                        type='none'
+                        className="btn-custom btn btn-danger d-flex justify-content-center mx-auto"
                         icon={<DeleteOutlined />} 
-                        onClick={() => handleDeleteBooking(record.id)}
+                        onClick={() => handleDeleteBooking(record)}
                     >
                         Delete
                     </Button>
@@ -92,20 +85,25 @@ const BookingPage = () => {
         }
     ];
 
-    const handleConfirmBooking = (id) => {
-        setBookingRequests(bookingRequests.map(request =>
-            request.id === id ? { ...request, status: 'Accepted' } : request
-        ));
+    const handleConfirmBooking = async (record) => {
+        const valuesToUpdate = {
+            status: 'CONFIRMED'
+        }
+        try{
+            const response = await api.put(`bookings${record.id}`, valuesToUpdate)
+            toast.success('Confirmed.')
+        }catch(error){
+            console.log(error)
+        }
     };
 
-    const handleRejectBooking = (id) => {
-        setBookingRequests(bookingRequests.map(request => 
-            request.id === id ? { ...request, status: 'Rejected'} : request
-        ));
-    };
-
-    const handleDeleteBooking = (id) => {
-        setBookingRequests(bookingRequests.filter(request => request.id !== id));
+    const handleDeleteBooking = async (record) => {
+        try{
+            const response = await api.delete(`bookings${record.id}`)
+            toast.success('Deleted successful.')
+        }catch(error){
+            console.log(error)
+        }
     };
 
     return (
@@ -119,7 +117,7 @@ const BookingPage = () => {
                                 <Table 
                                     dataSource={bookingRequests} 
                                     columns={columns} 
-                                    pagination={{ pageSize: 5 }}
+                                    pagination={{ pageSize: 6 }}
                                     className="table"
                                 />
                             </div>

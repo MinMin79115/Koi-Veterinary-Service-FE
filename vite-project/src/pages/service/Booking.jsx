@@ -19,18 +19,9 @@ const Booking = () => {
   const [selectedService, setSelectedService] = useState('');
   const [selectedSlot, setSelectedSlot] = useState('')
   const [valuesToSend, setValuesToSend] = useState({
-    user_id: user.id,
-    veterinarian_id: 1,
-    services_detail_id: '',
-    slot_id: '',
-    booking_time: {
-      startTime: '',
-      endTime: '',
-      slotDate: ''
-    },
-    status: 'Pending'
+    servicesDetailId: '',
+    slotId: '',
   });
-  const [selectedDateTime, setSelectedDateTime] = useState(null);
   const [isInterviewService, setIsInterviewService] = useState(false)
   //Hàm validate chọn time
   const validateTimeRange = (_, value) => {
@@ -104,7 +95,7 @@ const Booking = () => {
     console.log('Values to send:', valuesToSend);
     if (user) {
       try {
-        const response = await api.post('bookings', valuesToSend, {
+        const response = await api.post('bookings',valuesToSend, {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem('token')}`
           }
@@ -113,9 +104,9 @@ const Booking = () => {
         toast.success('Booking submitted successfully!');
         setSelectedService('');
         setSelectedSlot('');
-        setSelectedDateTime(null);
         navigate("/booking-detail");
       } catch (error) {
+        console.log(error)
         toast.error(error.response?.data || 'An error occurred while booking');
       }
     } else {
@@ -133,12 +124,12 @@ const Booking = () => {
       setSelectedSlot(slotChoose)
       setValuesToSend(prevValues => ({
         ...prevValues,
-        slot_id: slotChoose
+        slotId: slotChoose
       }));
     }else{
       setValuesToSend(prevValues => ({
         ...prevValues,
-        slot_id: ''
+        slotId: ''
       }));
     }
     console.log(valuesToSend)
@@ -160,43 +151,42 @@ const Booking = () => {
       console.log('Selected Service:', serviceName, 'ServicesDetailId:', servicesDetailId);
       setValuesToSend(prevValues => ({
         ...prevValues,
-        services_detail_id: servicesDetailId
+        servicesDetailId: servicesDetailId
       }));
       // Assuming 'Online Consulting' is the name for interview services
       setIsInterviewService(serviceTypeName === 'Online');
     } else {
       setValuesToSend(prevValues => ({
         ...prevValues,
-        services_detail_id: ''
+        servicesDetailId: ''
       }));
       setIsInterviewService(false);
     }
   }
 
   const handleDateTimeChange = (value) => {
-    setSelectedDateTime(value);
-    if (value) {
-      const startTime = value.format('HH:mm');
-      //2 để tiếng phỏng vấn online hoặc khám online
+    const timeForrmat = value.format('YYYY-MM-DD HH:mm:ss')
+    setSelectedDateTime(timeForrmat);
+    console.log(timeForrmat)
+    if (timeForrmat) {
+      // const startTime = value.format('HH:mm');
+      // //2 để tiếng phỏng vấn online hoặc khám online
       const endTime = value.clone().add(2, 'hours').format('HH:mm');
-      const slotDate = value.format('YYYY-MM-DD');
+      // const slotDate = value.format('YYYY-MM-DD');
       
       setValuesToSend(prevValues => ({
         ...prevValues,
-        booking_time: {
-          startTime: startTime,
-          endTime: endTime,
-          slotDate: slotDate,
-        }
+        slot_id: 12,
+        booking_time: timeForrmat,
       }));
       
-      console.log('Start Time:', startTime);
+      // console.log('Start Time:', startTime);
       console.log('End Time:', endTime);
-      console.log('Slot Date:', slotDate);
+      // console.log('Slot Date:', slotDate);
     } else {
       setValuesToSend(prevValues => ({ 
         ...prevValues, 
-        booking_time: {},
+        booking_time: '',
       }));
     }
   };
@@ -265,7 +255,7 @@ const Booking = () => {
                     >
                       <option value="">Select a Slot</option>
                       {slots.map((slot) => (
-                        <option key={slot.slotId} value={slot.slotId}>
+                        <option key={slot.slotId} value={`${slot.slotId}`}>
                           {slot.startTime} - {slot.endTime} on {slot.slotDate}
                         </option>
                       ))}

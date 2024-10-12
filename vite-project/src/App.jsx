@@ -52,7 +52,7 @@ function App() {
 
   const ProtectedRouteVeterian = ({ children }) => {
     const user = useSelector((state) => state.user);
-    if (user && user?.role === 'VETERIAN') {
+    if (user && user?.role === 'VETERINARIAN') {
       return children;
     }
     alert('You dont have permission to access this page');
