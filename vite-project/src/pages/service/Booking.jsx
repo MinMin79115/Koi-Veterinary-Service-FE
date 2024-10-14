@@ -21,6 +21,7 @@ const Booking = () => {
   const [valuesToSend, setValuesToSend] = useState({
     servicesDetailId: '',
     slotId: '',
+    veterinarianId: ''
   });
   const [selectedDateTime, setSelectedDateTime] = useState('')
   const [isInterviewService, setIsInterviewService] = useState(false)
@@ -79,9 +80,26 @@ const Booking = () => {
     }
   }
 
+  const fetchDoctors = async () => {
+    //Lấy dữ liệu từ be - Doctor Online to pick
+    try {
+      const response = await api.get('veterinarian', {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`
+        }
+      });
+      // const response = await axios.get(api);
+      console.log(response.data)
+      setDoctors(response.data);
+    } catch (error) {
+      toast.error('Error fetching doctors:', error.response.data);
+    }
+  }
+
   useEffect(() => {
     fetchServices();
     fetchSlots();
+    //fetchDoctors();
   }, []);
 
   useEffect(() => {
@@ -92,7 +110,8 @@ const Booking = () => {
   }, [location]);
 
 
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (e) => {
+    e.prevent.default;
     console.log('Values to send:', valuesToSend);
     if (user) {
       try {
@@ -105,6 +124,7 @@ const Booking = () => {
         toast.success('Booking submitted successfully!');
         setSelectedService('');
         setSelectedSlot('');
+        setSelectedDoctor('')
         navigate("/booking-detail");
       } catch (error) {
         console.log(error)
@@ -134,14 +154,26 @@ const Booking = () => {
       }));
     }
     console.log(valuesToSend)
-      
-      // setValues(prevValues => ({
-      //   ...prevValues,
-      //   slot: selectedSlot,
-      //   doctor_name: selectedDoctorName
-      // }));
-      // setSlot(selectedSlot);
-      // setSelectedDoctor(selectedDoctorName);
+  };
+
+  const handleDoctorChange = (e) => {
+    const doctorChoose = e.target.value;
+    console.log(doctorChoose)
+      // const [selectedSlot, selectedDoctorName] = selectedValue.split('|');
+    
+    if(doctorChoose){
+      setSelectedDoctor(doctorChoose)
+      setValuesToSend(prevValues => ({
+        ...prevValues,
+        veterinarianId: doctorChoose
+      }));
+    }else{
+      setValuesToSend(prevValues => ({
+        ...prevValues,
+        veterinarianId: ''
+      }));
+    }
+    console.log(valuesToSend)
   };
 
   const handleServiceChange = (e) => {
@@ -227,6 +259,7 @@ const Booking = () => {
                 <div className="mb-3">
                   <label htmlFor="slot" className="form-label">Slot:</label>
                   {isInterviewService ? (
+                    <>
                     <Form.Item
                       name="dateTime"
                       label="Select Date and Time"
@@ -244,6 +277,24 @@ const Booking = () => {
                         className="form-control"
                       />
                     </Form.Item>
+                    <Form.Item>
+                    <select
+                    id="veterinarianId"
+                    name='veterinarianId'
+                    value={selectedDoctor}
+                    onChange={handleDoctorChange}
+                    required
+                    className="form-select"
+                  >
+                    <option value="">Select a Slot</option>
+                    {doctors.map((item) => (
+                      <option key={item.veterinarianId} value={`${item.veterinarianId}`}>
+                        Doctor: {item.name}
+                      </option>
+                    ))}
+                  </select>
+                  </Form.Item>
+                  </>
                   ) : (
                     <Form.Item>
                       <select
@@ -277,7 +328,6 @@ const Booking = () => {
                   <button 
                     type="submit" 
                     className="submit-btn"
-                    disabled={!selectedService || (!isInterviewService && !selectedSlot) || (isInterviewService && !selectedDateTime)}
                   >
                     Book Now
                   </button>

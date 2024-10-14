@@ -1,16 +1,16 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate , Link} from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from './CustomerPage.module.css';
 import api from '../../config/axios';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
-
+import { SendOutlined } from '@ant-design/icons'
 function CustomerPage() {
   const location = useLocation();
-  const [customer, setCustomer] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
+  const [customer, setCustomer] = useState([]);
+  const [newPassword, setNewPassword] = useState('')
   const user = useSelector((state) => state.user);
 
   useEffect(() => {
@@ -23,20 +23,24 @@ function CustomerPage() {
   const fetchCustomer = async () => {
     try {
       const response = await api.get(`customers/${user.id}`);
-      setCustomer(response.data);
+      const {fullname, email,phone, address} = response.data;
+      const userProfile = {
+        fullname: fullname,
+        email: email,
+        phone: phone,
+        address: address,
+      }
+      setCustomer(userProfile);
     } catch (error) {
       console.error('Error fetching customer data:', error);
       toast.error('Failed to load customer data. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
+    } 
   }
 
   useEffect(() => {
     if (user && user.id) {
       fetchCustomer();
     }
-    setIsLoading(false);
   }, [user]);
 
   const handleInputChange = (e) => {
@@ -50,36 +54,58 @@ function CustomerPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      setIsLoading(true);
       const token = sessionStorage.getItem('token');
       if (!token) {
         throw new Error('No authentication token found');
       }
+      
+      if (newPassword !== '' || !newPassword ) {
+        setCustomer(preValues => ({
+          ...preValues,
+          password: newPassword
+        }));
+      }
+      
+      console.log(customer)
       const response = await api.put(`customers/${user.id}`, customer, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
+      
       console.log('Updated customer information:', response.data);
       toast.success('Profile updated successfully!');
       // Optionally update the Redux store or local state here
     } catch (error) {
       console.error('Error updating profile:', error);
       toast.error(error.response?.data?.message || 'Failed to update profile. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
+    } 
   };
 
-  if (isLoading) {
-    return <div className={styles.loading}>Loading...</div>;
-  }
-
+  
   return (
-
-    <div className={`bg-white shadow`} id="page-content">
+    <div className={`bg-white shadow my-2`} id="page-content">
+      {user.role === "CUSTOMER" ? (
+        <div className="row mb-4">
+          <div className="col-12 d-flex justify-content-end align-items-center my-4">
+            <SendOutlined className="me-2" />
+            <Link className="btn btn-outline-info btn-sm me-2" to="/booking-detail">
+              View Booking History
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <div className="row mb-4">
+          <div className="col-12 d-flex justify-content-end align-items-center my-4">
+            <SendOutlined className="me-2" />
+            <Link className="btn btn-outline-info btn-sm me-2" to="/booking-management">
+              Manage Bookings
+            </Link>
+          </div>
+        </div>
+      )}
       <div className={`${styles.padding} m-5`}>
-        <div className={`row container d- flex justify-content-center `}>
+        <div className={`row container d-flex justify-content-center `}>
           <div className={`${styles.card} ${styles.userCardFull}`}>
             <div className={`row ${styles.mL0} ${styles.mR0}`}>
               <div className={`col-sm-4 ${styles.bgCLiteGreen} ${styles.userProfile}`}>
@@ -136,17 +162,17 @@ function CustomerPage() {
                       </div>
                     </div>
                     <div className={`col-md-12`}>
-                        <div className={styles.formGroup}>
-                          <p className={`mb-1 ${styles.fW600}`}>Password</p>
-                          <input
-                            className={`${styles.formControl} ${styles.textMuted} ${styles.fW400}`}
-                            name="password"
-                            value={customer.password}
-                            onChange={handleInputChange}
-                            required
-                          />
-                        </div>
+                      <div className={styles.formGroup}>
+                        <p className={`mb-1 ${styles.fW600}`}>Password</p>
+                        <input
+                          // type="password"
+                          className={`${styles.formControl} ${styles.textMuted} ${styles.fW400}`}
+                          name="password"
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                        />
                       </div>
+                    </div>
                     <div className={`row`}>
                       <div className={`col-md-12`}>
                         <div className={styles.formGroup}>
@@ -164,9 +190,10 @@ function CustomerPage() {
                     </div>
                     
                     <div className={styles.mT20}>
-                      <button type="submit" className={styles.updateButton} disabled={isLoading}>
-                        {isLoading ? 'Updating...' : 'Update Profile'}
+                      <button type="submit" className={styles.updateButton} >
+                        Update
                       </button>
+                      
                     </div>
                   </form>
                 </div>

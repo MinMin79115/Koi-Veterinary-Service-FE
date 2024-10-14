@@ -1,22 +1,16 @@
 import React, { useState } from 'react';
 import { Table, Button } from 'antd';
-import { CheckCircleOutlined, CloseCircleOutlined, DeleteOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './BookingManagement.css';
 import api from '../../config/axios'
 
 const BookingPage = () => {
     const [bookingRequests, setBookingRequests] = useState([
-        { id: '1', customerName: 'HungDung', service: 'Interview', status: 'Pending' },
-        { id: '2', customerName: 'hd', service: 'Health Checking', status: 'Pending' },
-        { id: '3', customerName: 'mt', service: 'Pond Checking', status: 'Pending' },
-        { id: '4', customerName: 'mt', service: 'Pond Checking', status: 'Pending' },
-        { id: '5', customerName: 'mt', service: 'Pond Checking', status: 'Pending' },
-        { id: '6', customerName: 'mt', service: 'Pond Checking', status: 'Pending' },
-        { id: '7', customerName: 'mt', service: 'Pond Checking', status: 'Pending' },
-        { id: '8', customerName: 'mt', service: 'Pond Checking', status: 'Pending' },
-        { id: '9', customerName: 'mt', service: 'Pond Checking', status: 'Pending' },
-        { id: '10', customerName: 'mt', service: 'Pond Checking', status: 'Pending' },
+        { id: '1', customerName: 'HungDung', service: 'Interview', status: 'PENDING' },
+        { id: '2', customerName: 'hd', service: 'Health Checking', status: 'PENDING' },
+        { id: '3', customerName: 'mt', service: 'Pond Checking', status: 'CONFIRMED' },
+        { id: '10', customerName: 'mt', service: 'Pond Checking', status: 'COMPLETED' },
         
     ]);
 
@@ -53,7 +47,7 @@ const BookingPage = () => {
             align: 'center',
             className: 'column-border',
             render: (status) => (
-                <span className={`badge ${status === 'Pending' ? 'bg-warning' : status === 'Accepted' ? 'bg-success' : 'bg-danger'} d-flex justify-content-center py-2 fst-italic`}>
+                <span className={`badge ${status === 'PENDING' ? 'bg-warning' : status === 'CONFIRMED' ? 'bg-success' : 'bg-info'} d-flex justify-content-center py-2 fst-italic`}>
                     {status}
                 </span>
             ),
@@ -64,9 +58,22 @@ const BookingPage = () => {
             className: 'column-border',
             render: (_, record) => (
                 <div className="d-flex flex-column flex-md-row justify-content-center">
-                    <Button 
+                    {record.status === "COMPLETED" ? (
+                        <p className='fst-italic text-info'>HAS BEEN COMPLETED</p>
+                    ) : record.status === "CONFIRMED" ? (
+                        <Button 
                         type='none'
-                        className="btn-custom btn btn-success d-flex justify-content-center mx-auto" 
+                        className="btn-custom btn btn-danger d-flex justify-content-center m-auto"
+                        icon={<DeleteOutlined />} 
+                        onClick={() => handleDeleteBooking(record)}
+                    >
+                        Delete
+                    </Button>
+                    ) : (
+                        <>
+                        <Button 
+                        type='none'
+                        className="btn-custom btn btn-success d-flex justify-content-center m-1" 
                         icon={<CheckCircleOutlined />} 
                         onClick={() => handleConfirmBooking(record)}
                     >
@@ -74,17 +81,20 @@ const BookingPage = () => {
                     </Button>
                     <Button 
                         type='none'
-                        className="btn-custom btn btn-danger d-flex justify-content-center mx-auto"
+                        className="btn-custom btn btn-danger d-flex justify-content-center m-1"
                         icon={<DeleteOutlined />} 
                         onClick={() => handleDeleteBooking(record)}
                     >
                         Delete
                     </Button>
+                    </>
+                    )}
                 </div>
             )
         }
     ];
 
+   
     const handleConfirmBooking = async (record) => {
         const valuesToUpdate = {
             status: 'CONFIRMED'
@@ -117,8 +127,8 @@ const BookingPage = () => {
                                 <Table 
                                     dataSource={bookingRequests} 
                                     columns={columns} 
-                                    pagination={{ pageSize: 6 }}
-                                    className="table"
+                                    pagination={{ pageSize: 6}}
+                                    className="table column-border"
                                 />
                             </div>
                         </div>

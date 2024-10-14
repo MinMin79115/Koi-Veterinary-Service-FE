@@ -20,6 +20,7 @@ import StaffManagement from './pages/admin/StaffManagement';
 import NotFound from './pages/NotFound';
 import BookingManagement from './pages/booking/BookingManagement';
 import ServiceManagement from './pages/admin/ServiceManagement';
+import SlotManagement from './pages/admin/SlotManagement';
 import BookingDetail from './pages/booking/BookingDetail';
 function App() {
   const ProtectedRoute = ({ children }) => {
@@ -33,7 +34,7 @@ function App() {
 
   const ProtectedRouteCustomer = ({ children }) => {
     const user = useSelector((state) => state.user);
-    if (user && user?.role === 'CUSTOMER') {
+    if (user && user?.role === 'CUSTOMER' || user?.role === null) {
       return children;
     }else{
       alert('You dont have permission to access this page');
@@ -66,6 +67,8 @@ function App() {
         <Route path='/manager' element={<ProtectedRoute><Manager /></ProtectedRoute>} />
         <Route path="/staff-management" element={<ProtectedRoute><StaffManagement /></ProtectedRoute>} />
         <Route path="/service-management" element={<ProtectedRoute><ServiceManagement/></ProtectedRoute>}/>
+        <Route path="/service-management" element={<ProtectedRoute><SlotManagement/></ProtectedRoute>}/>
+
         {/* <Route path="/booking-management" element={<ProtectedRouteStaff><BookingManagement/></ProtectedRouteStaff>}/> */}
 
         <Route path="/login" element={<Login />} />

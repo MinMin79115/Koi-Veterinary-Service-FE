@@ -5,6 +5,7 @@ import {
   BarChartOutlined,
   UserOutlined,
   CustomerServiceOutlined,
+  CalendarOutlined 
 } from '@ant-design/icons';
 import { Breadcrumb, Layout, Menu, theme } from 'antd';
 import StaffManagement from './StaffManagement';
@@ -12,6 +13,7 @@ import Dashboard from './Dashboard';
 import AdminProfile from './AdminPage';
 import FAQManagement from './FAQ';
 import ServiceManagement from './ServiceManagement';
+import SlotManagement from './SlotManagement';
 const { Header, Content, Sider } = Layout;
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -41,6 +43,7 @@ const Manager = () => {
     getItem('Manage Staff', 'staff', <PieChartOutlined />),
     getItem('Manage FAQ', 'faq', <DesktopOutlined />),
     getItem('Manage Service', 'service', <CustomerServiceOutlined />),
+    getItem('Manage Slot', 'slot', <CalendarOutlined />),
     getItem('User', 'sub1', <UserOutlined />, [
       getItem('Profile', 'profile'),
       getItem('Logout', 'logout'),
@@ -62,6 +65,8 @@ const Manager = () => {
         return <FAQManagement />;
       case 'service':
         return <ServiceManagement />;
+      case 'slot':
+        return <SlotManagement />;
       case 'profile':
         return <AdminProfile />;
       case 'logout':
@@ -88,7 +93,7 @@ const Manager = () => {
         <Content style={{ margin: '0 16px' }}>
           <Breadcrumb style={{ margin: '16px 0' }}>
             <Breadcrumb.Item>Manager</Breadcrumb.Item>
-            <Breadcrumb.Item>{selectedKey === 'dashboard' ? 'Dashboard' : selectedKey === 'staff' ? 'Staff Management' : selectedKey === 'faq' ? 'FAQ Management' : selectedKey === 'service' ? 'Service Management' : 'User Profile'}</Breadcrumb.Item>
+            <Breadcrumb.Item>{selectedKey === 'dashboard' ? 'Dashboard' : selectedKey === 'staff' ? 'Staff Management' : selectedKey === 'faq' ? 'FAQ Management' : selectedKey === 'service' ? 'Service Management' : selectedKey === 'slot' ? 'Slot Management' : 'User Profile'}</Breadcrumb.Item>
           </Breadcrumb>
           <div
             style={{

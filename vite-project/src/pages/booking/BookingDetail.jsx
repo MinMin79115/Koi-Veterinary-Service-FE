@@ -1,18 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button } from 'antd';
-import { CheckCircleOutlined, CloseCircleOutlined, DeleteOutlined } from '@ant-design/icons';
+import { DeleteOutlined, FileProtectOutlined } from '@ant-design/icons';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './BookingDetail.css';
 import api from '../../config/axios'
+import {  useNavigate } from 'react-router-dom';
 
 const BookingDetail = () => {
   const [booking, setBooking] = useState([
-    { id: '1', customerName: 'HungDung', dateTime: '2024-10-14 7:00:00', service: 'Interview', serviceType: 'Online', status: 'Pending', price: '200.000 VNĐ' },
-    { id: '3', customerName: 'MinMin', dateTime: '2024-10-14 15:00:00', service: 'Health Checking', serviceType: 'At center', status: 'Pending', price: '300.000 VNĐ' },
-    { id: '2', customerName: 'Customer', dateTime: '2024-10-14 9:00:00', service: 'Pond Checking', serviceType: 'At home', status: 'Confirmed', price: '450.000 VNĐ' },
+    { id: '1', customerName: 'HungDung', dateTime: '2024-10-14 7:00:00', service: 'Interview', serviceType: 'Online', status: 'PENDING', price: '200.000 VNĐ' },
+    { id: '3', customerName: 'MinMin', dateTime: '2024-10-14 15:00:00', service: 'Health Checking', serviceType: 'At center', status: 'PENDING', price: '300.000 VNĐ' },
+    { id: '2', customerName: 'Customer', dateTime: '2024-10-14 9:00:00', service: 'Pond Checking', serviceType: 'At home', status: 'CONFIRMED', price: '450.000 VNĐ' },
+    { id: '4', customerName: 'Thuanne', dateTime: '2024-10-14 14:00:00', service: 'Pond Checking', serviceType: 'At home', status: 'COMPLETED', price: '450.000 VNĐ' },
+
 
   ]);
-
+  const navigate = useNavigate();
   // const fetchBooking = async () => {      
   //   try{
   //     const response = await api.get('bookings')
@@ -68,7 +71,7 @@ const BookingDetail = () => {
       align: 'center',
       className: 'column-border',
       render: (status) => (
-        <span className={`badge ${status === 'Pending' ? 'bg-warning' : 'bg-success'} d-flex justify-content-center py-2 fst-italic`}>
+        <span className={`badge ${status === 'PENDING' ? 'bg-warning' : status === 'COMPLETED' ? 'bg-info' : 'bg-success  '} d-flex justify-content-center py-2 fst-italic`}>
           {status}
         </span>
       ),
@@ -87,14 +90,19 @@ const BookingDetail = () => {
       className: 'column-border',
       render: (_, record) => (
         <div className="d-flex flex-column flex-md-row justify-content-center">
-          <Button
+          {record.status === "COMPLETED" ? (
+            <p className='fst-italic fs-6 text-info'>HAS BEEN COMPLETED</p>
+          ): (
+            <Button
             type='none'
-            className="btn-custom btn btn-danger d-flex justify-content-center mx-1 my-1"
+            className="btn-custom btn btn-danger d-flex justify-content-center m-1"
             icon={<DeleteOutlined />}
             onClick={() => handleDeleteBooking(record)}
-          >
+            >
             Delete
-          </Button>
+            </Button>
+          )}
+        
         </div>
       )
     }
@@ -122,7 +130,7 @@ const BookingDetail = () => {
                   dataSource={booking}
                   columns={columns}
                   pagination={{ pageSize: 6 }}
-                  className="table"
+                  className="table column-border"
                 />
               </div>
             </div>
