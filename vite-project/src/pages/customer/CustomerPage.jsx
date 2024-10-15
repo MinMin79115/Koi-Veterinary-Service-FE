@@ -7,6 +7,8 @@ import api from '../../config/axios';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import { SendOutlined } from '@ant-design/icons'
+import userImage from '../../assets/user.png'
+
 function CustomerPage() {
   const location = useLocation();
   const [customer, setCustomer] = useState([]);
@@ -65,7 +67,7 @@ function CustomerPage() {
           password: newPassword
         }));
       }
-      
+
       console.log(customer)
       const response = await api.put(`customers/${user.id}`, customer, {
         headers: {
@@ -85,7 +87,7 @@ function CustomerPage() {
   
   return (
     <div className={`bg-white shadow my-2`} id="page-content">
-      {user.role === "CUSTOMER" ? (
+      {user.role === "CUSTOMER" || user.role === "VETERINARIAN" ? (
         <div className="row mb-4">
           <div className="col-12 d-flex justify-content-end align-items-center my-4">
             <SendOutlined className="me-2" />
@@ -111,7 +113,7 @@ function CustomerPage() {
               <div className={`col-sm-4 ${styles.bgCLiteGreen} ${styles.userProfile}`}>
                 <div className={`${styles.cardBlock} text-center text-white`}>
                   <div className={styles.mB25}>
-                    <img src="https://img.icons8.com/bubbles/100/000000/user.png" className={styles.imgRadius} alt="User-Profile" />
+                    <img src={userImage} className={styles.imgRadius} alt="User-Profile" />
                   </div>
                   <h6 className={styles.fW600}>{customer.fullname}</h6>
                 </div>

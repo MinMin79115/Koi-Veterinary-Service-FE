@@ -14,7 +14,7 @@ import AdminProfile from './AdminPage';
 import FAQManagement from './FAQ';
 import ServiceManagement from './ServiceManagement';
 import SlotManagement from './SlotManagement';
-const { Header, Content, Sider } = Layout;
+const { Content, Sider } = Layout;
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { logout } from '../../redux/features/userSlider';

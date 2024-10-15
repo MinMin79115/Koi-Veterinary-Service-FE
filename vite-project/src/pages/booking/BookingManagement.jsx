@@ -1,18 +1,44 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Table, Button } from 'antd';
 import { CheckCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './BookingManagement.css';
 import api from '../../config/axios'
+import { toast } from 'react-toastify';
 
 const BookingPage = () => {
-    const [bookingRequests, setBookingRequests] = useState([
-        { id: '1', customerName: 'HungDung', service: 'Interview', status: 'PENDING' },
-        { id: '2', customerName: 'hd', service: 'Health Checking', status: 'PENDING' },
-        { id: '3', customerName: 'mt', service: 'Pond Checking', status: 'CONFIRMED' },
-        { id: '10', customerName: 'mt', service: 'Pond Checking', status: 'COMPLETED' },
-        
-    ]);
+    const [bookings, setBookings] = useState([]);
+
+    const fetchBooking = async () => {      
+        try {
+          const response = await api.get('bookings', {
+            headers: {
+              'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+            }
+          });
+          console.log(response.data);
+          
+          const values = response.data.map(booking => ({
+            id: booking.bookingId,
+            customerName: booking.user.fullname,
+            service: booking.servicesDetail.serviceId.serviceName,
+            serviceType: booking.servicesDetail.serviceTypeId.service_type,
+            status: booking.status,
+            price: booking.servicesDetail.serviceTypeId.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
+          }));
+    
+          setBookings(values); // Set bookings to an array of booking objects
+        } catch (error) {
+          toast.error("Fetching booking failed.");
+          console.log(error);
+        }
+      };
+
+      useEffect(() => {
+        fetchBooking();
+      }, []);
+
+
 
     const columns = [
         {
@@ -47,7 +73,7 @@ const BookingPage = () => {
             align: 'center',
             className: 'column-border',
             render: (status) => (
-                <span className={`badge ${status === 'PENDING' ? 'bg-warning' : status === 'CONFIRMED' ? 'bg-success' : 'bg-info'} d-flex justify-content-center py-2 fst-italic`}>
+                <span className={`badge ${status === 'PENDING' ? 'bg-warning' : status === 'CONFIRMED' ? 'bg-success' : status === 'COMPLETED' ? 'bg-info' : 'bg-danger'} d-flex justify-content-center py-2 fst-italic`}>
                     {status}
                 </span>
             ),
@@ -69,7 +95,7 @@ const BookingPage = () => {
                     >
                         Delete
                     </Button>
-                    ) : (
+                    ) : record.status === "PENDING" ? (
                         <>
                         <Button 
                         type='none'
@@ -88,6 +114,8 @@ const BookingPage = () => {
                         Delete
                     </Button>
                     </>
+                    ) : (
+                        <></>
                     )}
                 </div>
             )
@@ -96,12 +124,17 @@ const BookingPage = () => {
 
    
     const handleConfirmBooking = async (record) => {
-        const valuesToUpdate = {
-            status: 'CONFIRMED'
+        const valuesToSend = {
+            status: "CONFIRMED"
         }
         try{
-            const response = await api.put(`bookings${record.id}`, valuesToUpdate)
+            const response = await api.put(`bookings/${record.id}`,valuesToSend, {
+                headers: {
+                  'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+                }
+              });
             toast.success('Confirmed.')
+            fetchBooking();
         }catch(error){
             console.log(error)
         }
@@ -109,10 +142,15 @@ const BookingPage = () => {
 
     const handleDeleteBooking = async (record) => {
         try{
-            const response = await api.delete(`bookings${record.id}`)
+            const response = await api.put(`bookings/delete/${record.id}`, {
+                headers: {
+                  'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+                }
+              });
             toast.success('Deleted successful.')
+            fetchBooking();
         }catch(error){
-            console.log(error)
+            console.log(error.response.data)
         }
     };
 
@@ -125,7 +163,7 @@ const BookingPage = () => {
                         <div className="card-body">
                             <div className="table-responsive">
                                 <Table 
-                                    dataSource={bookingRequests} 
+                                    dataSource={bookings} 
                                     columns={columns} 
                                     pagination={{ pageSize: 6}}
                                     className="table column-border"

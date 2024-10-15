@@ -40,12 +40,10 @@ const Login = () => {
       const userProfile = response.data;
       sessionStorage.setItem("token",accessToken)
       sessionStorage.setItem("userToken",JSON.stringify(userProfile))
-      if(role === 'CUSTOMER' || role ==='VETERINARIAN' || role === null ){
+      if(role === 'CUSTOMER' || role ==='VETERINARIAN' || role === "STAFF" ){
         navigate('/')
       }else if(role === 'ADMIN'){
         navigate('/manager')
-      }else if(role === 'STAFF'){
-        navigate('/staff-profile')
       }
     }catch(error){
       toast.error(error.response.data);

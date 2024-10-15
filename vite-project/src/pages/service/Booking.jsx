@@ -21,7 +21,8 @@ const Booking = () => {
   const [valuesToSend, setValuesToSend] = useState({
     servicesDetailId: '',
     slotId: '',
-    veterinarianId: ''
+    veterinarianId: '',
+    slotDate: ''
   });
   const [selectedDateTime, setSelectedDateTime] = useState('')
   const [isInterviewService, setIsInterviewService] = useState(false)
@@ -42,7 +43,7 @@ const Booking = () => {
       (time >= startTime1 && time <= endTime1) || // 7 AM - 10 AM
       (time >= startTime2 && time <= endTime2) // 2 PM - 6 PM (inclusive)
     ) {
-      
+
       return Promise.resolve();
     } else {
       return Promise.reject(new Error('Time must be between 7 AM - 10 AM or 2 PM - 6 PM!'));
@@ -58,7 +59,7 @@ const Booking = () => {
         }
       });
       console.log(response.data);
-      setSlots(response.data); 
+      setSlots(response.data);
     } catch (error) {
       toast.error('Error fetching slots:', error.response.data);
     }
@@ -83,12 +84,11 @@ const Booking = () => {
   const fetchDoctors = async () => {
     //Lấy dữ liệu từ be - Doctor Online to pick
     try {
-      const response = await api.get('veterinarian', {
+      const response = await api.get('bookings/veterinarians', {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem('token')}`
         }
       });
-      // const response = await axios.get(api);
       console.log(response.data)
       setDoctors(response.data);
     } catch (error) {
@@ -99,7 +99,7 @@ const Booking = () => {
   useEffect(() => {
     fetchServices();
     fetchSlots();
-    //fetchDoctors();
+    fetchDoctors();
   }, []);
 
   useEffect(() => {
@@ -111,11 +111,10 @@ const Booking = () => {
 
 
   const handleSubmit = async (e) => {
-    e.prevent.default;
     console.log('Values to send:', valuesToSend);
     if (user) {
       try {
-        const response = await api.post('bookings',valuesToSend, {
+        const response = await api.post('bookings', valuesToSend, {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem('token')}`
           }
@@ -138,19 +137,21 @@ const Booking = () => {
 
   const handleSlotChange = (e) => {
     const slotChoose = e.target.value;
+    const [selectedSlot, selectedDoctor, name] = slotChoose.split('|');
     console.log(slotChoose)
-      // const [selectedSlot, selectedDoctorName] = selectedValue.split('|');
-    
-    if(slotChoose){
+    if (slotChoose) {
       setSelectedSlot(slotChoose)
+      setSelectedDoctor(name)
       setValuesToSend(prevValues => ({
         ...prevValues,
-        slotId: slotChoose
+        slotId: selectedSlot,
+        veterinarianId: selectedDoctor
       }));
-    }else{
+    } else {
       setValuesToSend(prevValues => ({
         ...prevValues,
-        slotId: ''
+        slotId: '',
+        veterinarianId: ''
       }));
     }
     console.log(valuesToSend)
@@ -158,27 +159,31 @@ const Booking = () => {
 
   const handleDoctorChange = (e) => {
     const doctorChoose = e.target.value;
-    console.log(doctorChoose)
-      // const [selectedSlot, selectedDoctorName] = selectedValue.split('|');
-    
-    if(doctorChoose){
-      setSelectedDoctor(doctorChoose)
+    setSelectedSlot('')
+    console.log('Selected Doctor Value:', doctorChoose); // Log the selected value
+    const [selectedDoctorId, name] = doctorChoose.split('|');
+    console.log('Doctor ID:', selectedDoctorId, 'Doctor Name:', name); // Log the split values
+    if (doctorChoose) {
+      setSelectedDoctor(name); // Trim to remove any extra spaces
       setValuesToSend(prevValues => ({
         ...prevValues,
-        veterinarianId: doctorChoose
+        slotId: selectedSlot,
+        veterinarianId: selectedDoctorId // Use the ID for the value
       }));
-    }else{
+    } else {
+      setSelectedDoctor('');
       setValuesToSend(prevValues => ({
         ...prevValues,
         veterinarianId: ''
       }));
     }
-    console.log(valuesToSend)
   };
 
   const handleServiceChange = (e) => {
     const selectedService = e.target.value;
     setSelectedService(selectedService);
+    setSelectedSlot('')
+    setSelectedDoctor('')
     if (selectedService) {
       const [serviceName, servicesDetailId, serviceTypeName] = selectedService.split(' || ');
       console.log('Selected Service:', serviceName, 'ServicesDetailId:', servicesDetailId);
@@ -187,7 +192,13 @@ const Booking = () => {
         servicesDetailId: servicesDetailId
       }));
       // Assuming 'Online Consulting' is the name for interview services
-      setIsInterviewService(serviceTypeName === 'Online');
+      setIsInterviewService(serviceTypeName === 'Online' || serviceTypeName === 'At Home');
+      if(isInterviewService){
+        setValuesToSend(prevValues => ({
+          ...prevValues,
+          slotId: selectedSlot,
+        }));
+      }
     } else {
       setValuesToSend(prevValues => ({
         ...prevValues,
@@ -200,26 +211,27 @@ const Booking = () => {
   const handleDateTimeChange = (value) => {
     const timeForrmat = value.format('YYYY-MM-DD HH:mm:ss')
     setSelectedDateTime(timeForrmat);
+    setSelectedSlot('')
     console.log(timeForrmat)
     if (timeForrmat) {
       // const startTime = value.format('HH:mm');
       // //2 để tiếng phỏng vấn online hoặc khám online
       const endTime = value.clone().add(2, 'hours').format('HH:mm');
       // const slotDate = value.format('YYYY-MM-DD');
-      
+
       setValuesToSend(prevValues => ({
         ...prevValues,
-        slot_id: 12,
-        booking_time: timeForrmat,
+        slotId: selectedSlot,
+        slotDate: timeForrmat,
       }));
-      
+
       // console.log('Start Time:', startTime);
       console.log('End Time:', endTime);
       // console.log('Slot Date:', slotDate);
     } else {
-      setValuesToSend(prevValues => ({ 
-        ...prevValues, 
-        booking_time: '',
+      setValuesToSend(prevValues => ({
+        ...prevValues,
+        slotDate: '',
       }));
     }
   };
@@ -239,6 +251,7 @@ const Booking = () => {
               <Form onFinish={handleSubmit} className="booking-form">
                 <div className="mb-3">
                   <label htmlFor="service" className="form-label">Services:</label>
+                  <Form.Item>
                   <select
                     id="service"
                     name='servicesDetailId'
@@ -249,89 +262,93 @@ const Booking = () => {
                   >
                     <option value="">Select a service</option>
                     {services.map((service) => (
-                      <option key={service.servicesDetailId} value={`${service.serviceId.serviceName} || ${service.servicesDetailId} || ${service.serviceTypeId.service_typeName}`}>
-                        {service.serviceId.serviceName} - {service.serviceTypeId.service_typeName}
+                      <option key={service.servicesDetailId} value={`${service.serviceId.serviceName} || ${service.servicesDetailId} || ${service.serviceTypeId.service_type}`}>
+                        {service.serviceId.serviceName} - {service.serviceTypeId.service_type}
                       </option>
                     ))}
                   </select>
+                  </Form.Item>
                 </div>
 
                 <div className="mb-3">
                   <label htmlFor="slot" className="form-label">Slot:</label>
                   {isInterviewService ? (
                     <>
-                    <Form.Item
-                      name="dateTime"
-                      label="Select Date and Time"
-                      rules={[
-                        { required: true, message: 'Please select the date and time!' },
-                        { validator: validateTimeRange }
-                      ]}
-                    >
-                      <DatePicker
-                        showTime={{ format: 'HH:mm' }}
-                        format="YYYY-MM-DD HH:mm"
-                        disabledDate={disabledDate}
-                        onChange={handleDateTimeChange}
-                        value={selectedDateTime}
-                        className="form-control"
-                      />
-                    </Form.Item>
-                    <Form.Item>
-                    <select
-                    id="veterinarianId"
-                    name='veterinarianId'
-                    value={selectedDoctor}
-                    onChange={handleDoctorChange}
-                    required
-                    className="form-select"
-                  >
-                    <option value="">Select a Slot</option>
-                    {doctors.map((item) => (
-                      <option key={item.veterinarianId} value={`${item.veterinarianId}`}>
-                        Doctor: {item.name}
-                      </option>
-                    ))}
-                  </select>
-                  </Form.Item>
-                  </>
+                      <Form.Item
+                        name="dateTime"
+                        label="Select Date and Time"
+                        rules={[
+                          { validator: validateTimeRange }
+                        ]}
+                      >
+                        <DatePicker
+                          showTime={{ format: 'HH:mm' }}
+                          format="YYYY-MM-DD HH:mm"
+                          disabledDate={disabledDate}
+                          onChange={handleDateTimeChange}
+                          value={selectedDateTime}
+                          className="form-control"
+                        />
+                      </Form.Item>
+                      <label htmlFor="veterinarianId" className="form-label">Doctors:</label>
+                      <div>
+                      <Form.Item>
+                        <select
+                          id="veterinarianId"
+                          name='veterinarianId'
+                          value={doctors.fullname}
+                          onChange={handleDoctorChange}
+                          className="form-control"
+                        >
+                          <option value="">Select a Doctor</option>
+                          {doctors.map((item) => (
+                            <option key={item.veterinarianId} value={`${item.veterinarianId} | ${item.user.fullname}`}>
+                              Doctor: {item.user.fullname}
+                            </option>
+                          ))}
+                        </select>
+                        </Form.Item>
+                      </div>
+                    </>
                   ) : (
                     <Form.Item>
                       <select
-                      id="slot"
-                      name='slotId'
-                      value={selectedSlot}
-                      onChange={handleSlotChange}
-                      required
-                      className="form-select"
-                    >
-                      <option value="">Select a Slot</option>
-                      {slots.map((slot) => (
-                        <option key={slot.slotId} value={`${slot.slotId}`}>
-                          {slot.startTime} - {slot.endTime} on {slot.slotDate}
-                        </option>
-                      ))}
-                    </select>
+                        id="slot"
+                        name='slotId'
+                        value={selectedSlot}
+                        onChange={handleSlotChange}
+                        required
+                        className="form-select"
+                      >
+                        <option value="">Select a Slot</option>
+                        {slots.map((slot) => (
+                          <option key={slot.slotId} value={`${slot.slotId} | ${slot.veterinarianId.veterinarianId} | ${slot.veterinarianId.user.fullname}`}>
+                            {slot.startTime} - {slot.endTime} on {slot.slotDate}
+                          </option>
+                        ))}
+                      </select>
                     </Form.Item>
                   )}
                 </div>
 
-                {/* {selectedDoctor && (
+                {selectedDoctor ? (
                   <div className="mb-3">
                     <label className="form-label">Your doctor:</label>
-                    <p className="form-control-static">{selectedDoctor}</p>
+                    <p className="form-control-static text-success fst-italic fs-6">{selectedDoctor}</p>
                   </div>
-                )} */}
+                ) : (
+                  <></>
+                )}
 
                 <Form.Item>
-                <div className="d-grid">
-                  <button 
-                    type="submit" 
-                    className="submit-btn"
-                  >
-                    Book Now
-                  </button>
-                </div>
+                  <div className="d-grid">
+                    <button
+                      type="submit"
+                      className="submit-btn"
+                    >
+                      Book Now
+                    </button>
+                  </div>
                 </Form.Item>
               </Form>
             </div>

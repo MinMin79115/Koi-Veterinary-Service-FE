@@ -1,34 +1,66 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button } from 'antd';
-import { DeleteOutlined, FileProtectOutlined } from '@ant-design/icons';
+import { DeleteOutlined, FileDoneOutlined } from '@ant-design/icons';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './BookingDetail.css';
 import api from '../../config/axios'
-import {  useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 
 const BookingDetail = () => {
-  const [booking, setBooking] = useState([
-    { id: '1', customerName: 'HungDung', dateTime: '2024-10-14 7:00:00', service: 'Interview', serviceType: 'Online', status: 'PENDING', price: '200.000 VNĐ' },
-    { id: '3', customerName: 'MinMin', dateTime: '2024-10-14 15:00:00', service: 'Health Checking', serviceType: 'At center', status: 'PENDING', price: '300.000 VNĐ' },
-    { id: '2', customerName: 'Customer', dateTime: '2024-10-14 9:00:00', service: 'Pond Checking', serviceType: 'At home', status: 'CONFIRMED', price: '450.000 VNĐ' },
-    { id: '4', customerName: 'Thuanne', dateTime: '2024-10-14 14:00:00', service: 'Pond Checking', serviceType: 'At home', status: 'COMPLETED', price: '450.000 VNĐ' },
-
-
-  ]);
+  const [bookings, setBookings] = useState([]);
   const navigate = useNavigate();
-  // const fetchBooking = async () => {      
-  //   try{
-  //     const response = await api.get('bookings')
-  //     setBooking(response.data)
-  //   }catch(error){
-  //     toast.error("Fetching booking failed.")
-  //     console.log(error)
-  //   }
-  // }
+  const user = useSelector((state) => state.user);
 
-  // useEffect(() => {
-  //   fetchBooking()
-  // },[])
+  const fetchBooking = async () => {
+    try {
+      if (user.role === 'CUSTOMER') {
+        const response = await api.get(`bookings/user/${user.id}`, {
+          headers: {
+            'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+          }
+        });
+        console.log(response.data);
+
+        const values = response.data.map(booking => ({
+          id: booking.bookingId,
+          customerName: booking.user.fullname,
+          service: booking.servicesDetail.serviceId.serviceName,
+          serviceType: booking.servicesDetail.serviceTypeId.service_type,
+          status: booking.status,
+          price: booking.servicesDetail.serviceTypeId.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
+        }));
+
+        setBookings(values); //Set bookings to an array of booking objects      
+        }else{
+        const response = await api.get(`bookings/veterinarian/${user.id}`, {
+          headers: {
+            'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+          }
+        });
+        console.log(response.data);
+
+        const values = response.data.map(booking => ({
+          id: booking.bookingId,
+          customerName: booking.user.fullname,
+          service: booking.servicesDetail.serviceId.serviceName,
+          serviceType: booking.servicesDetail.serviceTypeId.service_type,
+          status: booking.status,
+          price: booking.servicesDetail.serviceTypeId.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
+        }));
+
+        setBookings(values); //Set bookings to an array of booking objects
+      }
+    } catch (error) {
+      toast.error("Fetching booking failed.");
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchBooking();
+  }, []);
 
   const columns = [
     {
@@ -90,19 +122,33 @@ const BookingDetail = () => {
       className: 'column-border',
       render: (_, record) => (
         <div className="d-flex flex-column flex-md-row justify-content-center">
-          {record.status === "COMPLETED" ? (
-            <p className='fst-italic fs-6 text-info'>HAS BEEN COMPLETED</p>
-          ): (
-            <Button
-            type='none'
-            className="btn-custom btn btn-danger d-flex justify-content-center m-1"
-            icon={<DeleteOutlined />}
-            onClick={() => handleDeleteBooking(record)}
-            >
-            Delete
-            </Button>
+          {user?.role === 'CUSTOMER' ? (
+            record.status === "COMPLETED" ? (
+              <p className='fst-italic fs-6 text-info'>HAS BEEN COMPLETED</p>
+            ) : (
+              <Button
+                type='none'
+                className="btn-custom btn btn-danger d-flex justify-content-center m-1"
+                icon={<DeleteOutlined />}
+                onClick={() => handleDeleteBooking(record)}
+              >
+                Delete
+              </Button>
+            )
+          ) : (
+            record.status === "COMPLETED" ? (
+              <p className='fst-italic fs-6 text-info'>HAS BEEN COMPLETED</p>
+            ) : (
+              <Button
+                type='none'
+                icon={<FileDoneOutlined />}
+                className="btn-custom btn btn-success d-flex justify-content-center m-1"
+                onClick={() => handleComplete(record)}
+              >
+                Complete
+              </Button>
+            )
           )}
-        
         </div>
       )
     }
@@ -110,24 +156,45 @@ const BookingDetail = () => {
 
   const handleDeleteBooking = async (record) => {
     try {
-      const response = await api.delete(`bookings${record.id}`)
+      const response = await api.delete(`bookings/${record.id}`)
       toast.success('Deleted successful.')
       fetchBooking()
     } catch (error) {
-      console.log(error)
+      console.log(error.response.data)
     }
   };
 
+  const handleComplete = async (record) => {
+    try {
+      const valuesToUpdate = {
+        status: 'COMPLETED'
+      }
+      const response = await api.put(`bookings/${record.id}`, valuesToUpdate,{
+        headers: {
+          'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+        }
+      })
+      //Update the booking status to COMPLETED
+      //Need to send mail to customer (user.emai)
+      toast.success('Complete successful.')
+      fetchBooking()
+    } catch (error) {
+      console.log(error.response.data)
+    }
+  };
+
+  const filteredBookings = bookings.filter(booking => booking.status !== 'CANCELLED');
+
   return (
     <div className="container-fluid mt-5">
-      <h2 className="mb-4 text-center">Booking Detail</h2>
+      <h2 className="mb-4 text-center fw-bold">Booking Detail</h2>
       <div className="row justify-content-center">
         <div className="col-12">
           <div className="card">
             <div className="card-body">
               <div className="table-responsive">
                 <Table
-                  dataSource={booking}
+                  dataSource={filteredBookings}
                   columns={columns}
                   pagination={{ pageSize: 6 }}
                   className="table column-border"
