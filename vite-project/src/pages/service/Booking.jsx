@@ -125,7 +125,7 @@ const Booking = () => {
         <body>
           <h1 style='color: blue;'>Welcome, ${user.fullname}</h1>
           <p style='font-size: 16px;'>You have successfully booked an appointment.</p>
-          <p style='font-size: 16px;'>Your booking service will start at <b>${selectedSlot} ${selectedHour} ${selectedDateTime}</b> <i>with ${selectedDoctor}</i>.</p>
+          <p style='font-size: 16px;'>Your ${selectedService} will start at <b>${selectedSlot} ${selectedHour} ${selectedDateTime}</b> <i>with ${selectedDoctor}</i>.</p>
           <p style='font-size: 16px;'>Thank you for choosing our service!</p>
         </body>
       </html>
