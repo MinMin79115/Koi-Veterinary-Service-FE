@@ -158,7 +158,9 @@ const StaffManagement = () => {
         onChange={(e) => handleSearch(e.target.value)}
         style={{ margin: 16, width: '60%'}}
       />
-      <Table dataSource={filteredData} columns={columns} />
+      <Table dataSource={filteredData} columns={columns}
+        pagination={{ pageSize: 7 }}
+      />
       {/* onCancel: Bấm ra ngoài thì hành động được chạy */}
       {/* onOK: Chạy hàm trong Modal */}
       <Modal onOk={() => form.submit()} title="Create new Staff" open={openModal} onCancel={handleCloseModal}>

@@ -21,6 +21,7 @@ const BookingPage = () => {
           const values = response.data.map(booking => ({
             id: booking.bookingId,
             customerName: booking.user.fullname,
+            email: booking.user.email,
             service: booking.servicesDetail.serviceId.serviceName,
             serviceType: booking.servicesDetail.serviceTypeId.service_type,
             status: booking.status,
@@ -48,6 +49,15 @@ const BookingPage = () => {
             width: '10%',
             align: 'center',
             className: 'column-border'
+        },
+        {
+            title: 'Email',
+            dataIndex: 'email',
+            key: 'email',
+            width: '20%',
+            align: 'center',
+            className: 'column-border',
+            hidden: user?.role === 'CUSTOMER' || user?.role === 'VETERINARIAN' || user?.role === 'STAFF'
         },
         {
             title: 'Customer Name',
@@ -127,7 +137,27 @@ const BookingPage = () => {
         const valuesToSend = {
             status: "CONFIRMED"
         }
+        const emailContent = `
+        <html>
+          <body>
+            <h1 style='color: blue;'>Welcome, ${record.customerName}</h1>
+            <p style='font-size: 16px;'>Your booking has been confirmed at time: ${new Date().toLocaleString()}.</p>
+            <p style='font-size: 16px;'>Thank you for choosing our service!</p>
+            <p style='font-size: 16px;'>If you have any questions, please contact us at <b>KOI FISH CARE Centre</b></p>
+            <p style='font-size: 16px;'>Best regards, <b>KOI FISH CARE Centre</b></p>
+          </body>
+        </html>
+        `;
         try{
+            const format = {
+                subject: "Booking Confirmation",
+                body: emailContent
+            }
+            const resMail = await api.post(`mail/send/${record.email}`, format, {
+                headers: {
+                  Authorization: `Bearer ${sessionStorage.getItem('token')}`
+                }
+              })
             const response = await api.put(`bookings/${record.id}`,valuesToSend, {
                 headers: {
                   'Authorization': `Bearer ${sessionStorage.getItem('token')}`
@@ -142,11 +172,31 @@ const BookingPage = () => {
 
     const handleDeleteBooking = async (record) => {
         try{
+            const emailContent = `
+            <html>
+              <body>
+                <h1 style='color: blue;'>Welcome, ${record.customerName}</h1>
+                <p style='font-size: 16px;'>Your booking has been deleted at time: ${new Date().toLocaleString()}.</p>
+                <p style='font-size: 16px;'>If you have any questions, please contact us at <b>KOI FISH CARE Centre</b></p>
+                <p style='font-size: 16px;'>Best regards, <b>KOI FISH CARE Centre</b></p>
+              </body>
+            </html>
+            `;
+            const format = {
+                subject: "Booking Deletion",
+                html: emailContent
+            }
+            const resMail = await api.post(`mail/send/${record.email}`, format, {
+                headers: {
+                  Authorization: `Bearer ${sessionStorage.getItem('token')}`
+                }
+              })
             const response = await api.put(`bookings/delete/${record.id}`, {
                 headers: {
                   'Authorization': `Bearer ${sessionStorage.getItem('token')}`
                 }
               });
+            console.log(resMail)
             toast.success('Deleted successful.')
             fetchBooking();
         }catch(error){

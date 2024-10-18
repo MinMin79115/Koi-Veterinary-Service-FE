@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 import { Form, DatePicker } from 'antd';
 import moment from 'moment';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import axios from 'axios';
 
 const Booking = () => {
   const user = useSelector(state => state.user);
@@ -22,10 +23,14 @@ const Booking = () => {
     servicesDetailId: '',
     slotId: '',
     veterinarianId: '',
-    slotDate: ''
+    serviceTime: ''
   });
+  const [selectedHour, setSelectedHour] = useState('')
   const [selectedDateTime, setSelectedDateTime] = useState('')
   const [isInterviewService, setIsInterviewService] = useState(false)
+
+  
+
   //Hàm validate chọn time
   const validateTimeRange = (_, value) => {
     if (!value) {
@@ -109,24 +114,49 @@ const Booking = () => {
 
   }, [location]);
 
-
+  //có send email
   const handleSubmit = async (e) => {
     console.log('Values to send:', valuesToSend);
+    console.log(user.email);
+
+    // Construct the email content
+    const emailContent = `
+      <html>
+        <body>
+          <h1 style='color: blue;'>Welcome, ${user.fullname}</h1>
+          <p style='font-size: 16px;'>You have successfully booked an appointment.</p>
+          <p style='font-size: 16px;'>Your booking service will start at <b>${selectedSlot} ${selectedHour} ${selectedDateTime}</b> <i>with ${selectedDoctor}</i>.</p>
+          <p style='font-size: 16px;'>Thank you for choosing our service!</p>
+        </body>
+      </html>
+    `;
+
+    const format = {
+      subject: "Booking Confirmation",
+      body: emailContent
+    };
+
     if (user) {
       try {
+        const resMail = await api.post(`mail/send/${user.email}`, format, {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem('token')}`
+          }
+        });
         const response = await api.post('bookings', valuesToSend, {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem('token')}`
           }
         });
+        console.log(resMail);
         console.log('Booking submitted:', response.data);
         toast.success('Booking submitted successfully!');
         setSelectedService('');
         setSelectedSlot('');
-        setSelectedDoctor('')
+        setSelectedDoctor('');
         navigate("/booking-detail");
       } catch (error) {
-        console.log(error)
+        console.log(error);
         toast.error(error.response?.data || 'An error occurred while booking');
       }
     } else {
@@ -145,13 +175,14 @@ const Booking = () => {
       setValuesToSend(prevValues => ({
         ...prevValues,
         slotId: selectedSlot,
-        veterinarianId: selectedDoctor
+        veterinarianId: selectedDoctor,
       }));
     } else {
       setValuesToSend(prevValues => ({
         ...prevValues,
         slotId: '',
-        veterinarianId: ''
+        veterinarianId: '',
+        serviceTime: ''
       }));
     }
     console.log(valuesToSend)
@@ -209,7 +240,9 @@ const Booking = () => {
   }
 
   const handleDateTimeChange = (value) => {
-    const timeForrmat = value.format('YYYY-MM-DD HH:mm:ss')
+    const timeForrmat = value.format('YYYY-MM-DD')
+    const hour = value.format('HH:mm')
+    setSelectedHour(hour)
     setSelectedDateTime(timeForrmat);
     setSelectedSlot('')
     console.log(timeForrmat)
@@ -217,21 +250,21 @@ const Booking = () => {
       // const startTime = value.format('HH:mm');
       // //2 để tiếng phỏng vấn online hoặc khám online
       const endTime = value.clone().add(2, 'hours').format('HH:mm');
-      // const slotDate = value.format('YYYY-MM-DD');
+      // const serviceTime = value.format('YYYY-MM-DD');
 
       setValuesToSend(prevValues => ({
         ...prevValues,
         slotId: selectedSlot,
-        slotDate: timeForrmat,
+        serviceTime: timeForrmat,
       }));
 
       // console.log('Start Time:', startTime);
       console.log('End Time:', endTime);
-      // console.log('Slot Date:', slotDate);
+      // console.log('Slot Date:', serviceTime);
     } else {
       setValuesToSend(prevValues => ({
         ...prevValues,
-        slotDate: '',
+        serviceTime: '',
       }));
     }
   };
@@ -271,12 +304,12 @@ const Booking = () => {
                 </div>
 
                 <div className="mb-3">
-                  <label htmlFor="slot" className="form-label">Slot:</label>
                   {isInterviewService ? (
-                    <>
+                    <>                
+                    <label htmlFor="dateTime" className="form-label">Date and Time:</label>
                       <Form.Item
                         name="dateTime"
-                        label="Select Date and Time"
+                        label="Select:"
                         rules={[
                           { validator: validateTimeRange }
                         ]}
@@ -311,7 +344,22 @@ const Booking = () => {
                       </div>
                     </>
                   ) : (
+                    <>
+                    <label htmlFor="dateTime" className="form-label">Date:</label> 
+                    <Form.Item
+                        name="date"
+                        label="Select:"
+                      >
+                        <DatePicker
+                          format="YYYY-MM-DD"
+                          disabledDate={disabledDate}
+                          onChange={handleDateTimeChange}
+                          value={selectedDateTime}
+                          className="form-control"
+                        />
+                      </Form.Item>
                     <Form.Item>
+                      <label htmlFor="slot" className="form-label">Slot:</label>
                       <select
                         id="slot"
                         name='slotId'
@@ -321,14 +369,21 @@ const Booking = () => {
                         className="form-select"
                       >
                         <option value="">Select a Slot</option>
-                        {slots.map((slot) => (
-                          <option key={slot.slotId} value={`${slot.slotId} | ${slot.veterinarianId.veterinarianId} | ${slot.veterinarianId.user.fullname}`}>
-                            {slot.startTime} - {slot.endTime} on {slot.slotDate}
-                          </option>
-                        ))}
+                        {slots
+                          .filter(slot => slot.slotStatus === "AVAILABLE") // Filter only available slots
+                          .map(slot => (
+                            <option 
+                              key={slot.slotId} 
+                              value={`${slot.slotId} | ${slot.veterinarian.veterinarianId} | ${slot.veterinarian.user.fullname}`}
+                            >
+                              {slot.timeSlot.startTime} - {slot.timeSlot.endTime}
+                            </option>
+                          ))}
                       </select>
                     </Form.Item>
+                    </>
                   )}
+                  
                 </div>
 
                 {selectedDoctor ? (
