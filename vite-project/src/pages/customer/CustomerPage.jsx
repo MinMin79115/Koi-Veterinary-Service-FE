@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate , Link} from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from './CustomerPage.module.css';
 import api from '../../config/axios';
@@ -25,7 +25,7 @@ function CustomerPage() {
   const fetchCustomer = async () => {
     try {
       const response = await api.get(`customers/${user.id}`);
-      const {fullname, email,phone, address} = response.data;
+      const { fullname, email, phone, address } = response.data;
       const userProfile = {
         fullname: fullname,
         email: email,
@@ -36,7 +36,7 @@ function CustomerPage() {
     } catch (error) {
       console.error('Error fetching customer data:', error);
       toast.error('Failed to load customer data. Please try again.');
-    } 
+    }
   }
 
   useEffect(() => {
@@ -60,31 +60,30 @@ function CustomerPage() {
       if (!token) {
         throw new Error('No authentication token found');
       }
-      
-      if (newPassword !== '' || !newPassword ) {
-        setCustomer(preValues => ({
-          ...preValues,
-          password: newPassword
-        }));
+
+      const updatedCustomer = { ...customer };
+
+      if (newPassword.trim() !== '') {
+        updatedCustomer.password = newPassword;
       }
 
-      console.log(customer)
-      const response = await api.put(`customers/${user.id}`, customer, {
+      console.log(updatedCustomer);
+      const response = await api.put(`customers/${user.id}`, updatedCustomer, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
-      
+
       console.log('Updated customer information:', response.data);
       toast.success('Profile updated successfully!');
-      // Optionally update the Redux store or local state here
+      setNewPassword('');
     } catch (error) {
       console.error('Error updating profile:', error);
       toast.error(error.response?.data?.message || 'Failed to update profile. Please try again.');
-    } 
+    }
   };
 
-  
+
   return (
     <div className={`bg-white shadow my-2`} id="page-content">
       {user.role === "CUSTOMER" || user.role === "VETERINARIAN" ? (
@@ -190,12 +189,12 @@ function CustomerPage() {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className={styles.mT20}>
                       <button type="submit" className={styles.updateButton} >
                         Update
                       </button>
-                      
+
                     </div>
                   </form>
                 </div>
