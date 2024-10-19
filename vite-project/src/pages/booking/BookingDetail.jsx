@@ -134,6 +134,8 @@ const BookingDetail = () => {
           {user?.role === 'CUSTOMER' ? (
             record.status === "COMPLETED" ? (
               <p className='fst-italic fs-6 text-info'>HAS BEEN COMPLETED</p>
+            ) : record.status === "CANCELLED" ? (
+              <p className='fst-italic fs-6 text-danger'>CANCELLED</p>
             ) : (
               <Button
                 type='none'
@@ -147,6 +149,8 @@ const BookingDetail = () => {
           ) : (
             record.status === "COMPLETED" ? (
               <p className='fst-italic fs-6 text-info'>HAS BEEN COMPLETED</p>
+            ) : record.status === "CANCELLED" ? (
+              <p className='fst-italic fs-6 text-danger'>CANCELLED</p>
             ) : (
               <Button
                 type='none'
@@ -218,7 +222,7 @@ const BookingDetail = () => {
     }
   };
 
-  const filteredBookings = bookings.filter(booking => booking.status !== 'CANCELLED');
+  const filteredBookings = bookings.filter(booking => booking.status !== '');
 
   return (
     <div className="container-fluid mt-5">
