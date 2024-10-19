@@ -21,6 +21,8 @@ import BookingManagement from './pages/booking/BookingManagement';
 import ServiceManagement from './pages/admin/ServiceManagement';
 import SlotManagement from './pages/admin/SlotManagement';
 import BookingDetail from './pages/booking/BookingDetail';
+import PaySuccess from './pages/payment/paySuccess';
+import PayFailed from './pages/payment/payFailed';
 function App() {
   const ProtectedRoute = ({ children }) => {
     const user = useSelector((state) => state.user);
@@ -62,6 +64,8 @@ function App() {
         <Route path="/service-management" element={<ProtectedRoute><SlotManagement/></ProtectedRoute>}/>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/success" element={<PaySuccess />} />
+        <Route path="/failed" element={<PayFailed />} />
         {/* Routes with Header and Footer */}
         <Route element={
           <div className="App">

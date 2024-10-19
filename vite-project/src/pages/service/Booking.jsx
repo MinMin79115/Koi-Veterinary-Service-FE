@@ -115,7 +115,8 @@ const Booking = () => {
   }, [location]);
 
   //có send email
-  const handleSubmit = async (e) => {
+  const handleSubmit = async () => {
+    const token = sessionStorage.getItem('token')
     console.log('Values to send:', valuesToSend);
     console.log(user.email);
 
@@ -138,17 +139,37 @@ const Booking = () => {
 
     if (user) {
       try {
-        const resMail = await api.post(`mail/send/${user.email}`, format, {
-          headers: {
-            Authorization: `Bearer ${sessionStorage.getItem('token')}`
-          }
-        });
-        const response = await api.post('bookings', valuesToSend, {
-          headers: {
-            Authorization: `Bearer ${sessionStorage.getItem('token')}`
-          }
-        });
-        console.log(resMail);
+        if(selectedService.serviceTypeName === 'Online'){
+          const resMail = await api.post(`mail/send/${user.email}`, format, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+          });
+          console.log(resMail);
+          const response = await api.post('bookings', valuesToSend, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+          });
+          //Thanh toán Online ở đây
+          // const resPayment = await api.post(`payments/orderID?orderId=${response.data.bookingId}`, {
+          //   headers: {
+          //     Authorization: `Bearer ${token}`
+          //   }
+          // });
+        }else{
+          const resMail = await api.post(`mail/send/${user.email}`, format, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+          console.log(resMail);
+          const response = await api.post('bookings', valuesToSend, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+        }
         console.log('Booking submitted:', response.data);
         toast.success('Booking submitted successfully!');
         setSelectedService('');
