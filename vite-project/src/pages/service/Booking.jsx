@@ -138,8 +138,7 @@ const Booking = () => {
     };
 
     if (user) {
-      try {
-        if(selectedService.serviceTypeName === 'Online'){
+      try {   
           const resMail = await api.post(`mail/send/${user.email}`, format, {
             headers: {
                 Authorization: `Bearer ${token}`
@@ -157,19 +156,6 @@ const Booking = () => {
           //     Authorization: `Bearer ${token}`
           //   }
           // });
-        }else{
-          const resMail = await api.post(`mail/send/${user.email}`, format, {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          });
-          console.log(resMail);
-          const response = await api.post('bookings', valuesToSend, {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          });
-        }
         console.log('Booking submitted:', response.data);
         toast.success('Booking submitted successfully!');
         setSelectedService('');
