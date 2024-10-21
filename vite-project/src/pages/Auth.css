@@ -9,6 +9,18 @@
   max-width: 500px;
 }
 
+<<<<<<< HEAD
+=======
+.auth-form-container-register {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  width: 500px;
+  max-width: 600px;
+}
+
+>>>>>>> be0869eaf5d981e5045dbd09818a5d79b2d28ac0
 .auth-form-container h2 {
   color: #ff9966;
   text-align: center;
@@ -108,3 +120,45 @@ body {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.5)), url('../assets/login-register.jpg') no-repeat center center fixed; /* Background image with gradient */
   background-size: cover; /* Cover the entire background */
 }
+<<<<<<< HEAD
+=======
+
+.register-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh; /* Full viewport height */
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.5)), url('../assets/login-register.jpg') no-repeat center center fixed; /* Background image with gradient */
+  background-size: cover; /* Cover the entire background */
+}
+
+@media (max-width: 480px) {
+  .auth-form-container {
+    padding: 1.5rem;
+  }
+  .auth-form-container-register,
+  .auth-form-container {
+    padding: 1.5rem;
+  }
+
+  .login-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50%; /* Full viewport height */
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.5)), url('../assets/login-register.jpg') no-repeat center center fixed; /* Background image with gradient */
+    background-size: cover; /* Cover the entire background */
+  }
+  
+  .register-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50%; /* Full viewport height */
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.5)), url('../assets/login-register.jpg') no-repeat center center fixed; /* Background image with gradient */
+    background-size: cover; /* Cover the entire background */
+    min-height: 50%;
+  }
+
+}
+>>>>>>> be0869eaf5d981e5045dbd09818a5d79b2d28ac0

@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+/* eslint-disable no-unused-vars */
+>>>>>>> be0869eaf5d981e5045dbd09818a5d79b2d28ac0
 import React from 'react';
 import { Link } from 'react-router-dom';
 import secureLocalStorage from 'react-secure-storage';
@@ -14,8 +18,13 @@ import {
 
 export default function AdminPage() {
   // Use optional chaining to safely access secureLocalStorage
+<<<<<<< HEAD
   
 
+=======
+  const profile = JSON.parse(sessionStorage.getItem("userToken"))
+  console.log(profile)
+>>>>>>> be0869eaf5d981e5045dbd09818a5d79b2d28ac0
   return (
     <section style={{ backgroundColor: '#eee' }}>
       <MDBContainer className="py-5">
@@ -42,7 +51,11 @@ export default function AdminPage() {
                     <MDBCardText>Full Name</MDBCardText>
                   </MDBCol>
                   <MDBCol sm="9">
+<<<<<<< HEAD
                     <MDBCardText className="text-muted">{profile.fullName}</MDBCardText>
+=======
+                    <MDBCardText className="text-muted">{profile.fullname}</MDBCardText>
+>>>>>>> be0869eaf5d981e5045dbd09818a5d79b2d28ac0
                   </MDBCol>
                 </MDBRow>
                 <hr />
@@ -66,6 +79,7 @@ export default function AdminPage() {
                 <hr />
                 <MDBRow>
                   <MDBCol sm="3">
+<<<<<<< HEAD
                     <MDBCardText>Mobile</MDBCardText>
                   </MDBCol>
                   <MDBCol sm="9">
@@ -75,6 +89,8 @@ export default function AdminPage() {
                 <hr />
                 <MDBRow>
                   <MDBCol sm="3">
+=======
+>>>>>>> be0869eaf5d981e5045dbd09818a5d79b2d28ac0
                     <MDBCardText>Address</MDBCardText>
                   </MDBCol>
                   <MDBCol sm="9">

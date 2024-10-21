@@ -40,5 +40,10 @@
 }
 
 .service-link:hover {
+<<<<<<< HEAD
   background-color: #ffb380;
+=======
+  background-color: black;
+  color: white;
+>>>>>>> be0869eaf5d981e5045dbd09818a5d79b2d28ac0
 }

@@ -62,9 +62,15 @@
 }
 
 .submit-btn:hover {
+<<<<<<< HEAD
   background-color: #ffb380;
   transform: translateY(-2px);
   color: #333;
+=======
+  background-color: black;
+  transform: translateY(-1px);
+  color: #ffffff;
+>>>>>>> be0869eaf5d981e5045dbd09818a5d79b2d28ac0
 }
 
 .form-group-booking .doctor {
@@ -74,3 +80,23 @@
 .form-group-booking p{
   color: #0eb33f;
 }
+<<<<<<< HEAD
+=======
+
+select option {
+  font-weight: normal;
+  padding-left: 15px;
+}
+
+.card-body {
+  padding: 2rem;
+}
+
+.form-label {
+  font-weight: 500;
+}
+
+.form-select, .form-control {
+  border-radius: 0.5rem;
+}
+>>>>>>> be0869eaf5d981e5045dbd09818a5d79b2d28ac0
