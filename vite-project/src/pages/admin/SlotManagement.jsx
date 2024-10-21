@@ -2,238 +2,228 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { toast } from 'react-toastify';
-import { Button, Table, Modal, Form, Input, Popconfirm } from 'antd';
+import { Button, Table, Modal, Form, Input, Popconfirm, Select } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 import api from '../../config/axios';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { SearchOutlined } from '@ant-design/icons';
 
 const SlotManagement = () => {
-    // const api = 'https://66ff9fda4da5bd23755149e9.mockapi.io/Service';
-
-    const [services, setServices] = useState([]);
+    const [slots, setSlots] = useState([]);
+    const [veterinarians, setVeterinarians] = useState([]);
     const [openModal, setOpenModal] = useState(false);
     const [openModalEdit, setOpenModalEdit] = useState(false);
     const [form] = useForm();
     const [submitting, setSubmitting] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-    const [editingService, setEditingService] = useState(null);
-    const dispatch = useDispatch();
+    const [editingSlot, setEditingSlot] = useState(null);
 
-    const fetchServices = async () => {
-        //Lấy dữ liệu từ be
+    const fetchSlots = async () => {
         try {
-              const response = await api.get('services', {
+            const response = await api.get('veterinarian/slot', {
                 headers: {
-                  Authorization: `Bearer ${sessionStorage.getItem('token')}`
+                    Authorization: `Bearer ${sessionStorage.getItem('token')}`
                 }
-              });
-            // const response = await axios.get(api);
-            setServices(response.data);
+            });
+            setSlots(response.data);
         } catch (error) {
-            toast.error('Error fetching services:', error.response.data);
+            toast.error('Error fetching slots:', error.response?.data || error.message);
         }
-    }
+    };
+
+    const fetchVeterinarians = async () => {
+        try {
+            const response = await api.get('veterinarian', {
+                headers: {
+                    Authorization: `Bearer ${sessionStorage.getItem('token')}`
+                }
+            });
+            setVeterinarians(response.data);
+        } catch (error) {
+            toast.error('Error fetching veterinarians:', error.response?.data || error.message);
+        }
+    };
 
     useEffect(() => {
-        //Chạy 1 hành động
-        //[] => chạy khi load trang lần đầu
-        //[number] => chạy mỗi khi number thay đổi
-        fetchServices();
+        fetchSlots();
+        fetchVeterinarians();
     }, []);
 
     const handleOpenModal = () => {
+        form.setFieldsValue({
+            veterinarianId: '',
+            slotTimeId: '',
+        });
         setOpenModal(true);
-    }
-
-    //setting information of object has been choosen to be edited
-    const handleOpenModalEdit = (record) => {
-        setEditingService(record);
-        form.setFieldsValue({ serviceName: record.serviceName || '' });
-        setOpenModalEdit(true);
     };
-
 
     const handleCloseModal = () => {
         setOpenModal(false);
-        setOpenModalEdit(false);
-    }
+        form.resetFields();
+    };
 
-    const handleSubmitService = async (values) => {
-        //Xử lý thông tin trong Form
-        //Post xuống API
+    const handleOpenModalEdit = (record) => {
+        setEditingSlot(record);
+        form.setFieldsValue({
+            slotTimeId: record.timeSlot.slotTimeId,
+            veterinarianId: record.veterinarian.veterinarianId,
+        });
+        setOpenModalEdit(true);
+    };
+
+    const handleCloseModalEdit = () => {
+        setOpenModalEdit(false);
+        setEditingSlot(null);
+        form.resetFields();
+    };
+
+    const handleSubmitSlot = async (values) => {
+        console.log(values);
         try {
-            setSubmitting(true);//loading
-              const response = await api.post('services', values, {
+            setSubmitting(true);
+            await api.post('veterinarian/slot', values, {
                 headers: {
-                  Authorization: `Bearer ${sessionStorage.getItem('token')}`
+                    Authorization: `Bearer ${sessionStorage.getItem('token')}`
                 }
-              })
-           // const res = await axios.post(api, values);
-            //Toast css for beautiful
-            toast.success("Successfully !")
-            setOpenModal(false)
-            form.resetFields()
-            fetchServices();
+            });
+            toast.success("Slot successfully added!");
+            setOpenModal(false);
+            form.resetFields();
+            fetchSlots();
         } catch (err) {
-            toast.error(err)
+            toast.error(err.response?.data || "An error occurred while adding the slot.");
         } finally {
             setSubmitting(false);
         }
-    }
+    };
 
-    //update service
-    const updateService = async (values) => {
+    const handleEditSlot = async (values) => {
         try {
-              await api.put(`services/${editingService.serviceId}`, {
-                serviceName: values.serviceName,
-                serviceDescription: values.serviceDescription
-              }, {
+            setSubmitting(true);
+            await api.put(`veterinarian/slot/${editingSlot.slotId}`, values, {
                 headers: {
                     Authorization: `Bearer ${sessionStorage.getItem('token')}`
-                  }
-              });
-            // // const res = await axios.put(`${api}/${editingService.id}`, {
-            //     name: values.name,
-            //     description: values.description
-            // });
-            toast.success('Service updated successfully');
-            fetchServices();
+                }
+            });
+            toast.success("Slot successfully updated!");
             setOpenModalEdit(false);
-        } catch (error) {
-            console.error('Error updating service:', error);
-            toast.error('Failed to update service');
+            fetchSlots();
+        } catch (err) {
+            toast.error(err.response?.data || "An error occurred while updating the slot.");
+        } finally {
+            setSubmitting(false);
         }
     };
 
-    //Delete service
     const handleDelete = async (id) => {
         try {
-              await api.delete(`services/${id}`, {
+            await api.delete(`veterinarian/slot/${id}`, {
                 headers: {
-                  Authorization: `Bearer ${sessionStorage.getItem('token')}`
+                    Authorization: `Bearer ${sessionStorage.getItem('token')}`
                 }
-              });
-            // const res = await axios.delete(`${api}/${id}`);
-            toast.success("Delete successfully!");
-            fetchServices();
+            });
+            toast.success("Slot deleted successfully!");
+            fetchSlots();
         } catch (err) {
-            console.error('Error deleting service:', err);
-            toast.error(err.response?.data || "An error occurred while deleting the service.");
+            toast.error(err.response?.data || "An error occurred while deleting the slot.");
         }
-    }
+    };
 
     const handleSearch = (value) => {
         setSearchTerm(value);
     };
 
-    const filteredData = services.filter(item =>
-        item.serviceName.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredData = slots.filter(item =>
+        item.veterinarian.user.fullname.toLowerCase().includes(searchTerm.toLowerCase())
     );
-
 
     const columns = [
         {
-            title: "ID",
-            dataIndex: "serviceId",
-            key: "serviceId",
-            width: "5%",
+            title: "Slot ID",
+            dataIndex: "slotId",
+            key: "slotId",
+            width: "10%",
         },
         {
-            title: "Service Name",
-            dataIndex: "serviceName",
-            key: "serviceName",
-            width: "20%",
+            title: "Slot Status",
+            dataIndex: "slotStatus",
+            key: "slotStatus",
+            width: "15%",
         },
         {
-            title: "Description",
-            dataIndex: "serviceDescription",
-            key: "serviceDescription",
-            width: "40%",
+            title: "Time Slot ID",
+            dataIndex: ['timeSlot', 'slotTimeId'],
+            key: "slotTimeId",
+            width: "15%",
+        },
+        {
+            title: "Veterinarian Name",
+            dataIndex: ['veterinarian', 'user', 'fullname'],
+            key: "veterinarianName",
+            width: "25%",
         },
         {
             title: "Action",
-            className: "text-center",
+            key: "action",
+            width: "20%",
+            align: 'center',
             render: (_, record) => (
-                <div>
-                    <>
-                        <div className='d-flex justify-content-center'>
-                        <Button className='mx-1' type="primary" onClick={() => handleOpenModalEdit(record)} style={{ marginRight: 8 }}>
-                            Edit Service
-                        </Button>
-                        <Popconfirm
-                            title="Are you sure you want to delete this question?"
-                            onConfirm={() => handleDelete(record.serviceId)}
-                            okText="Yes"
-                                cancelText="No"
-                            >
-                                <Button type="primary" danger>Delete</Button>
-                            </Popconfirm>
-                        </div>
-                    </>
+                <div className='d-flex justify-content-center'>
+                    <Button className='mx-1' type="primary" onClick={() => handleOpenModalEdit(record)}>
+                        Edit
+                    </Button>
+                    <Popconfirm
+                        title="Are you sure you want to delete this slot?"
+                        onConfirm={() => handleDelete(record.slotId)}
+                        okText="Yes"
+                        cancelText="No"
+                    >
+                        <Button type="primary" danger>Delete</Button>
+                    </Popconfirm>
                 </div>
             )
         },
     ];
 
-
     return (
         <div>
-            <Button onClick={handleOpenModal}>Create new service</Button>
+            <Button onClick={handleOpenModal}>Create new slot</Button>
             <Input
-                placeholder="Search name"
-                prefix={<searchOutlined />}
+                placeholder="Search veterinarian name"
+                prefix={<SearchOutlined />}
                 onChange={(e) => handleSearch(e.target.value)}
                 style={{ margin: 16, width: '60%' }}
             />
-            <Table 
-            dataSource={filteredData} 
-            columns={columns}                                     
-            pagination={{ pageSize: 5 }}         
+            <Table
+                dataSource={filteredData}
+                columns={columns}
+                pagination={{ pageSize: 5 }}
+                rowKey="slotId"
             />
-            {/* onCancel: Bấm ra ngoài thì hành động được chạy */}
-            {/* onOK: Chạy hàm trong Modal */}
-            <Modal onOk={() => form.submit()} title="Create new service" open={openModal} onCancel={handleCloseModal}>
-                {/* name: tên biến trùng (phù hợp) với DB */}
-                {/* rule: Định nghĩa validation => [] */}
-                <Form onFinish={handleSubmitService} form={form}>
-                    <Form.Item label="Service name" name="serviceName" rules={[
-                        {
-                            required: true,
-                            message: "Please input name !"
-                        }
-                    ]}>
-                        <Input />
+            <Modal onOk={() => form.submit()} title="Create new Slot" open={openModal} onCancel={handleCloseModal}>
+                <Form onFinish={handleSubmitSlot} form={form}>
+                    <Form.Item label="Veterinarian" name="veterinarianId" rules={[{ required: true, message: "Please input veterinarian id!" }]}>
+                        <Select options={veterinarians.map(veterinarian => ({
+                            label: veterinarian.user.fullname,
+                            value: veterinarian.veterinarianId
+                        }))} />
                     </Form.Item>
-                    <Form.Item label="Description" name="serviceDescription" rules={[
-                        {
-                            required: true,
-                            message: "Please input description !"
-                        }
-                    ]}>
+                    <Form.Item label="Time Slot ID" name="slotTimeId" rules={[{ required: true, message: "Please input time slot id!" }]}>
                         <Input />
                     </Form.Item>
                 </Form>
             </Modal>
-            <Modal onOk={() => form.submit()} title="Edit service" open={openModalEdit} onCancel={handleCloseModal}>
-                {/* name: tên biến trùng (phù hợp) với DB */}
-                {/* rule: Định nghĩa validation => [] */}
-                <Form onFinish={updateService} form={form}>
-                        <Form.Item label="Service name" name="serviceName" rules={[
-                            {
-                                required: true,
-                                message: "Please input name !"
-                            }
-                        ]}>
-                            <Input />
-                        </Form.Item>
-                        <Form.Item label="Description...." name="serviceDescription" rules={[
-                            {
-                                required: true,
-                                message: "Please input description !"
-                            }
-                        ]}>
-                            <Input.TextArea rows={4} />
-                        </Form.Item>
+            <Modal onOk={() => form.submit()} title="Edit Slot" open={openModalEdit} onCancel={handleCloseModalEdit}>
+                <Form onFinish={handleEditSlot} form={form}>
+                    <Form.Item label="Veterinarian" name="veterinarianId" rules={[{ required: true, message: "Please input veterinarian id!" }]}>
+                        <Select options={veterinarians.map(veterinarian => ({
+                            label: veterinarian.user.fullname,
+                            value: veterinarian.veterinarianId
+                        }))} />
+                    </Form.Item>
+                    <Form.Item label="Time Slot ID" name="slotTimeId" rules={[{ required: true, message: "Please input time slot id!" }]}>
+                        <Input />
+                    </Form.Item>
                 </Form>
             </Modal>
         </div>

@@ -23,8 +23,9 @@ const Booking = () => {
     servicesDetailId: '',
     slotId: '',
     veterinarianId: '',
-    serviceTime: ''
+    serviceTime: '',
   });
+  const [totalPrice, setTotalPrice] = useState('')
   const [selectedHour, setSelectedHour] = useState('')
   const [selectedDateTime, setSelectedDateTime] = useState('')
   const [isInterviewService, setIsInterviewService] = useState(false)
@@ -126,7 +127,7 @@ const Booking = () => {
         <body>
           <h1 style='color: blue;'>Welcome, ${user.fullname}</h1>
           <p style='font-size: 16px;'>You have successfully booked an appointment.</p>
-          <p style='font-size: 16px;'>Your ${selectedService} will start at <b>${selectedSlot} ${selectedHour} ${selectedDateTime}</b> <i>with ${selectedDoctor}</i>.</p>
+          <p style='font-size: 16px;'>Your service is: ${selectedService.split(' || ')[0]} will start at <i>${selectedHour} ${selectedDateTime}</i> <i>with ${selectedDoctor}</i>.</p>
           <p style='font-size: 16px;'>Thank you for choosing our service!</p>
         </body>
       </html>
@@ -137,7 +138,7 @@ const Booking = () => {
       body: emailContent
     };
 
-    if (user) {
+    if (user && totalPrice) {
       try {   
           const resMail = await api.post(`mail/send/${user.email}`, format, {
             headers: {
@@ -151,17 +152,18 @@ const Booking = () => {
             }
           });
           //Thanh toán Online ở đây
-          // const resPayment = await api.post(`payments/orderID?orderId=${response.data.bookingId}`, {
-          //   headers: {
-          //     Authorization: `Bearer ${token}`
-          //   }
-          // });
+          const resPayment = await api.get(`payment/vnpay?amount=${totalPrice}&bankCode=NCB`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
         console.log('Booking submitted:', response.data);
+        console.log('Payment:', resPayment);
+        window.open(resPayment.data.data.paymentUrl);
         toast.success('Booking submitted successfully!');
         setSelectedService('');
         setSelectedSlot('');
         setSelectedDoctor('');
-        navigate("/booking-detail");
       } catch (error) {
         console.log(error);
         toast.error(error.response?.data || 'An error occurred while booking');
@@ -223,14 +225,15 @@ const Booking = () => {
     setSelectedSlot('')
     setSelectedDoctor('')
     if (selectedService) {
-      const [serviceName, servicesDetailId, serviceTypeName] = selectedService.split(' || ');
+      const [serviceName, servicesDetailId, serviceTypeName, totalPrice] = selectedService.split(' || ');
+      setTotalPrice(totalPrice)
       console.log('Selected Service:', serviceName, 'ServicesDetailId:', servicesDetailId);
       setValuesToSend(prevValues => ({
         ...prevValues,
-        servicesDetailId: servicesDetailId
+        servicesDetailId: servicesDetailId,
       }));
       // Assuming 'Online Consulting' is the name for interview services
-      setIsInterviewService(serviceTypeName === 'Online' || serviceTypeName === 'At Home');
+      setIsInterviewService(serviceTypeName === 'Online' || serviceTypeName === 'At_Home');
       if(isInterviewService){
         setValuesToSend(prevValues => ({
           ...prevValues,
@@ -240,16 +243,20 @@ const Booking = () => {
     } else {
       setValuesToSend(prevValues => ({
         ...prevValues,
-        servicesDetailId: ''
+        servicesDetailId: '',
       }));
+      setTotalPrice('')
       setIsInterviewService(false);
     }
   }
 
   const handleDateTimeChange = (value) => {
     const timeForrmat = value.format('YYYY-MM-DD')
-    const hour = value.format('HH:mm')
-    setSelectedHour(hour)
+    if(value.format('HH:mm') === '00:00'){
+      setSelectedHour('')
+    }else{
+      setSelectedHour(value.format('HH:mm'))
+    }
     setSelectedDateTime(timeForrmat);
     setSelectedSlot('')
     console.log(timeForrmat)
@@ -302,7 +309,7 @@ const Booking = () => {
                   >
                     <option value="">Select a service</option>
                     {services.map((service) => (
-                      <option key={service.servicesDetailId} value={`${service.serviceId.serviceName} || ${service.servicesDetailId} || ${service.serviceTypeId.service_type}`}>
+                      <option key={service.servicesDetailId} value={`${service.serviceId.serviceName} || ${service.servicesDetailId} || ${service.serviceTypeId.service_type} || ${service.serviceTypeId.price}`}>
                         {service.serviceId.serviceName} - {service.serviceTypeId.service_type}
                       </option>
                     ))}

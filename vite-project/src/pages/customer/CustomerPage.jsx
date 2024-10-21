@@ -8,11 +8,13 @@ import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import { SendOutlined } from '@ant-design/icons'
 import userImage from '../../assets/user.png'
-
+import { updateUser } from '../../redux/features/userSlider';
+import { useDispatch } from 'react-redux';
 function CustomerPage() {
+  const dispatch = useDispatch();
   const location = useLocation();
   const [customer, setCustomer] = useState([]);
-  const [newPassword, setNewPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('');
   const user = useSelector((state) => state.user);
 
   useEffect(() => {
@@ -21,23 +23,27 @@ function CustomerPage() {
     }
   }, [location]);
 
-
   const fetchCustomer = async () => {
+    const token = sessionStorage.getItem('token');
     try {
-      const response = await api.get(`customers/${user.id}`);
+      const response = await api.get(`customers/${user.id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       const { fullname, email, phone, address } = response.data;
       const userProfile = {
         fullname: fullname,
         email: email,
         phone: phone,
         address: address,
-      }
+      };
       setCustomer(userProfile);
     } catch (error) {
       console.error('Error fetching customer data:', error);
       toast.error('Failed to load customer data. Please try again.');
     }
-  }
+  };
 
   useEffect(() => {
     if (user && user.id) {
@@ -47,10 +53,20 @@ function CustomerPage() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+
+    // Update customer state
     setCustomer(prevState => ({
       ...prevState,
       [name]: value
     }));
+
+    // If the updated field is phone and the role is STAFF or VETERINARIAN, update username
+    if (name === 'phone' && (user.role === 'STAFF' || user.role === 'VETERINARIAN')) {
+      setCustomer(prevState => ({
+        ...prevState,
+        username: value // Update username to the new phone number
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -73,7 +89,7 @@ function CustomerPage() {
           Authorization: `Bearer ${token}`
         }
       });
-
+      dispatch(updateUser(response.data));
       console.log('Updated customer information:', response.data);
       toast.success('Profile updated successfully!');
       setNewPassword('');
@@ -82,7 +98,6 @@ function CustomerPage() {
       toast.error(error.response?.data?.message || 'Failed to update profile. Please try again.');
     }
   };
-
 
   return (
     <div className={`bg-white shadow my-2`} id="page-content">
@@ -120,7 +135,7 @@ function CustomerPage() {
               <div className="col-sm-8">
                 <div className={styles.cardBlock}>
                   <h3 className={`mb-2 ${styles.pB5} ${styles.bBDefault} ${styles.fW600}`}>Information</h3>
-                  <form onSubmit={handleSubmit} >
+                  <form onSubmit={handleSubmit}>
                     <div className={`row`}>
                       <div className={`col-md-12`}>
                         <div className={styles.formGroup}>
@@ -166,7 +181,7 @@ function CustomerPage() {
                       <div className={styles.formGroup}>
                         <p className={`mb-1 ${styles.fW600}`}>Password</p>
                         <input
-                          // type="password"
+                          type="password"
                           className={`${styles.formControl} ${styles.textMuted} ${styles.fW400}`}
                           name="password"
                           value={newPassword}
@@ -191,10 +206,9 @@ function CustomerPage() {
                     </div>
 
                     <div className={styles.mT20}>
-                      <button type="submit" className={styles.updateButton} >
+                      <button type="submit" className={styles.updateButton}>
                         Update
                       </button>
-
                     </div>
                   </form>
                 </div>
