@@ -1,7 +1,6 @@
-<<<<<<< HEAD
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-=======
+import React, { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { logout } from './redux/features/userSlider';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 >>>>>>> be0869eaf5d981e5045dbd09818a5d79b2d28ac0
@@ -36,7 +35,9 @@ import SlotManagement from './pages/admin/SlotManagement';
 import BookingDetail from './pages/booking/BookingDetail';
 import PaySuccess from './pages/payment/paySuccess';
 import PayFailed from './pages/payment/payFailed';
-function App() {
+
+const App = () => {
+
   const ProtectedRoute = ({ children }) => {
     const user = useSelector((state) => state.user);
     if (user && user?.role === 'ADMIN') {

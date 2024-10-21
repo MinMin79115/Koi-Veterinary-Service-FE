@@ -31,7 +31,6 @@ import { useSelector } from 'react-redux';
 import { Form, DatePicker } from 'antd';
 import moment from 'moment';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import axios from 'axios';
 
 const Booking = () => {
   const user = useSelector(state => state.user);
@@ -51,10 +50,10 @@ const Booking = () => {
   });
   const [totalPrice, setTotalPrice] = useState('')
   const [selectedHour, setSelectedHour] = useState('')
+  const [timeSlot, setTimeSlot] = useState('')
   const [selectedDateTime, setSelectedDateTime] = useState('')
   const [isInterviewService, setIsInterviewService] = useState(false)
-
-  
+  const [uniqueSlots, setUniqueSlots] = useState({});
 
   //Hàm validate chọn time
   const validateTimeRange = (_, value) => {
@@ -90,6 +89,22 @@ const Booking = () => {
       });
       console.log(response.data);
       setSlots(response.data);
+      
+      // Gộp 1 Slot chứa nhiều bác sĩ
+      const processedSlots = response.data.reduce((acc, slot) => {
+        const timeKey = `${slot.timeSlot.startTime} - ${slot.timeSlot.endTime}`;
+        if (!acc[timeKey]) {
+          acc[timeKey] = { doctors: [] };
+        }
+        acc[timeKey].doctors.push({
+          id: slot.veterinarian.veterinarianId,
+          name: slot.veterinarian.user.fullname,
+          slotId: slot.slotId
+        });
+        return acc;
+      }, {});
+      
+      setUniqueSlots(processedSlots);
     } catch (error) {
       toast.error('Error fetching slots:', error.response.data);
     }
@@ -130,6 +145,7 @@ const Booking = () => {
     fetchServices();
     fetchSlots();
     fetchDoctors();
+    
   }, []);
 >>>>>>> be0869eaf5d981e5045dbd09818a5d79b2d28ac0
 
@@ -255,12 +271,6 @@ const Booking = () => {
 
     if (user && totalPrice) {
       try {   
-          const resMail = await api.post(`mail/send/${user.email}`, format, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-          });
-          console.log(resMail);
           const response = await api.post('bookings', valuesToSend, {
             headers: {
                 Authorization: `Bearer ${token}`
@@ -272,6 +282,11 @@ const Booking = () => {
               Authorization: `Bearer ${token}`
             }
           });
+          const resMail = await api.post(`mail/send/${user.email}`, format, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+          });
         console.log('Booking submitted:', response.data);
         console.log('Payment:', resPayment);
         window.open(resPayment.data.data.paymentUrl);
@@ -279,6 +294,9 @@ const Booking = () => {
         setSelectedService('');
         setSelectedSlot('');
         setSelectedDoctor('');
+        setSelectedDateTime(''); // Reset selectedDateTime
+        setSelectedHour('')
+        setTimeSlot('')
       } catch (error) {
         console.log(error);
         toast.error(error.response?.data || 'An error occurred while booking');
@@ -290,26 +308,18 @@ const Booking = () => {
   };
 
   const handleSlotChange = (e) => {
-    const slotChoose = e.target.value;
-    const [selectedSlot, selectedDoctor, name] = slotChoose.split('|');
-    console.log(slotChoose)
-    if (slotChoose) {
-      setSelectedSlot(slotChoose)
-      setSelectedDoctor(name)
-      setValuesToSend(prevValues => ({
-        ...prevValues,
-        slotId: selectedSlot,
-        veterinarianId: selectedDoctor,
-      }));
-    } else {
-      setValuesToSend(prevValues => ({
-        ...prevValues,
-        slotId: '',
-        veterinarianId: '',
-        serviceTime: ''
-      }));
-    }
-    console.log(valuesToSend)
+    const [timeSlot, doctorInfo] = e.target.value.split('|');
+    const [doctorId, doctorName, slotId] = doctorInfo.split(',');
+    setTimeSlot(timeSlot);
+    setSelectedHour(timeSlot);
+    setSelectedSlot(slotId);
+    console.log(selectedSlot);
+    setSelectedDoctor(doctorName);
+    setValuesToSend(prevValues => ({
+      ...prevValues,
+      slotId: slotId,
+      veterinarianId: doctorId,
+    }));
   };
 
   const handleDoctorChange = (e) => {
@@ -339,6 +349,8 @@ const Booking = () => {
     setSelectedService(selectedService);
     setSelectedSlot('')
     setSelectedDoctor('')
+    setTimeSlot('')
+
     if (selectedService) {
       const [serviceName, servicesDetailId, serviceTypeName, totalPrice] = selectedService.split(' || ');
       setTotalPrice(totalPrice)
@@ -371,6 +383,7 @@ const Booking = () => {
       setSelectedHour('')
     }else{
       setSelectedHour(value.format('HH:mm'))
+      setTimeSlot(value.format('HH:mm'))
     }
     setSelectedDateTime(timeForrmat);
     setSelectedSlot('')
@@ -433,7 +446,7 @@ const Booking = () => {
                 </div>
 
                 <div className="mb-3">
-                  {isInterviewService ? (
+                  {isInterviewService && selectedService ? (
                     <>                
                     <label htmlFor="dateTime" className="form-label">Date and Time:</label>
                       <Form.Item
@@ -472,7 +485,7 @@ const Booking = () => {
                         </Form.Item>
                       </div>
                     </>
-                  ) : (
+                  ) : selectedService ? (
                     <>
                     <label htmlFor="dateTime" className="form-label">Date:</label> 
                     <Form.Item
@@ -492,37 +505,44 @@ const Booking = () => {
                       <select
                         id="slot"
                         name='slotId'
-                        value={selectedSlot}
                         onChange={handleSlotChange}
                         required
                         className="form-select"
                       >
                         <option value="">Select a Slot</option>
-                        {slots
-                          .filter(slot => slot.slotStatus === "AVAILABLE") // Filter only available slots
-                          .map(slot => (
-                            <option 
-                              key={slot.slotId} 
-                              value={`${slot.slotId} | ${slot.veterinarian.veterinarianId} | ${slot.veterinarian.user.fullname}`}
-                            >
-                              {slot.timeSlot.startTime} - {slot.timeSlot.endTime}
-                            </option>
-                          ))}
+                        {Object.entries(uniqueSlots).map(([timeSlot, data]) => (
+                          <optgroup key={timeSlot} label={timeSlot}>
+                            {data.doctors.map(doctor => (
+                              <option 
+                                key={`${timeSlot}-${doctor.id}`} 
+                                value={`${timeSlot}|${doctor.id},${doctor.name},${doctor.slotId}`}
+                              >
+                              Dr. {doctor.name}
+                              </option>
+                            ))}
+                          </optgroup>
+                        ))}
                       </select>
                     </Form.Item>
                     </>
+                  ) : (
+                    <></>
                   )}
                   
                 </div>
 
-                {selectedDoctor ? (
+                {timeSlot || selectedDoctor ? (
                   <div className="mb-3">
-                    <label className="form-label">Your doctor:</label>
-                    <p className="form-control-static text-success fst-italic fs-6">{selectedDoctor}</p>
+                      <div>
+                        <label className="form-label">Selected time slot:</label>
+                        <p className="form-control-static text-success fst-italic fs-6">{timeSlot}</p>
+                      </div>
+                      <div>
+                        <label className="form-label">Your doctor:</label>
+                        <p className="form-control-static text-success fst-italic fs-6">{selectedDoctor}</p>
+                      </div>
                   </div>
-                ) : (
-                  <></>
-                )}
+                ) : null}
 
                 <Form.Item>
                   <div className="d-grid">
