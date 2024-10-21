@@ -99,17 +99,19 @@
   margin-left: 1.5rem;
 }
 
-.auth-user .user-icon{
+.auth-user.user-icon{
   transition: all 0.3s ease;
   color: #ffffff;
   border-radius: 4px;
   font-size: 2.1rem;
-  transition: all 0.3s ease;
 }
 
-.auth-user.user-icon i{
-  font-size: 2.1rem;
+.auth-user.user-icon:hover{
+  transition: all 0.3s ease;
+  color: #d0d0d0;
 }
+
+
 
 
 .auth-button {
@@ -120,6 +122,11 @@
   font-weight: 600;
   font-size: 0.9rem;
   transition: all 0.3s ease;
+}
+
+.auth-button:hover{
+  transition: all 0.3s ease;
+  color: #4e4e4e;
 }
 
 .auth-button.login

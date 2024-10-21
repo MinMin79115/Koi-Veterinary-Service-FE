@@ -1,4 +1,6 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import secureLocalStorage from 'react-secure-storage';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {
   MDBCol,
@@ -8,17 +10,12 @@ import {
   MDBCardText,
   MDBCardBody,
   MDBCardImage,
-  MDBBtn,
-  MDBBreadcrumb,
-  MDBBreadcrumbItem,
-  MDBProgress,
-  MDBProgressBar,
-  MDBIcon,
-  MDBListGroup,
-  MDBListGroupItem
 } from 'mdb-react-ui-kit';
 
 export default function AdminPage() {
+  // Use optional chaining to safely access secureLocalStorage
+  
+
   return (
     <section style={{ backgroundColor: '#eee' }}>
       <MDBContainer className="py-5">
@@ -45,7 +42,7 @@ export default function AdminPage() {
                     <MDBCardText>Full Name</MDBCardText>
                   </MDBCol>
                   <MDBCol sm="9">
-                    <MDBCardText className="text-muted">Johnatan Smith</MDBCardText>
+                    <MDBCardText className="text-muted">{profile.fullName}</MDBCardText>
                   </MDBCol>
                 </MDBRow>
                 <hr />
@@ -54,7 +51,7 @@ export default function AdminPage() {
                     <MDBCardText>Email</MDBCardText>
                   </MDBCol>
                   <MDBCol sm="9">
-                    <MDBCardText className="text-muted">example@example.com</MDBCardText>
+                    <MDBCardText className="text-muted">{profile.email}</MDBCardText>
                   </MDBCol>
                 </MDBRow>
                 <hr />
@@ -63,7 +60,7 @@ export default function AdminPage() {
                     <MDBCardText>Phone</MDBCardText>
                   </MDBCol>
                   <MDBCol sm="9">
-                    <MDBCardText className="text-muted">(097) 234-5678</MDBCardText>
+                    <MDBCardText className="text-muted">{profile.phone}</MDBCardText>
                   </MDBCol>
                 </MDBRow>
                 <hr />
@@ -72,7 +69,7 @@ export default function AdminPage() {
                     <MDBCardText>Mobile</MDBCardText>
                   </MDBCol>
                   <MDBCol sm="9">
-                    <MDBCardText className="text-muted">(098) 765-4321</MDBCardText>
+                  <MDBCardText className="text-muted">{profile.phone}</MDBCardText>
                   </MDBCol>
                 </MDBRow>
                 <hr />
@@ -81,7 +78,7 @@ export default function AdminPage() {
                     <MDBCardText>Address</MDBCardText>
                   </MDBCol>
                   <MDBCol sm="9">
-                    <MDBCardText className="text-muted">Bay Area, San Francisco, CA</MDBCardText>
+                    <MDBCardText className="text-muted">{profile.address}</MDBCardText>
                   </MDBCol>
                 </MDBRow>
               </MDBCardBody>

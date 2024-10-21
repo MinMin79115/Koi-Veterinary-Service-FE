@@ -4,14 +4,16 @@ import { Link, useNavigate } from 'react-router-dom';
 import './Auth.css';
 import { googleProvider } from '../config/firebase';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import api from '../config/axios';
 import secureLocalStorage from 'react-secure-storage';
+import { toast } from 'react-toastify';
 
 const Login = () => {
   const navigate = useNavigate();
 
-
+  
   const [formData, setFormData] = useState({
-    email: '',
+    phone: '',
     password: ''
   });
 
@@ -19,8 +21,9 @@ const Login = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (values) => {
-    
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    const values = formData
     // Set the boolean value in secureLocalStorage
     //Lấy token
     //Check token exist
@@ -28,18 +31,34 @@ const Login = () => {
     //try catch finally
     //navigate to customer page
     try{
-      const response = await api.post('/login', values);
-      secureLocalStorage.setItem("userToken",response.data.token)
+      const response = await api.post('login', values);
       const {role} = response.data
-      if(role.name === 'Customer'){
+      if(role === 'CUSTOMER'){
         navigate('/')
-      }else if(role.name === 'Admin'){
+      }else if(role === 'ADMIN'){
         navigate('/manager')
+      }else if(role === 'STAFF'){
+        navigate('/staff-profile')
       }
     }catch(error){
       toast.error(error.response.data.message);
       navigate('/login')
-    }
+    };
+    // try{
+    //   if(values.username === customer.username && values.password === customer.password){
+    //     navigate('/')
+    //     secureLocalStorage.setItem("userToken",JSON.stringify(customer))
+    //   }else if(values.username === admin.username && values.password === admin.password){
+    //     sessionStorage.setItem("userToken",JSON.stringify(admin))//Object need to parsing
+    //     navigate('/manager')
+    //   }else{
+    //     toast.error("Invalid username or password");
+    //     navigate('/login')
+    //   }
+    // }catch(error){
+    //   toast.error(error.response.data.message);
+    //   navigate('/login')
+    // }
   };
 
   const handleLoginGoogle = () => {
@@ -78,12 +97,12 @@ const Login = () => {
           <h2>Welcome Back</h2>
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-group">
-              <label htmlFor="email">Username</label>
+              <label htmlFor="phone">Username</label>
               <input
                 type="text"
-                id="username"
-                name="username"
-                value={formData.username}
+                id="phone"
+                name="phone"
+                value={formData.phone}
                 onChange={handleChange}
                 required
               />
