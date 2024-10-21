@@ -29,6 +29,7 @@ const Booking = () => {
   const [selectedHour, setSelectedHour] = useState('')
   const [selectedDateTime, setSelectedDateTime] = useState('')
   const [isInterviewService, setIsInterviewService] = useState(false)
+  const [uniqueSlots, setUniqueSlots] = useState({});
 
   
 
@@ -66,6 +67,22 @@ const Booking = () => {
       });
       console.log(response.data);
       setSlots(response.data);
+      
+      // Gộp 1 Slot chứa nhiều bác sĩ
+      const processedSlots = response.data.reduce((acc, slot) => {
+        const timeKey = `${slot.timeSlot.startTime} - ${slot.timeSlot.endTime}`;
+        if (!acc[timeKey]) {
+          acc[timeKey] = { doctors: [] };
+        }
+        acc[timeKey].doctors.push({
+          id: slot.veterinarian.veterinarianId,
+          name: slot.veterinarian.user.fullname,
+          slotId: slot.slotId
+        });
+        return acc;
+      }, {});
+      
+      setUniqueSlots(processedSlots);
     } catch (error) {
       toast.error('Error fetching slots:', error.response.data);
     }
@@ -175,26 +192,16 @@ const Booking = () => {
   };
 
   const handleSlotChange = (e) => {
-    const slotChoose = e.target.value;
-    const [selectedSlot, selectedDoctor, name] = slotChoose.split('|');
-    console.log(slotChoose)
-    if (slotChoose) {
-      setSelectedSlot(slotChoose)
-      setSelectedDoctor(name)
-      setValuesToSend(prevValues => ({
-        ...prevValues,
-        slotId: selectedSlot,
-        veterinarianId: selectedDoctor,
-      }));
-    } else {
-      setValuesToSend(prevValues => ({
-        ...prevValues,
-        slotId: '',
-        veterinarianId: '',
-        serviceTime: ''
-      }));
-    }
-    console.log(valuesToSend)
+    const [timeSlot, doctorInfo] = e.target.value.split('|');
+    const [doctorId, doctorName, slotId] = doctorInfo.split(',');
+    
+    setSelectedSlot(timeSlot);
+    setSelectedDoctor(doctorName);
+    setValuesToSend(prevValues => ({
+      ...prevValues,
+      slotId: slotId,
+      veterinarianId: doctorId,
+    }));
   };
 
   const handleDoctorChange = (e) => {
@@ -383,16 +390,18 @@ const Booking = () => {
                         className="form-select"
                       >
                         <option value="">Select a Slot</option>
-                        {slots
-                          .filter(slot => slot.slotStatus === "AVAILABLE") // Filter only available slots
-                          .map(slot => (
-                            <option 
-                              key={slot.slotId} 
-                              value={`${slot.slotId} | ${slot.veterinarian.veterinarianId} | ${slot.veterinarian.user.fullname}`}
-                            >
-                              {slot.timeSlot.startTime} - {slot.timeSlot.endTime}
-                            </option>
-                          ))}
+                        {Object.entries(uniqueSlots).map(([timeSlot, data]) => (
+                          <optgroup key={timeSlot} label={timeSlot}>
+                            {data.doctors.map(doctor => (
+                              <option 
+                                key={`${timeSlot}-${doctor.id}`} 
+                                value={`${timeSlot}|${doctor.id},${doctor.name},${doctor.slotId}`}
+                              >
+                              Dr. {doctor.name}
+                              </option>
+                            ))}
+                          </optgroup>
+                        ))}
                       </select>
                     </Form.Item>
                     </>
@@ -400,14 +409,22 @@ const Booking = () => {
                   
                 </div>
 
-                {selectedDoctor ? (
+                {selectedSlot || selectedDoctor ? (
                   <div className="mb-3">
-                    <label className="form-label">Your doctor:</label>
-                    <p className="form-control-static text-success fst-italic fs-6">{selectedDoctor}</p>
+                    {selectedSlot && (
+                      <div>
+                        <label className="form-label">Selected time slot:</label>
+                        <p className="form-control-static text-success fst-italic fs-6">{selectedSlot}</p>
+                      </div>
+                    )}
+                    {selectedDoctor && (
+                      <div>
+                        <label className="form-label">Your doctor:</label>
+                        <p className="form-control-static text-success fst-italic fs-6">{selectedDoctor}</p>
+                      </div>
+                    )}
                   </div>
-                ) : (
-                  <></>
-                )}
+                ) : null}
 
                 <Form.Item>
                   <div className="d-grid">
