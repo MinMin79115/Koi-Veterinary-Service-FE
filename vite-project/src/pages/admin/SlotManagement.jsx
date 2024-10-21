@@ -197,7 +197,7 @@ const SlotManagement = () => {
             <Table
                 dataSource={filteredData}
                 columns={columns}
-                pagination={{ pageSize: 5 }}
+                pagination={{ pageSize: 7 }}
                 rowKey="slotId"
             />
             <Modal onOk={() => form.submit()} title="Create new Slot" open={openModal} onCancel={handleCloseModal}>

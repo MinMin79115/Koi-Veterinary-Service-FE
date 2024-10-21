@@ -47,21 +47,31 @@ const Dashboard = () => {
       let uniqueCustomers = new Set();
       let totalBookings = 0;
 
-      response.data.forEach(booking => {
-        const serviceId = booking.servicesDetail.serviceId.serviceId;
-        const customerId = booking.user.id;
-        //Tính tổng giá tiền của tất cả các dịch vụ đã được book
-        totalPrice += booking.servicesDetail.serviceTypeId.price;
-        //Tính tổng số lượng booking
-        totalBookings += 1;
+      // Reset serviceCounts to ensure no duplication
+      serviceCounts[1] = 0;
+      serviceCounts[2] = 0;
+      serviceCounts[3] = 0;
 
-        //Đếm số lượng từng loại dịch vụ đã được book dựa theo serviceId
-        if (serviceCounts[serviceId] !== undefined) {
-          serviceCounts[serviceId] += 1;
+      response.data.forEach(booking => {
+        if (booking.status === "COMPLETED") {
+          const serviceId = booking.servicesDetail.serviceId.serviceId;
+          const customerId = booking.user.id;
+          // Count the number of each service type booked
+          if (serviceCounts[serviceId] !== undefined) {
+            serviceCounts[serviceId] += 1;
+          }
+          // Calculate total price of all completed bookings
+          totalPrice += booking.servicesDetail.serviceTypeId.price;
+          // Count total number of completed bookings
+          totalBookings += 1;
+          // Add unique customers
+          uniqueCustomers.add(customerId);
         }
-        //Set nó tự sắp xếp và loại bỏ phần tử trùng lặp
-        uniqueCustomers.add(customerId);
       });
+
+      console.log('Total Bookings:', totalBookings);
+      console.log('Service Counts:', serviceCounts);
+      console.log('Unique Customers:', uniqueCustomers.size);
 
       setTotalPrice(totalPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }));
       setTotalCustomer(uniqueCustomers.size);
@@ -78,7 +88,6 @@ const Dashboard = () => {
         ],
       }));
 
-      console.log(response.data);
     } catch (error) {
       console.error('Error fetching booking stats: ', error);
     }

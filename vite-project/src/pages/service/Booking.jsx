@@ -7,7 +7,6 @@ import { useSelector } from 'react-redux';
 import { Form, DatePicker } from 'antd';
 import moment from 'moment';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import axios from 'axios';
 
 const Booking = () => {
   const user = useSelector(state => state.user);
@@ -27,11 +26,10 @@ const Booking = () => {
   });
   const [totalPrice, setTotalPrice] = useState('')
   const [selectedHour, setSelectedHour] = useState('')
+  const [timeSlot, setTimeSlot] = useState('')
   const [selectedDateTime, setSelectedDateTime] = useState('')
   const [isInterviewService, setIsInterviewService] = useState(false)
   const [uniqueSlots, setUniqueSlots] = useState({});
-
-  
 
   //Hàm validate chọn time
   const validateTimeRange = (_, value) => {
@@ -123,6 +121,7 @@ const Booking = () => {
     fetchServices();
     fetchSlots();
     fetchDoctors();
+    
   }, []);
 
   useEffect(() => {
@@ -157,12 +156,6 @@ const Booking = () => {
 
     if (user && totalPrice) {
       try {   
-          const resMail = await api.post(`mail/send/${user.email}`, format, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-          });
-          console.log(resMail);
           const response = await api.post('bookings', valuesToSend, {
             headers: {
                 Authorization: `Bearer ${token}`
@@ -174,6 +167,11 @@ const Booking = () => {
               Authorization: `Bearer ${token}`
             }
           });
+          const resMail = await api.post(`mail/send/${user.email}`, format, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+          });
         console.log('Booking submitted:', response.data);
         console.log('Payment:', resPayment);
         window.open(resPayment.data.data.paymentUrl);
@@ -181,6 +179,9 @@ const Booking = () => {
         setSelectedService('');
         setSelectedSlot('');
         setSelectedDoctor('');
+        setSelectedDateTime(''); // Reset selectedDateTime
+        setSelectedHour('')
+        setTimeSlot('')
       } catch (error) {
         console.log(error);
         toast.error(error.response?.data || 'An error occurred while booking');
@@ -194,8 +195,10 @@ const Booking = () => {
   const handleSlotChange = (e) => {
     const [timeSlot, doctorInfo] = e.target.value.split('|');
     const [doctorId, doctorName, slotId] = doctorInfo.split(',');
-    
-    setSelectedSlot(timeSlot);
+    setTimeSlot(timeSlot);
+    setSelectedHour(timeSlot);
+    setSelectedSlot(slotId);
+    console.log(selectedSlot);
     setSelectedDoctor(doctorName);
     setValuesToSend(prevValues => ({
       ...prevValues,
@@ -231,6 +234,8 @@ const Booking = () => {
     setSelectedService(selectedService);
     setSelectedSlot('')
     setSelectedDoctor('')
+    setTimeSlot('')
+
     if (selectedService) {
       const [serviceName, servicesDetailId, serviceTypeName, totalPrice] = selectedService.split(' || ');
       setTotalPrice(totalPrice)
@@ -263,6 +268,7 @@ const Booking = () => {
       setSelectedHour('')
     }else{
       setSelectedHour(value.format('HH:mm'))
+      setTimeSlot(value.format('HH:mm'))
     }
     setSelectedDateTime(timeForrmat);
     setSelectedSlot('')
@@ -325,7 +331,7 @@ const Booking = () => {
                 </div>
 
                 <div className="mb-3">
-                  {isInterviewService ? (
+                  {isInterviewService && selectedService ? (
                     <>                
                     <label htmlFor="dateTime" className="form-label">Date and Time:</label>
                       <Form.Item
@@ -364,7 +370,7 @@ const Booking = () => {
                         </Form.Item>
                       </div>
                     </>
-                  ) : (
+                  ) : selectedService ? (
                     <>
                     <label htmlFor="dateTime" className="form-label">Date:</label> 
                     <Form.Item
@@ -384,7 +390,6 @@ const Booking = () => {
                       <select
                         id="slot"
                         name='slotId'
-                        value={selectedSlot}
                         onChange={handleSlotChange}
                         required
                         className="form-select"
@@ -405,24 +410,22 @@ const Booking = () => {
                       </select>
                     </Form.Item>
                     </>
+                  ) : (
+                    <></>
                   )}
                   
                 </div>
 
-                {selectedSlot || selectedDoctor ? (
+                {timeSlot || selectedDoctor ? (
                   <div className="mb-3">
-                    {selectedSlot && (
                       <div>
                         <label className="form-label">Selected time slot:</label>
-                        <p className="form-control-static text-success fst-italic fs-6">{selectedSlot}</p>
+                        <p className="form-control-static text-success fst-italic fs-6">{timeSlot}</p>
                       </div>
-                    )}
-                    {selectedDoctor && (
                       <div>
                         <label className="form-label">Your doctor:</label>
                         <p className="form-control-static text-success fst-italic fs-6">{selectedDoctor}</p>
                       </div>
-                    )}
                   </div>
                 ) : null}
 

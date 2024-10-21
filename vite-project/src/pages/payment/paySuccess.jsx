@@ -1,16 +1,20 @@
 import React from 'react';
 import { Button, Result } from 'antd';
 import { useNavigate } from 'react-router-dom';
-const PaySuccess = ({orderId}) => {
-    const navigate = useNavigate();
+import useParam from '../../hook/useParam';
+const PaySuccess = () => {
+  const params = useParam();
+  const orderInfo = params.getParam('vnp_OrderInfo');
+  const orderNo = params.getParam('vnp_TransactionNo');
+  const navigate = useNavigate();
   return (
     <Result
       status="success"
     title="Payment Successfully!"
-    subTitle={`Order number: ${orderId}`}
+    subTitle={`BookingNo: ${orderNo} , ${orderInfo}`}
     extra={[
       <Button type="primary" onClick={() => {
-        navigate('/booking-history');
+        navigate('/booking-detail');
       }}>
         Go To Booking History
       </Button>,

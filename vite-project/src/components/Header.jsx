@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import secureLocalStorage from "react-secure-storage";
 import koiLogo from '../assets/koi-logo.png'; // Import the image
 import './Header.css';
 import { FaRegUserCircle } from "react-icons/fa";
 import { logout } from '../redux/features/userSlider';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const Header = () => {
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Check login status using token from secureLocalStorage
@@ -24,13 +25,11 @@ const Header = () => {
   }, []);
 
   const handleLogout = () => {
-    // Clear all items from secureLocalStorage
+    // Clear all items from sessionStorage
     sessionStorage.clear();
-    dispatch(logout())
-    // Update state to reflect that the user is logged out
-    setIsLoggedIn(false); // Update state on logout
-    // Redirect to login page
-    window.location.href = '/login';
+    // Dispatch logout action to clear Redux state
+    dispatch(logout());
+    
   };
 
   const handleLinkClick = () => {
@@ -53,14 +52,14 @@ const Header = () => {
           </ul>
         </nav>
         <div className="auth-nav">
-          {isLoggedIn ? (
+          {user ? (
             <>
               <Link to="/customer-profile#profile" className='auth-user user-icon'>
                 <i>
                   <FaRegUserCircle />
                 </i>
               </Link>
-              <Link to="/" onClick={handleLogout} className='auth-button '>Logout</Link>
+              <Link to='/login' onClick={handleLogout} className='auth-button '>Logout</Link>
             </>
           ) : (
             <>

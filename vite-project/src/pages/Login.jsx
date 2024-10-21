@@ -7,7 +7,7 @@ import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import api from '../config/axios';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
-import { login } from '../redux/features/userSlider';
+import { login, logout } from '../redux/features/userSlider';
 
 const Login = () => {
 
@@ -18,6 +18,23 @@ const Login = () => {
   const [phone, setPhone] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      // Clear the user state
+      dispatch(logout());
+
+      // Remove token from sessionStorage
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('userToken');
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [dispatch]);
 
   const handleSubmit = async (e) => {
     e.preventDefault()

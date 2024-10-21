@@ -1,3 +1,6 @@
+import React, { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { logout } from './redux/features/userSlider';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Header from './components/Header';
@@ -23,7 +26,9 @@ import SlotManagement from './pages/admin/SlotManagement';
 import BookingDetail from './pages/booking/BookingDetail';
 import PaySuccess from './pages/payment/paySuccess';
 import PayFailed from './pages/payment/payFailed';
-function App() {
+
+const App = () => {
+
   const ProtectedRoute = ({ children }) => {
     const user = useSelector((state) => state.user);
     if (user && user?.role === 'ADMIN') {

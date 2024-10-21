@@ -227,7 +227,7 @@ const StaffManagement = () => {
       </Modal>
       <Modal onOk={() => form.submit()} title="Edit Staff" open={openModalEdit} onCancel={handleCloseModalEdit}>
         <Form onFinish={handleSubmitEdit} form={form}>
-          <Form.Item label="Service Type ID: 1 - Online" name="serviceTypeId" rules={[{ required: true, message: "Please select a service type!" }]}>
+          <Form.Item label="Service Type ID: 1 - Online, null" name="serviceTypeId" rules={[{ message: "Please select a service type!" }]}>
             <Input />
           </Form.Item>
           
