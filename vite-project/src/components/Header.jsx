@@ -3,12 +3,6 @@ import { Link } from 'react-router-dom';
 import koiLogo from '../assets/koi-logo.png'; // Import the image
 import './Header.css';
 import { FaRegUserCircle } from "react-icons/fa";
-<<<<<<< HEAD
-
-const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-=======
 import { logout } from '../redux/features/userSlider';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -17,27 +11,17 @@ const Header = () => {
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
->>>>>>> be0869eaf5d981e5045dbd09818a5d79b2d28ac0
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     // Check login status using token from secureLocalStorage
-<<<<<<< HEAD
-    // const checkLogin = secureLocalStorage.getItem("checkLogin");
-    // if (checkLogin) {
-    //   setIsLoggedIn(true);
-    // }
-    const token = secureLocalStorage.getItem("userToken"); // Adjust the key as needed
-    setIsLoggedIn(!!token); // Set true if token exists
-=======
     const checkLogin = sessionStorage.getItem("userToken");
     if (checkLogin) {
       setIsLoggedIn(true);
     }
     // Adjust the key as needed
     setIsLoggedIn(!!user); // Set true if token exists
->>>>>>> be0869eaf5d981e5045dbd09818a5d79b2d28ac0
   }, []);
 
   const handleLogout = () => {
@@ -45,7 +29,7 @@ const Header = () => {
     sessionStorage.clear();
     // Dispatch logout action to clear Redux state
     dispatch(logout());
-    
+
   };
 
   const handleLinkClick = () => {
@@ -70,17 +54,10 @@ const Header = () => {
         <div className="auth-nav">
           {user ? (
             <>
-<<<<<<< HEAD
-              <Link to="/customer-profile" className='auth-user user-icon'>
-              <i>
-              <FaRegUserCircle /> 
-              </i>
-=======
               <Link to="/customer-profile#profile" className='auth-user user-icon'>
                 <i>
                   <FaRegUserCircle />
                 </i>
->>>>>>> be0869eaf5d981e5045dbd09818a5d79b2d28ac0
               </Link>
               <Link to='/login' onClick={handleLogout} className='auth-button '>Logout</Link>
             </>
