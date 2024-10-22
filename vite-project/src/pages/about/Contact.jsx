@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './Contact.css';
-<<<<<<< HEAD
-=======
 import axios from 'axios';
->>>>>>> be0869eaf5d981e5045dbd09818a5d79b2d28ac0
 // import contactImage from '../assets/koi-contact.jpg'; // Make sure to add this image to your assets folder
 
 const Contact = () => {
@@ -26,12 +23,6 @@ const Contact = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-<<<<<<< HEAD
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Here you would typically send the form data to your backend
-    console.log('Form submitted:', formData);
-=======
   const handleSubmit = async (e) => {
     e.preventDefault();
     var data = {
@@ -50,7 +41,6 @@ const Contact = () => {
       }catch(error){
         console.log(error)
       }
->>>>>>> be0869eaf5d981e5045dbd09818a5d79b2d28ac0
     // Reset form after submission
     setFormData({ name: '', email: '', message: '' });
     alert('Thank you for your message. We will get back to you soon!');
