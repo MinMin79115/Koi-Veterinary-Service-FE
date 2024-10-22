@@ -1,23 +1,3 @@
-<<<<<<< HEAD
-import React from 'react';
-import { Link } from 'react-router-dom';
-const CustomerDashboard = () => {
-  return (
-    
-    <div className="dashboard">
-      <h2>Customer Profile</h2>
-      <nav>
-        <ul>
-          <li><Link to="/booking">Make a Booking</Link></li>
-          <li><Link to="/profile">Edit Profile</Link></li>
-        </ul>
-      </nav>
-    </div>
-  );
-};
-
-export default CustomerDashboard;
-=======
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
@@ -243,4 +223,3 @@ function CustomerPage() {
 }
 
 export default CustomerPage;
->>>>>>> be0869eaf5d981e5045dbd09818a5d79b2d28ac0
