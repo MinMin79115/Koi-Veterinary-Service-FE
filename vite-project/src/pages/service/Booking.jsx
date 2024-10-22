@@ -175,7 +175,12 @@ const Booking = () => {
         console.log('Booking submitted:', response.data);
         console.log('Payment:', resPayment);
         console.log('Email sent: ', resMail)
-        window.open(resPayment.data.data.paymentUrl);
+        sessionStorage.setItem('bookingId', response.data.bookingId);
+        sessionStorage.setItem('price', totalPrice);
+        sessionStorage.setItem('serviceName', selectedService.split(' || ')[0]);
+        sessionStorage.setItem('serviceTime', selectedDateTime);
+        sessionStorage.setItem('paymentUrl', resPayment.data.data.paymentUrl);
+        navigate('/payment-detail')
         toast.success('Booking submitted successfully!');
         setSelectedService('');
         setSelectedSlot('');

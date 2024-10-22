@@ -29,7 +29,7 @@ const Header = () => {
     sessionStorage.clear();
     // Dispatch logout action to clear Redux state
     dispatch(logout());
-    
+
   };
 
   const handleLinkClick = () => {
