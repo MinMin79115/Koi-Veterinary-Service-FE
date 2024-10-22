@@ -1,62 +1,12 @@
-<<<<<<< HEAD
-import React from 'react';
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-=======
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios'; // Import axios
 import { toast } from 'react-toastify'; // Import toast if you're using it
 import 'bootstrap/dist/css/bootstrap.min.css';
->>>>>>> be0869eaf5d981e5045dbd09818a5d79b2d28ac0
 import koiImage1 from '../assets/koi-image1.jpg';
 import koiImage2 from '../assets/koi-image2.jpg';
 import koiImage3 from '../assets/koi-image3.jpg';
 import koiImage4 from '../assets/koi-image4.jpg';
-<<<<<<< HEAD
-import '../components/Header.css';
-import './Home.css';
-
-
-const Home = () => {
-
-  const [faqs, setFaqs] = useState([
-    {
-      question: "What is the best diet for KOI fish?",
-      answer: "KOI fish thrive on a balanced diet that includes high-quality pellets, vegetables, and occasional treats like fruits."
-    },
-    {
-      question: "How often should I feed my KOI fish?",
-      answer: "Feed your KOI fish 2-3 times a day, only as much as they can consume in 5-10 minutes."
-    },
-    {
-      question: "What temperature is ideal for KOI fish?",
-      answer: "KOI fish prefer water temperatures between 65°F and 75°F (18°C to 24°C)."
-    },
-    {
-      question: "How can I tell if my KOI fish are healthy?",
-      answer: "Healthy KOI fish are active, have bright colors, and show no signs of distress or disease."
-    }
-  ]);
-
-  const [newQuestion, setNewQuestion] = useState('');
-
-  const handleAddFAQ = (e) => {
-    e.preventDefault();
-    if (newQuestion) {
-      // Create new FAQ object
-      const newFAQ = { question: newQuestion };
-
-      // Update FAQs, removing the oldest if there are already 5
-      setFaqs((prevFaqs) => {
-        const updatedFaqs = [...prevFaqs, newFAQ];
-        if (updatedFaqs.length > 5) {
-          updatedFaqs.shift(); // Remove the oldest FAQ
-        }
-        return updatedFaqs;
-      });
-
-=======
 import './Home.css';
 
 const Home = () => {
@@ -89,19 +39,15 @@ const Home = () => {
       // Update FAQs, adding the new one and keeping only the 5 most recent
       await axios.post('https://66fa96f0afc569e13a9c5417.mockapi.io/FAQ', newFAQ);
       fetchFaqs();
->>>>>>> be0869eaf5d981e5045dbd09818a5d79b2d28ac0
       // Clear input fields
       setNewQuestion('');
     }
   };
 
-<<<<<<< HEAD
-=======
   const toggleAccordion = (index) => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
->>>>>>> be0869eaf5d981e5045dbd09818a5d79b2d28ac0
   return (
     <div className="home">
 
@@ -169,33 +115,6 @@ const Home = () => {
         <Link to="/booking">Schedule here.</Link>
       </div>
       <div>
-<<<<<<< HEAD
-        <div className="faq-section">
-          <h3>Frequently Asked Questions</h3>
-          {faqs.map((faq, index) => (
-            <div className="faq-item" key={index}>
-              <h4>{faq.question}</h4>
-              <p>{faq.answer}</p>
-            </div>
-          ))}
-        </div>
-
-        <form onSubmit={handleAddFAQ} className="faq-form">
-          <h3>Add your FAQ</h3>
-          <div>
-            <label htmlFor="question">Question:</label>
-            <input
-              type="text"
-              id="question"
-              value={newQuestion}
-              onChange={(e) => setNewQuestion(e.target.value)}
-              required
-            />
-          </div>
-
-          <button type="submit">Add FAQ</button>
-        </form>
-=======
         <div className="container mt-5">
           <div className="row">
             <div className="col-lg-12">
@@ -253,7 +172,6 @@ const Home = () => {
             </div>
           </div>
         </div>
->>>>>>> be0869eaf5d981e5045dbd09818a5d79b2d28ac0
       </div>
     </div>
   );
