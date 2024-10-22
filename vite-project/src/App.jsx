@@ -1,6 +1,4 @@
-import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { logout } from './redux/features/userSlider';
+import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Header from './components/Header';
@@ -13,7 +11,6 @@ import Contact from './pages/about/Contact';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import CustomerPage from './pages/customer/CustomerPage';
-// import VeterianPage from '.pages/admin/VeterianProfile'
 import Booking from './pages/service/Booking';
 import Services from './pages/service/Services';
 import Manager from './pages/admin/Manager';
@@ -25,7 +22,6 @@ import ServiceManagement from './pages/admin/ServiceManagement';
 import SlotManagement from './pages/admin/SlotManagement';
 import BookingDetail from './pages/booking/BookingDetail';
 import PaySuccess from './pages/payment/paySuccess';
-import PayFailed from './pages/payment/payFailed';
 
 const App = () => {
 
@@ -70,7 +66,6 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/success" element={<PaySuccess />} />
-        <Route path="/failed" element={<PayFailed />} />
         {/* Routes with Header and Footer */}
         <Route element={
           <div className="App">
@@ -88,7 +83,6 @@ const App = () => {
                   <Route path="/customer-profile" element={<ProtectedRouteCustomer><CustomerPage /></ProtectedRouteCustomer>} />
                   <Route path="/booking" element={<Booking />} />
                   <Route path="/booking-detail" element={<BookingDetail />} />
-                  <Route path="/booking-management" element={<BookingManagement />} />
                   <Route path="/about" element={<AboutUs />} />
 
                 </Routes>

@@ -174,6 +174,7 @@ const Booking = () => {
           });
         console.log('Booking submitted:', response.data);
         console.log('Payment:', resPayment);
+        console.log('Email sent: ', resMail)
         window.open(resPayment.data.data.paymentUrl);
         toast.success('Booking submitted successfully!');
         setSelectedService('');
