@@ -5,8 +5,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './BookingManagement.css';
 import api from '../../config/axios'
 import { toast } from 'react-toastify';
+import { useSelector } from 'react-redux';
 
 const BookingPage = () => {
+    const  user  = useSelector(state => state.user);
     const [bookings, setBookings] = useState([]);
 
     const fetchBooking = async () => {      

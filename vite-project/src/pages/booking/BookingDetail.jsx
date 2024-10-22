@@ -112,7 +112,7 @@ const BookingDetail = () => {
       align: 'center',
       className: 'column-border',
       render: (status) => (
-        <span className={`badge ${status === 'PENDING' ? 'bg-warning' : status === 'COMPLETED' ? 'bg-info' : 'bg-success  '} d-flex justify-content-center py-2 fst-italic`}>
+        <span className={`badge ${status === 'PENDING' ? 'bg-warning' : status === 'COMPLETED' ? 'bg-info' : status === 'CANCELLED' ? 'bg-danger' : 'bg-success  '} d-flex justify-content-center py-2 fst-italic`}>
           {status}
         </span>
       ),
