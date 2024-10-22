@@ -1,27 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-<<<<<<< HEAD
-const FishTypes = () => {
-  return (
-    
-    <>
-      <div className="fish-types">
-      <h2>KOI Fish Types</h2>
-      <ul>
-        <li>Kohaku (Red and White)</li>
-        <li>Taisho Sanshoku (Sanke)</li>
-        <li>Showa Sanshoku</li>
-        <li>Asagi</li>
-        <li>Shusui</li>
-        <li>Butterfly Koi</li>
-      </ul>
-    </div>
-    <div className="cta-section">
-    <h3>Need personalized advice for your koi?</h3>
-    <Link to="/booking#booking" className="cta-button">Schedule a Consultation</Link>
-    </div>
-    </>
-=======
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const FishTypes = () => {
@@ -79,7 +57,6 @@ const FishTypes = () => {
         <Link to="/booking#booking" className="cta-button">Schedule a Consultation</Link>
       </div>
     </div>
->>>>>>> be0869eaf5d981e5045dbd09818a5d79b2d28ac0
   );
 };
 
