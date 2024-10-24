@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button } from 'antd';
-import { DeleteOutlined, FileDoneOutlined } from '@ant-design/icons';
+import { Table, Button, Popconfirm } from 'antd';
+import { DeleteOutlined, FileDoneOutlined, PayCircleOutlined } from '@ant-design/icons';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './BookingDetail.css';
 import api from '../../config/axios'
@@ -12,6 +12,22 @@ const BookingDetail = () => {
   const [bookings, setBookings] = useState([]);
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
+
+  const [bills, setBills] = useState([]);
+
+  const fetchBill = async () => {
+    try {
+      const response = await api.get(`bills`, {
+        headers: {
+          'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+        }
+      })
+      setBills(response.data);
+    } catch (error) {
+      console.log(error);
+
+    }
+  }
 
   const fetchBooking = async () => {
     try {
@@ -34,7 +50,7 @@ const BookingDetail = () => {
         }));
 
         setBookings(values); //Set bookings to an array of booking objects      
-        }else{
+      } else {
         const response = await api.get(`bookings/veterinarian/${user.id}`, {
           headers: {
             'Authorization': `Bearer ${sessionStorage.getItem('token')}`
@@ -61,6 +77,7 @@ const BookingDetail = () => {
 
   useEffect(() => {
     fetchBooking();
+    fetchBill();
   }, []);
 
   const columns = [
@@ -136,17 +153,33 @@ const BookingDetail = () => {
               <p className='fst-italic fs-6 text-info'>HAS BEEN COMPLETED</p>
             ) : record.status === "CANCELLED" ? (
               <p className='fst-italic fs-6 text-danger'>CANCELLED</p>
+            ) : record.id !== bills.find(bill => bill.bookingId === record.id) ? (
+              <>
+                <div className='d-flex justify-content-around'>
+                  <Button
+                    type='none'
+                    className="btn-custom btn btn-success d-flex justify-content-center m-1"
+                    icon={<PayCircleOutlined />}
+                    onClick={() => handlePay(record)}
+                  >
+                    Pay
+                  </Button>
+                  <Popconfirm
+                    title="Delete"
+                    description="Are you sure you want to delete this booking?"
+                    className="btn-custom btn btn-danger d-flex justify-content-center m-1"
+                    onConfirm={() => handleDeleteBooking(record)}
+                    okText="Yes"
+                    cancelText="No"
+                  >
+                    <Button  type='primary' icon={<DeleteOutlined />} danger>Delete</Button>
+                  </Popconfirm>
+                </div>
+              </>
             ) : (
-              <Button
-                type='none'
-                className="btn-custom btn btn-danger d-flex justify-content-center m-1"
-                icon={<DeleteOutlined />}
-                onClick={() => handleDeleteBooking(record)}
-              >
-                Delete
-              </Button>
+              <p className='fst-italic fs-6 text-success'>PAID</p>
             )
-          ) : (
+          ) : user?.role === 'VETERINARIAN' ? (
             record.status === "COMPLETED" ? (
               <p className='fst-italic fs-6 text-info'>HAS BEEN COMPLETED</p>
             ) : record.status === "CANCELLED" ? (
@@ -161,6 +194,8 @@ const BookingDetail = () => {
                 Complete
               </Button>
             )
+          ) : (
+            <></>
           )}
         </div>
       )
@@ -169,7 +204,7 @@ const BookingDetail = () => {
 
   const handleDeleteBooking = async (record) => {
     try {
-      const response = await api.put(`bookings/delete/${record.id}`,{
+      const response = await api.put(`bookings/delete/${record.id}`, {
         headers: {
           'Authorization': `Bearer ${sessionStorage.getItem('token')}`
         }
@@ -178,6 +213,36 @@ const BookingDetail = () => {
       fetchBooking()
     } catch (error) {
       console.log(error.response.data)
+    }
+  };
+
+  const handlePay = async (record) => {
+    try {
+      // Parse the price string to a number
+      const priceValue = parseFloat(record.price.replace(/[^\d,]/g, '').replace(',', '.'));
+      
+      if (isNaN(priceValue)) {
+        throw new Error('Invalid price format');
+      }
+
+      // Convert to smallest currency unit (e.g., cents)
+      const amount = Math.round(priceValue);
+      const resPayment = await api.get(`payment/vnpay?amount=${amount}&bankCode=NCB&bookingId=${record.id}`, {
+        headers: {
+          'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+        }
+      });
+      console.log(resPayment.data);
+      
+      // Open the payment URL in a new window
+      if (resPayment.data && resPayment.data.data && resPayment.data.data.paymentUrl) {
+        window.open(resPayment.data.data.paymentUrl, '_blank');
+      } else {
+        toast.error('Payment URL not found in the response');
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      toast.error(error.response?.data || 'An error occurred during payment processing');
     }
   };
 
@@ -207,7 +272,7 @@ const BookingDetail = () => {
         }
       })
       console.log(resMail)
-      const response = await api.put(`bookings/${record.id}`, valuesToUpdate,{
+      const response = await api.put(`bookings/${record.id}`, valuesToUpdate, {
         headers: {
           'Authorization': `Bearer ${sessionStorage.getItem('token')}`
         }
@@ -222,7 +287,8 @@ const BookingDetail = () => {
     }
   };
 
-  const filteredBookings = bookings.filter(booking => booking.status !== '');
+  //Lấy 10 booking mới nhất xếp theo id giảm dần
+  const newestBookings = bookings.slice(-10).sort((a, b) => b.id - a.id);
 
   return (
     <div className="container-fluid mt-5">
@@ -233,10 +299,10 @@ const BookingDetail = () => {
             <div className="card-body">
               <div className="table-responsive">
                 <Table
-                  dataSource={filteredBookings}
+                  dataSource={newestBookings}
                   columns={columns}
                   pagination={{ pageSize: 6 }}
-                  className="table column-border"
+                  className="table"
                 />
               </div>
             </div>
