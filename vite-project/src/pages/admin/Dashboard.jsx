@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Bar} from 'react-chartjs-2';
+import { Bar, Pie } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
   BarElement,
+  ArcElement,
   Title,
   Tooltip,
   Legend,
@@ -18,6 +19,7 @@ ChartJS.register(
   CategoryScale,
   LinearScale,
   BarElement,
+  ArcElement,
   Title,
   Tooltip,
   Legend
@@ -35,10 +37,19 @@ const Dashboard = () => {
     ],
   });
 
+  const [serviceTypeStats, setServiceTypeStats] = useState({
+    labels: [],
+    datasets: [
+      {
+        data: [],
+        backgroundColor: [],
+      },
+    ],
+  });
+
   const [totalPrice, setTotalPrice] = useState(0);
   const [totalCustomer, setTotalCustomer] = useState(0);
   const [totalBooking, setTotalBooking] = useState(0);
-  const serviceCounts = { 1: 0, 2: 0, 3: 0 };
 
   const fetchBookingStats = async () => {
     try {
@@ -47,46 +58,62 @@ const Dashboard = () => {
       let uniqueCustomers = new Set();
       let totalBookings = 0;
 
-      // Reset serviceCounts to ensure no duplication
-      serviceCounts[1] = 0;
-      serviceCounts[2] = 0;
-      serviceCounts[3] = 0;
-
+      // Reset counts
+      const serviceCounts = { 1: 0, 2: 0, 3: 0 };
+      const serviceTypeCounts = {};
+    
       response.data.forEach(booking => {
         if (booking.status === "COMPLETED") {
           const serviceId = booking.servicesDetail.serviceId.serviceId;
+          const serviceType = booking.servicesDetail.serviceTypeId.service_type;
           const customerId = booking.user.id;
-          // Count the number of each service type booked
+          
           if (serviceCounts[serviceId] !== undefined) {
             serviceCounts[serviceId] += 1;
           }
-          // Calculate total price of all completed bookings
+          
+          if (serviceTypeCounts[serviceType] === undefined) {
+            serviceTypeCounts[serviceType] = 1;
+          } else {
+            serviceTypeCounts[serviceType] += 1;
+          }
+          
           totalPrice += booking.servicesDetail.serviceTypeId.price;
-          // Count total number of completed bookings
           totalBookings += 1;
-          // Add unique customers
           uniqueCustomers.add(customerId);
         }
       });
-
-      console.log('Total Bookings:', totalBookings);
-      console.log('Service Counts:', serviceCounts);
-      console.log('Unique Customers:', uniqueCustomers.size);
 
       setTotalPrice(totalPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }));
       setTotalCustomer(uniqueCustomers.size);
       setTotalBooking(totalBookings);
 
-      // Update the bookingStats state with the new data
       setBookingStats(prevStats => ({
         ...prevStats,
         datasets: [
           {
             ...prevStats.datasets[0],
-            data: [serviceCounts[2], serviceCounts[1], serviceCounts[3]], // Order based on labels
+            data: [serviceCounts[2], serviceCounts[1], serviceCounts[3]],
           },
         ],
       }));
+
+      // Set service type stats for pie chart
+      const serviceTypeLabels = Object.keys(serviceTypeCounts);
+      const serviceTypeData = Object.values(serviceTypeCounts);
+      const serviceTypeColors = serviceTypeLabels.map(() => 
+        `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.6)`
+      );
+
+      setServiceTypeStats({
+        labels: serviceTypeLabels,
+        datasets: [
+          {
+            data: serviceTypeData,
+            backgroundColor: serviceTypeColors,
+          },
+        ],
+      });
 
     } catch (error) {
       console.error('Error fetching booking stats: ', error);
@@ -97,24 +124,15 @@ const Dashboard = () => {
     fetchBookingStats();
   }, []);
 
-  
   const chartOptions = {
     responsive: true,
-    scales: {
-      x: {
-        type: 'category',
-      },
-      y: {
-        beginAtZero: true,
-      },
-    },
     plugins: {
       legend: {
         position: 'top',
       },
       title: {
         display: true,
-        text: 'Booking Statistics by Service Type',
+        text: 'Booking Statistics',
       },
     },
   };
@@ -122,7 +140,7 @@ const Dashboard = () => {
   return (
     <div className="container-fluid mt-4">
       <div className="row mb-4">
-        <div className="col-md-4 mb-3">
+        <div className="col-md-4 ">
           <div className="card text-dark bg-warning">
             <div className="card-body">
               <h5 className="card-title">Total Bookings</h5>
@@ -130,7 +148,7 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-        <div className="col-md-4 mb-3">
+        <div className="col-md-4 ">
           <div className="card text-white bg-success">
             <div className="card-body">
               <h5 className="card-title">Total Profit</h5>
@@ -138,7 +156,7 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-        <div className="col-md-4 mb-3">
+        <div className="col-md-4 ">
           <div className="card text-dark bg-info">
             <div className="card-body">
               <h5 className="card-title">Total Customers</h5>
@@ -149,11 +167,19 @@ const Dashboard = () => {
       </div>
 
       <div className="row">
-        <div className="col-12">
+        <div className="col-md-8">
           <div className="card">
             <div className="card-body">
-              <h5 className="card-title">Booking Statistics</h5>
+              <h5 className="card-title">Booking Statistics by Service</h5>
               <Bar data={bookingStats} options={chartOptions} />
+            </div>
+          </div>
+        </div>
+        <div className="col-md-4 mb-3">
+          <div className="card">
+            <div className="card-body">
+              <h5 className="card-title">Service Type Distribution</h5>
+              <Pie data={serviceTypeStats} options={chartOptions} />
             </div>
           </div>
         </div>

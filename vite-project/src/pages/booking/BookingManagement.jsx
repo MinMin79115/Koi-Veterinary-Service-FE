@@ -11,6 +11,21 @@ const BookingPage = () => {
     const  user  = useSelector(state => state.user);
     const [bookings, setBookings] = useState([]);
 
+    const [bills, setBills] = useState([]);
+
+    const fetchBill = async () => {
+        try {
+            const response = await api.get('bills', {
+                headers: {
+                  'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+                }
+              });
+            setBills(response.data);
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     const fetchBooking = async () => {      
         try {
           const response = await api.get('bookings', {
@@ -19,10 +34,10 @@ const BookingPage = () => {
             }
           });
           console.log(response.data);
-          
           const values = response.data.map(booking => ({
             id: booking.bookingId,
             customerName: booking.user.fullname,
+            veterinarian: booking.veterinarian.user.fullname,
             email: booking.user.email,
             service: booking.servicesDetail.serviceId.serviceName,
             serviceType: booking.servicesDetail.serviceTypeId.service_type,
@@ -62,9 +77,17 @@ const BookingPage = () => {
             hidden: user?.role === 'CUSTOMER' || user?.role === 'VETERINARIAN' || user?.role === 'STAFF'
         },
         {
-            title: 'Customer Name',
+            title: 'Customer',
             dataIndex: 'customerName',
             key: 'customerName',
+            width: '20%',
+            align: 'center',
+            className: 'column-border'
+        },
+        {
+            title: 'Veterinarian',
+            dataIndex: 'veterinarian',
+            key: 'veterinarian',
             width: '20%',
             align: 'center',
             className: 'column-border'
@@ -126,8 +149,10 @@ const BookingPage = () => {
                         Delete
                     </Button>
                     </>
+                    ) : record.id === newestBookings.find(booking => booking.id === record.id) ? (
+                        <p className='fst-italic fs-6 text-danger'>PAID</p>
                     ) : (
-                        <></>
+                        <p className='fst-italic fs-6 text-danger'>CANCELLED</p>
                     )}
                 </div>
             )
@@ -178,7 +203,7 @@ const BookingPage = () => {
             <html>
               <body>
                 <h1 style='color: blue;'>Welcome, ${record.customerName}</h1>
-                <p style='font-size: 16px;'>Your booking has been deleted at time: ${new Date().toLocaleString()}.</p>
+                <p style='font-size: 16px;'>Your booking has been cancelled at time: ${new Date().toLocaleString()}.</p>
                 <p style='font-size: 16px;'>If you have any questions, please contact us at <b>KOI FISH CARE Centre</b></p>
                 <p style='font-size: 16px;'>Best regards, <b>KOI FISH CARE Centre</b></p>
               </body>
@@ -198,13 +223,14 @@ const BookingPage = () => {
                   'Authorization': `Bearer ${sessionStorage.getItem('token')}`
                 }
               });
-            console.log(resMail)
-            toast.success('Deleted successful.')
+            toast.success('Delete successful.')
             fetchBooking();
         }catch(error){
             console.log(error.response.data)
         }
     };
+
+    const bookingsSorted = bookings.sort((a, b) => b.id - a.id);
 
     return (
         <div className="container-fluid mt-5">
@@ -215,10 +241,10 @@ const BookingPage = () => {
                         <div className="card-body">
                             <div className="table-responsive">
                                 <Table 
-                                    dataSource={bookings} 
+                                    dataSource={bookingsSorted} 
                                     columns={columns} 
                                     pagination={{ pageSize: 6}}
-                                    className="table column-border"
+                                    className="table "
                                 />
                             </div>
                         </div>

@@ -276,26 +276,18 @@ const Booking = () => {
                 Authorization: `Bearer ${token}`
             }
           });
-          //Thanh toán Online ở đây
-          const resPayment = await api.get(`payment/vnpay?amount=${totalPrice}&bankCode=NCB`, {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          });
+          
           const resMail = await api.post(`mail/send/${user.email}`, format, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
           });
         console.log('Booking submitted:', response.data);
-        console.log('Payment:', resPayment);
         console.log('Email sent: ', resMail)
         sessionStorage.setItem('bookingId', response.data.bookingId);
         sessionStorage.setItem('price', totalPrice);
         sessionStorage.setItem('serviceName', selectedService.split(' || ')[0]);
         sessionStorage.setItem('serviceTime', selectedDateTime);
-        sessionStorage.setItem('paymentUrl', resPayment.data.data.paymentUrl);
-        navigate('/payment-detail')
         toast.success('Booking submitted successfully!');
         setSelectedService('');
         setSelectedSlot('');
@@ -303,6 +295,7 @@ const Booking = () => {
         setSelectedDateTime(''); // Reset selectedDateTime
         setSelectedHour('')
         setTimeSlot('')
+        navigate('/payment-detail')
       } catch (error) {
         console.log(error);
         toast.error(error.response?.data || 'An error occurred while booking');
