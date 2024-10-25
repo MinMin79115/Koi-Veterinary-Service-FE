@@ -11,20 +11,20 @@ const BookingPage = () => {
     const  user  = useSelector(state => state.user);
     const [bookings, setBookings] = useState([]);
 
-    const [bills, setBills] = useState([]);
+    // const [bills, setBills] = useState([]);
 
-    const fetchBill = async () => {
-        try {
-            const response = await api.get('bills', {
-                headers: {
-                  'Authorization': `Bearer ${sessionStorage.getItem('token')}`
-                }
-              });
-            setBills(response.data);
-        } catch (error) {
-            console.log(error)
-        }
-    }
+    // const fetchBill = async () => {
+    //     try {
+    //         const response = await api.get('bills', {
+    //             headers: {
+    //               'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+    //             }
+    //           });
+    //         setBills(response.data);
+    //     } catch (error) {
+    //         console.log(error)
+    //     }
+    // }
 
     const fetchBooking = async () => {      
         try {
@@ -175,26 +175,29 @@ const BookingPage = () => {
           </body>
         </html>
         `;
-        try{
-            const format = {
-                subject: "Booking Confirmation",
-                body: emailContent
-            }
+        const format = {
+            subject: "Booking Confirmation",
+            body: emailContent
+        }
+        try{  
+            const response = await api.put(`bookings/${record.id}`,valuesToSend, {
+                headers: {
+                  'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+                }
+            });
+            toast.success('Confirmed.')
+            fetchBooking();
+        }catch(error){
+            console.log(error)
+        }finally{
             const resMail = await api.post(`mail/send/${record.email}`, format, {
                 headers: {
                   Authorization: `Bearer ${sessionStorage.getItem('token')}`
                 }
               })
-            const response = await api.put(`bookings/${record.id}`,valuesToSend, {
-                headers: {
-                  'Authorization': `Bearer ${sessionStorage.getItem('token')}`
-                }
-              });
-            toast.success('Confirmed.')
-            fetchBooking();
-        }catch(error){
-            console.log(error)
+            console.log('Email sent: ', resMail)
         }
+        
     };
 
     const handleDeleteBooking = async (record) => {

@@ -49,7 +49,7 @@ const Header = () => {
             <li><Link onClick={handleLinkClick} to="/">Home</Link></li>
             <li><Link onClick={handleLinkClick} to="/services">Services</Link></li>
             <li><Link onClick={handleLinkClick} to="/contact">Contact</Link></li>
-            <li><Link onClick={handleLinkClick} to="/booking-detail">History</Link></li>
+            <li>{user?.role === 'CUSTOMER' || user?.role === 'VETERINARIAN' ? <Link onClick={handleLinkClick} to="/booking-detail">History</Link> : <Link onClick={handleLinkClick} to="/booking-management">History</Link>}</li>
           </ul>
         </nav>
         <div className="auth-nav">

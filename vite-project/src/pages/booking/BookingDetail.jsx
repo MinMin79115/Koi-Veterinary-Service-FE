@@ -13,21 +13,21 @@ const BookingDetail = () => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
 
-  const [bills, setBills] = useState([]);
+  // const [bills, setBills] = useState([]);
 
-  const fetchBill = async () => {
-    try {
-      const response = await api.get(`bills`, {
-        headers: {
-          'Authorization': `Bearer ${sessionStorage.getItem('token')}`
-        }
-      })
-      setBills(response.data);
-    } catch (error) {
-      console.log(error);
+  // const fetchBill = async () => {
+  //   try {
+  //     const response = await api.get(`bills`, {
+  //       headers: {
+  //         'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+  //       }
+  //     })
+  //     setBills(response.data);
+  //   } catch (error) {
+  //     console.log(error);
 
-    }
-  }
+  //   }
+  // }
 
   const fetchBooking = async () => {
     try {
@@ -77,7 +77,7 @@ const BookingDetail = () => {
 
   useEffect(() => {
     fetchBooking();
-    fetchBill();
+    // fetchBill();
   }, []);
 
   const columns = [
@@ -153,7 +153,9 @@ const BookingDetail = () => {
               <p className='fst-italic fs-6 text-info'>HAS BEEN COMPLETED</p>
             ) : record.status === "CANCELLED" ? (
               <p className='fst-italic fs-6 text-danger'>CANCELLED</p>
-            ) : record.id !== bills.find(bill => bill.bookingId === record.id) ? (
+            )  : record.status === "CONFIRMED" ? (
+              <p className='fst-italic fs-6 text-info'>CONFIRMED</p>
+            ): record.id !== bills.find(bill => bill.bookingId === record.id) ? (
               <>
                 <div className='d-flex justify-content-around'>
                   <Button
@@ -247,11 +249,7 @@ const BookingDetail = () => {
   };
 
   const handleComplete = async (record) => {
-    try {
-      const valuesToUpdate = {
-        status: 'COMPLETED'
-      }
-      const emailContent = `
+    const emailContent = `
     <html>
       <body>
         <h1 style='color: blue;'>Welcome, ${record.customerName}</h1>
@@ -264,26 +262,30 @@ const BookingDetail = () => {
     `;
       const format = {
         subject: "Booking Completion",
-        body: emailContent
+      body: emailContent
+    }
+    try {
+      const valuesToUpdate = {
+        status: 'COMPLETED'
       }
-      const resMail = await api.post(`mail/send/${record.email}`, format, {
-        headers: {
-          Authorization: `Bearer ${sessionStorage.getItem('token')}`
-        }
-      })
-      console.log(resMail)
       const response = await api.put(`bookings/${record.id}`, valuesToUpdate, {
         headers: {
           'Authorization': `Bearer ${sessionStorage.getItem('token')}`
         }
       })
       //Update the booking status to COMPLETED
-      //Need to send mail to customer (user.emai)
-      console.log(resMail)
       toast.success('Complete successful.')
       fetchBooking()
     } catch (error) {
       console.log(error.response.data)
+    }finally{
+     
+      const resMail = await api.post(`mail/send/${record.email}`, format, {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`
+        }
+      })
+      console.log(resMail)
     }
   };
 

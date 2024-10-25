@@ -22,7 +22,8 @@ import ServiceManagement from './pages/admin/ServiceManagement';
 import SlotManagement from './pages/admin/SlotManagement';
 import BookingDetail from './pages/booking/BookingDetail';
 import PaySuccess from './pages/payment/paySuccess';
-import PaymentDetail from './pages/service/paymentDetail';
+import PayFailed from './pages/payment/paymentFailed'
+import PaymentDetail from './pages/payment/paymentDetail';
 
 const App = () => {
 
@@ -67,6 +68,7 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/success" element={<PaySuccess />} />
+        <Route path="/failed" element={<PayFailed/>} />
         <Route path="/payment-detail" element={<PaymentDetail />} />
         {/* Routes with Header and Footer */}
         <Route element={

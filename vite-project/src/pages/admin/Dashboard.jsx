@@ -175,16 +175,16 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-        <div className="col-md-4 mb-3">
-          <div className="card">
+        <div className="col-md-4 mb-3" >
+          <div className="card " style={{ height: 'calc(100% + 16px)' }}>
             <div className="card-body">
               <h5 className="card-title">Service Type Distribution</h5>
               <Pie data={serviceTypeStats} options={chartOptions} />
             </div>
           </div>
+          </div>
         </div>
       </div>
-    </div>
   );
 };
 

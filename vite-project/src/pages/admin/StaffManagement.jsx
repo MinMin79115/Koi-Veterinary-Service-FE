@@ -6,6 +6,7 @@ import api from '../../config/axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 const StaffManagement = () => {
   const [staffs, setStaffs] = useState([]);
+  const [veterinarians, setVeterinarians] = useState([]);
   const [editingStaff, setEditingStaff] = useState(null);
   const [openModalEdit, setOpenModalEdit] = useState(false);
   const [openModal, setOpenModal] = useState(false);
@@ -27,8 +28,25 @@ const StaffManagement = () => {
     }
   };
 
+  const fetchVeterinarians = async () => {
+    try {
+      const response = await api.get('veterinarian', {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`
+        }
+      });
+      setVeterinarians(response.data);
+      console.log(response.data);
+    } catch (error) {
+      toast.error('Error fetching veterinarians:', error.response?.data || error.message);
+    }
+  };
+
+
+
   useEffect(() => {
     fetchStaffs();
+    fetchVeterinarians();
   }, []);
 
   const handleOpenModal = () => {
@@ -164,7 +182,10 @@ const StaffManagement = () => {
         <div className='d-flex gap-2 justify-content-center'>
           {record.role === 'VETERINARIAN' ? (
             <>
-              <Button type='primary' onClick={() => handleOpenModalEdit(record)}>Edit</Button>
+              {veterinarians.map((e) => e.user.id === record.id ? <div>
+                <></>
+              </div> : <Button type='primary' onClick={() => handleOpenModalEdit(record)}>Edit</Button>
+              )}
               <Popconfirm
                 title="Delete"
                 description="Are you sure you want to delete this staff?"

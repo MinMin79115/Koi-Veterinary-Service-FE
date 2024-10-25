@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import './Booking.css';
 import { toast } from 'react-toastify';
 import api from '../../config/axios';
@@ -12,7 +12,6 @@ const Booking = () => {
   const user = useSelector(state => state.user);
   const navigate = useNavigate();
   const location = useLocation();
-  const [slots, setSlots] = useState([]); // Change this line
   const [services, setServices] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState('');
@@ -162,13 +161,8 @@ const Booking = () => {
             }
           });
           
-          const resMail = await api.post(`mail/send/${user.email}`, format, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-          });
+
         console.log('Booking submitted:', response.data);
-        console.log('Email sent: ', resMail)
         sessionStorage.setItem('bookingId', response.data.bookingId);
         sessionStorage.setItem('price', totalPrice);
         sessionStorage.setItem('serviceName', selectedService.split(' || ')[0]);
@@ -180,10 +174,17 @@ const Booking = () => {
         setSelectedDateTime(''); // Reset selectedDateTime
         setSelectedHour('')
         setTimeSlot('')
-        navigate('/payment-detail')
       } catch (error) {
         console.log(error);
         toast.error(error.response?.data || 'An error occurred while booking');
+      } finally {
+        const resMail = await api.post(`mail/send/${user.email}`, format, {
+          headers: {
+              Authorization: `Bearer ${token}`
+          }
+        });
+        console.log('Email sent: ', resMail)
+        navigate('/payment-detail')
       }
     } else {
       toast.error('Please login to book a service');
