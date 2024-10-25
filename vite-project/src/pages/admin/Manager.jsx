@@ -11,7 +11,6 @@ import { Breadcrumb, Layout, Menu, theme } from 'antd';
 import StaffManagement from './StaffManagement';
 import Dashboard from './Dashboard';
 import AdminProfile from './AdminPage';
-import FAQManagement from './FAQ';
 import ServiceManagement from './ServiceManagement';
 import SlotManagement from './SlotManagement';
 const { Content, Sider } = Layout;
@@ -41,7 +40,6 @@ const Manager = () => {
   const items = [
     getItem('Dasboard', 'dashboard', <BarChartOutlined />),
     getItem('Manage Staff', 'staff', <PieChartOutlined />),
-    getItem('Manage FAQ', 'faq', <DesktopOutlined />),
     getItem('Manage Service', 'service', <CustomerServiceOutlined />),
     getItem('Manage Slot', 'slot', <CalendarOutlined />),
     getItem('User', 'sub1', <UserOutlined />, [
@@ -61,8 +59,6 @@ const Manager = () => {
         return <Dashboard />;
       case 'staff':
         return <StaffManagement />;
-      case 'faq':
-        return <FAQManagement />;
       case 'service':
         return <ServiceManagement />;
       case 'slot':
@@ -93,7 +89,7 @@ const Manager = () => {
         <Content style={{ margin: '0 16px' }}>
           <Breadcrumb style={{ margin: '16px 0' }}>
             <Breadcrumb.Item>Manager</Breadcrumb.Item>
-            <Breadcrumb.Item>{selectedKey === 'dashboard' ? 'Dashboard' : selectedKey === 'staff' ? 'Staff Management' : selectedKey === 'faq' ? 'FAQ Management' : selectedKey === 'service' ? 'Service Management' : selectedKey === 'slot' ? 'Slot Management' : 'User Profile'}</Breadcrumb.Item>
+            <Breadcrumb.Item>{selectedKey === 'dashboard' ? 'Dashboard' : selectedKey === 'staff' ? 'Staff Management' : selectedKey === 'service' ? 'Service Management' : selectedKey === 'slot' ? 'Slot Management' : 'User Profile'}</Breadcrumb.Item>
           </Breadcrumb>
           <div
             style={{

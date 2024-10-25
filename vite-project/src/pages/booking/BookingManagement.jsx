@@ -8,53 +8,56 @@ import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 
 const BookingPage = () => {
-    const  user  = useSelector(state => state.user);
+    const user = useSelector(state => state.user);
     const [bookings, setBookings] = useState([]);
+    const [bills, setBills] = useState([]);
 
-    // const [bills, setBills] = useState([]);
-
-    // const fetchBill = async () => {
-    //     try {
-    //         const response = await api.get('bills', {
-    //             headers: {
-    //               'Authorization': `Bearer ${sessionStorage.getItem('token')}`
-    //             }
-    //           });
-    //         setBills(response.data);
-    //     } catch (error) {
-    //         console.log(error)
-    //     }
-    // }
-
-    const fetchBooking = async () => {      
+    const fetchBill = async () => {
         try {
-          const response = await api.get('bookings', {
-            headers: {
-              'Authorization': `Bearer ${sessionStorage.getItem('token')}`
-            }
-          });
-          console.log(response.data);
-          const values = response.data.map(booking => ({
-            id: booking.bookingId,
-            customerName: booking.user.fullname,
-            veterinarian: booking.veterinarian.user.fullname,
-            email: booking.user.email,
-            service: booking.servicesDetail.serviceId.serviceName,
-            serviceType: booking.servicesDetail.serviceTypeId.service_type,
-            status: booking.status,
-            price: booking.servicesDetail.serviceTypeId.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
-          }));
-    
-          setBookings(values); // Set bookings to an array of booking objects
+            const response = await api.get('payment', {
+                headers: {
+                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+                }
+            });
+            const values = response.data.map(bill => ({
+                id: bill.booking.bookingId,
+            }));
+            setBills(values);
         } catch (error) {
-          toast.error("Fetching booking failed.");
-          console.log(error);
+            console.log(error)
         }
-      };
+    }
 
-      useEffect(() => {
+    const fetchBooking = async () => {
+        try {
+            const response = await api.get('bookings', {
+                headers: {
+                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+                }
+            });
+            console.log(response.data);
+            const values = response.data.map(booking => ({
+                id: booking.bookingId,
+                customerName: booking.user.fullname,
+                veterinarian: booking.veterinarian.user.fullname,
+                email: booking.user.email,
+                service: booking.servicesDetail.serviceId.serviceName,
+                serviceType: booking.servicesDetail.serviceTypeId.service_type,
+                status: booking.status,
+                price: booking.servicesDetail.serviceTypeId.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
+            }));
+
+            setBookings(values); // Set bookings to an array of booking objects
+        } catch (error) {
+            toast.error("Fetching booking failed.");
+            console.log(error);
+        }
+    };
+
+    useEffect(() => {
         fetchBooking();
-      }, []);
+        fetchBill();
+    }, []);
 
 
 
@@ -120,46 +123,37 @@ const BookingPage = () => {
             render: (_, record) => (
                 <div className="d-flex flex-column flex-md-row justify-content-center">
                     {record.status === "COMPLETED" ? (
-                        <p className='fst-italic text-info'>HAS BEEN COMPLETED</p>
+                        <p className='fst-italic text-info'>COMPLETED</p>
                     ) : record.status === "CONFIRMED" ? (
-                        <Button 
-                        type='none'
-                        className="btn-custom btn btn-danger d-flex justify-content-center m-auto"
-                        icon={<DeleteOutlined />} 
-                        onClick={() => handleDeleteBooking(record)}
-                    >
-                        Delete
-                    </Button>
-                    ) : record.status === "PENDING" ? (
-                        <>
-                        <Button 
-                        type='none'
-                        className="btn-custom btn btn-success d-flex justify-content-center m-1" 
-                        icon={<CheckCircleOutlined />} 
-                        onClick={() => handleConfirmBooking(record)}
-                    >
-                        Confirm
-                    </Button>
-                    <Button 
-                        type='none'
-                        className="btn-custom btn btn-danger d-flex justify-content-center m-1"
-                        icon={<DeleteOutlined />} 
-                        onClick={() => handleDeleteBooking(record)}
-                    >
-                        Delete
-                    </Button>
-                    </>
-                    ) : record.id === newestBookings.find(booking => booking.id === record.id) ? (
-                        <p className='fst-italic fs-6 text-danger'>PAID</p>
-                    ) : (
+                        <p className='fst-italic text-success'> CONFIRMED</p>
+                    ) : record.status === "PENDING" && bills.some(bill => bill.id === record.id) ? (
+                        <Button
+                            type='none'
+                            className="btn-custom btn btn-success d-flex justify-content-center m-1"
+                            icon={<CheckCircleOutlined />}
+                            onClick={() => handleConfirmBooking(record)}
+                        >
+                            Confirm
+                        </Button>
+                    ) : record.status === "CANCELLED" ? (
                         <p className='fst-italic fs-6 text-danger'>CANCELLED</p>
+                    ) : (
+                        <Button
+                            type='none'
+                            className="btn-custom btn btn-danger d-flex justify-content-center m-1"
+                            icon={<DeleteOutlined />}
+                            onClick={() => handleDeleteBooking(record)}
+                        >
+                            Delete
+                        </Button>
                     )}
+
                 </div>
             )
         }
     ];
 
-   
+
     const handleConfirmBooking = async (record) => {
         const valuesToSend = {
             status: "CONFIRMED"
@@ -179,29 +173,29 @@ const BookingPage = () => {
             subject: "Booking Confirmation",
             body: emailContent
         }
-        try{  
-            const response = await api.put(`bookings/${record.id}`,valuesToSend, {
+        try {
+            const response = await api.put(`bookings/${record.id}`, valuesToSend, {
                 headers: {
-                  'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`
                 }
             });
             toast.success('Confirmed.')
             fetchBooking();
-        }catch(error){
+        } catch (error) {
             console.log(error)
-        }finally{
+        } finally {
             const resMail = await api.post(`mail/send/${record.email}`, format, {
                 headers: {
-                  Authorization: `Bearer ${sessionStorage.getItem('token')}`
+                    Authorization: `Bearer ${sessionStorage.getItem('token')}`
                 }
-              })
+            })
             console.log('Email sent: ', resMail)
         }
-        
+
     };
 
     const handleDeleteBooking = async (record) => {
-        try{
+        try {
             const emailContent = `
             <html>
               <body>
@@ -218,17 +212,17 @@ const BookingPage = () => {
             }
             const resMail = await api.post(`mail/send/${record.email}`, format, {
                 headers: {
-                  Authorization: `Bearer ${sessionStorage.getItem('token')}`
+                    Authorization: `Bearer ${sessionStorage.getItem('token')}`
                 }
-              })
+            })
             const response = await api.put(`bookings/delete/${record.id}`, {
                 headers: {
-                  'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`
                 }
-              });
+            });
             toast.success('Delete successful.')
             fetchBooking();
-        }catch(error){
+        } catch (error) {
             console.log(error.response.data)
         }
     };
@@ -243,10 +237,10 @@ const BookingPage = () => {
                     <div className="card">
                         <div className="card-body">
                             <div className="table-responsive">
-                                <Table 
-                                    dataSource={bookingsSorted} 
-                                    columns={columns} 
-                                    pagination={{ pageSize: 6}}
+                                <Table
+                                    dataSource={bookingsSorted}
+                                    columns={columns}
+                                    pagination={{ pageSize: 6 }}
                                     className="table "
                                 />
                             </div>

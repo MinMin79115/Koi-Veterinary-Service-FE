@@ -10,24 +10,28 @@ import { toast } from 'react-toastify';
 
 const BookingDetail = () => {
   const [bookings, setBookings] = useState([]);
-  const navigate = useNavigate();
+  const [checkBookingId, setCheckBookingId] = useState('');
+  const [payStatus, setPayStatus] = useState('')
   const user = useSelector((state) => state.user);
 
-  // const [bills, setBills] = useState([]);
+  const [bills, setBills] = useState([]);
 
-  // const fetchBill = async () => {
-  //   try {
-  //     const response = await api.get(`bills`, {
-  //       headers: {
-  //         'Authorization': `Bearer ${sessionStorage.getItem('token')}`
-  //       }
-  //     })
-  //     setBills(response.data);
-  //   } catch (error) {
-  //     console.log(error);
-
-  //   }
-  // }
+  const fetchBill = async () => {
+    try {
+      const response = await api.get(`payment`, {
+        headers: {
+          'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+        }
+      })
+      const values = response.data.map(bill => ({
+        id: bill.booking.bookingId,
+      }));
+      setBills(values);
+      console.log('bills:', bills);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   const fetchBooking = async () => {
     try {
@@ -77,8 +81,11 @@ const BookingDetail = () => {
 
   useEffect(() => {
     fetchBooking();
-    // fetchBill();
+    fetchBill();
+
   }, []);
+
+
 
   const columns = [
     {
@@ -150,13 +157,19 @@ const BookingDetail = () => {
         <div className="d-flex flex-column flex-md-row justify-content-center">
           {user?.role === 'CUSTOMER' ? (
             record.status === "COMPLETED" ? (
-              <p className='fst-italic fs-6 text-info'>HAS BEEN COMPLETED</p>
+              <p className='fst-italic fs-6 text-info'>COMPLETED</p>
             ) : record.status === "CANCELLED" ? (
               <p className='fst-italic fs-6 text-danger'>CANCELLED</p>
             )  : record.status === "CONFIRMED" ? (
-              <p className='fst-italic fs-6 text-info'>CONFIRMED</p>
-            ): record.id !== bills.find(bill => bill.bookingId === record.id) ? (
+              <p className='fst-italic fs-6 text-success'>CONFIRMED</p>
+            ): bills.find(bill => bill.id === record.id) ? (
               <>
+                {setPayStatus('PAID')}
+                <p className='fst-italic fs-6 text-success'>{payStatus}</p>
+              </>
+            ) : (
+              <>
+                <p className='fst-italic fs-6 text-warning'>{bills.id}</p>
                 <div className='d-flex justify-content-around'>
                   <Button
                     type='none'
@@ -178,8 +191,6 @@ const BookingDetail = () => {
                   </Popconfirm>
                 </div>
               </>
-            ) : (
-              <p className='fst-italic fs-6 text-success'>PAID</p>
             )
           ) : user?.role === 'VETERINARIAN' ? (
             record.status === "COMPLETED" ? (
@@ -197,7 +208,9 @@ const BookingDetail = () => {
               </Button>
             )
           ) : (
-            <></>
+            <>
+              <p className='fst-italic fs-6 text-warning'>{payStatus}</p>
+            </>
           )}
         </div>
       )

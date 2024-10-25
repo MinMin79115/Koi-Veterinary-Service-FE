@@ -63,8 +63,6 @@ const Booking = () => {
         }
       });
       console.log(response.data);
-      setSlots(response.data);
-      
       // Gộp 1 Slot chứa nhiều bác sĩ
       const processedSlots = response.data.reduce((acc, slot) => {
         const timeKey = `${slot.timeSlot.startTime} - ${slot.timeSlot.endTime}`;
@@ -81,7 +79,7 @@ const Booking = () => {
       
       setUniqueSlots(processedSlots);
     } catch (error) {
-      toast.error('Error fetching slots:', error.response.data);
+      toast.error('Error fetching slots:', error);
     }
   }
 
@@ -159,9 +157,7 @@ const Booking = () => {
             headers: {
                 Authorization: `Bearer ${token}`
             }
-          });
-          
-
+        });
         console.log('Booking submitted:', response.data);
         sessionStorage.setItem('bookingId', response.data.bookingId);
         sessionStorage.setItem('price', totalPrice);
@@ -174,6 +170,7 @@ const Booking = () => {
         setSelectedDateTime(''); // Reset selectedDateTime
         setSelectedHour('')
         setTimeSlot('')
+        navigate('/payment-detail')
       } catch (error) {
         console.log(error);
         toast.error(error.response?.data || 'An error occurred while booking');
@@ -184,7 +181,6 @@ const Booking = () => {
           }
         });
         console.log('Email sent: ', resMail)
-        navigate('/payment-detail')
       }
     } else {
       toast.error('Please login to book a service');

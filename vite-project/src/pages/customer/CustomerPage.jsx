@@ -146,7 +146,7 @@ function CustomerPage() {
                             name="fullname"
                             value={customer.fullname}
                             onChange={handleInputChange}
-                            required
+                            
                           />
                         </div>
                       </div>
@@ -159,7 +159,7 @@ function CustomerPage() {
                             name="email"
                             value={customer.email}
                             onChange={handleInputChange}
-                            required
+                            
                           />
                         </div>
                       </div>
@@ -172,7 +172,7 @@ function CustomerPage() {
                             name="phone"
                             value={customer.phone}
                             onChange={handleInputChange}
-                            required
+                            
                           />
                         </div>
                       </div>
@@ -199,7 +199,7 @@ function CustomerPage() {
                             name="address"
                             value={customer.address}
                             onChange={handleInputChange}
-                            required
+                            
                           />
                         </div>
                       </div>

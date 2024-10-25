@@ -22,9 +22,9 @@ import ServiceManagement from './pages/admin/ServiceManagement';
 import SlotManagement from './pages/admin/SlotManagement';
 import BookingDetail from './pages/booking/BookingDetail';
 import PaySuccess from './pages/payment/paySuccess';
-import PayFailed from './pages/payment/paymentFailed'
 import PaymentDetail from './pages/payment/paymentDetail';
-
+import ForgotPassword from './pages/forgotPassword'
+import ResetPassword from './pages/resetPassword'
 const App = () => {
 
   const ProtectedRoute = ({ children }) => {
@@ -68,8 +68,9 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/success" element={<PaySuccess />} />
-        <Route path="/failed" element={<PayFailed/>} />
+        <Route path="/forgot-password" element={<ForgotPassword/>} />
         <Route path="/payment-detail" element={<PaymentDetail />} />
+        <Route path='/reset-password' element={<ResetPassword/>} />
         {/* Routes with Header and Footer */}
         <Route element={
           <div className="App">

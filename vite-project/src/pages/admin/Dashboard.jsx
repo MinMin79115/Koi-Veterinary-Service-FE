@@ -138,29 +138,29 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="container-fluid mt-4">
+    <div className="container-fluid mt-4" >
       <div className="row mb-4">
         <div className="col-md-4 ">
-          <div className="card text-dark bg-warning">
+          <div className="card text-dark" style={{backgroundColor: '#E27D60'}}>
             <div className="card-body">
-              <h5 className="card-title">Total Bookings</h5>
-              <p className="card-text display-4">{totalBooking}</p>
+              <h5 className="card-title text-white">Total Bookings</h5>
+              <p className="card-text display-3 text-white" >{totalBooking}</p>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-4" >
+          <div className="card text-white"  style={{backgroundColor: '#AFD275'}}>
+            <div className="card-body">
+              <h5 className="card-title text-white">Total Profit</h5>
+              <p className="card-text display-3 text-white">{totalPrice}</p>
             </div>
           </div>
         </div>
         <div className="col-md-4 ">
-          <div className="card text-white bg-success">
+          <div className="card text-dark" style={{backgroundColor: '#E7717D'}}>
             <div className="card-body">
-              <h5 className="card-title">Total Profit</h5>
-              <p className="card-text display-4">{totalPrice}</p>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-4 ">
-          <div className="card text-dark bg-info">
-            <div className="card-body">
-              <h5 className="card-title">Total Customers</h5>
-              <p className="card-text display-4">{totalCustomer}</p>
+              <h5 className="card-title text-white">Total Customers</h5>
+              <p className="card-text display-3 text-white">{totalCustomer}</p>
             </div>
           </div>
         </div>
@@ -168,14 +168,14 @@ const Dashboard = () => {
 
       <div className="row">
         <div className="col-md-8">
-          <div className="card">
+          <div className="card" style={{ height: 'calc(100%)' }}>
             <div className="card-body">
               <h5 className="card-title">Booking Statistics by Service</h5>
               <Bar data={bookingStats} options={chartOptions} />
             </div>
           </div>
         </div>
-        <div className="col-md-4 mb-3" >
+        <div className="col-md-4 mb-3" xs={12} sm={4} md={4}>
           <div className="card " style={{ height: 'calc(100% + 16px)' }}>
             <div className="card-body">
               <h5 className="card-title">Service Type Distribution</h5>

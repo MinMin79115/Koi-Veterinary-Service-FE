@@ -4,6 +4,7 @@ import { useForm } from 'antd/es/form/Form';
 import { toast } from 'react-toastify';
 import api from '../../config/axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
+
 const StaffManagement = () => {
   const [staffs, setStaffs] = useState([]);
   const [veterinarians, setVeterinarians] = useState([]);
@@ -85,7 +86,11 @@ const StaffManagement = () => {
         }
       });
       toast.success("Successfully updated!");
+      setOpenModalEdit(false);
+      setEditingStaff(null);
+      form.resetFields();
       fetchStaffs();
+      fetchVeterinarians();
     } catch (err) {
       toast.error(err.response?.data || "An error occurred while updating the staff.");
     }
@@ -182,9 +187,10 @@ const StaffManagement = () => {
         <div className='d-flex gap-2 justify-content-center'>
           {record.role === 'VETERINARIAN' ? (
             <>
-              {veterinarians.map((e) => e.user.id === record.id ? <div>
+              {veterinarians.find((e) => e.user.id === record.id)  ? (
                 <></>
-              </div> : <Button type='primary' onClick={() => handleOpenModalEdit(record)}>Edit</Button>
+              ) : (
+                <Button type='primary' onClick={() => handleOpenModalEdit(record)}>Edit</Button>
               )}
               <Popconfirm
                 title="Delete"
@@ -213,14 +219,29 @@ const StaffManagement = () => {
   ];
 
   return (
-    <div>
-      <Button onClick={handleOpenModal}>Create new staff</Button>
-      <Input
-        placeholder="Search name"
-        onChange={(e) => handleSearch(e.target.value)}
-        style={{ margin: 16, width: '60%' }}
-      />
-      <Table dataSource={filteredData} columns={columns} pagination={{ pageSize: 7 }} />
+    <>
+      <div className="row mb-3">
+        <div className="col-12 col-md-6 col-lg-4 mb-2">
+          <Button onClick={handleOpenModal} className="w-100">Create new staff</Button>
+        </div>
+        <div className="col-12 col-md-6 col-lg-8 mb-2">
+          <Input
+            placeholder="Search name"
+            onChange={(e) => handleSearch(e.target.value)}
+            className="w-100"
+          />
+        </div>
+      </div>
+      <div className="row">
+        <div className="col-12">
+          <Table 
+            dataSource={filteredData} 
+            columns={columns}
+            pagination={{ pageSize: 7 }}
+            className="w-100"
+          />
+        </div>
+      </div>
       <Modal onOk={() => form.submit()} title="Create new Staff" open={openModal} onCancel={handleCloseModal}>
         <Form onFinish={handleSubmitStaffs} form={form}>
           <Form.Item label="Staff name" name="fullname" rules={[{ required: true, message: "Please input name!" }]}>
@@ -254,7 +275,7 @@ const StaffManagement = () => {
           
         </Form>
       </Modal>
-    </div>
+    </>
   );
 };
 

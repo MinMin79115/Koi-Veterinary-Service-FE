@@ -22,7 +22,6 @@ const FAQManagement = () => {
       setFaqData(response.data);
     } catch (error) {
       console.error('Error fetching FAQ data:', error);
-      toast.error('Failed to fetch FAQ data');
     }
   };
 
@@ -72,8 +71,6 @@ const FAQManagement = () => {
       toast.error('Failed to delete question');
     }
   };
-
-  
 
   const handleSearch = (value) => {
     setSearchTerm(value);

@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { toast } from 'react-toastify';
 import { Button, Table, Modal, Form, Input, Popconfirm, Select } from 'antd';
 import { useForm } from 'antd/es/form/Form';
-import api from '../../config/axios';
-import { useDispatch } from 'react-redux';
+import { toast } from 'react-toastify';
 import { SearchOutlined } from '@ant-design/icons';
+import api from '../../config/axios';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const SlotManagement = () => {
     const [slots, setSlots] = useState([]);
@@ -38,9 +36,13 @@ const SlotManagement = () => {
                     Authorization: `Bearer ${sessionStorage.getItem('token')}`
                 }
             });
-            setVeterinarians(response.data);
+            const filteredVeterinarians = response.data.filter(veterinarian => 
+                veterinarian.serviceTypeId === null
+            );
+            setVeterinarians(filteredVeterinarians);
+            console.log(filteredVeterinarians);
         } catch (error) {
-            toast.error('Error fetching veterinarians:', error.response?.data || error.message);
+            console.log(error.response?.data);
         }
     };
 
@@ -107,6 +109,8 @@ const SlotManagement = () => {
             });
             toast.success("Slot successfully updated!");
             setOpenModalEdit(false);
+            setEditingSlot(null);
+            form.resetFields();
             fetchSlots();
         } catch (err) {
             toast.error(err.response?.data || "An error occurred while updating the slot.");
@@ -186,23 +190,40 @@ const SlotManagement = () => {
     ];
 
     return (
-        <div>
-            <Button onClick={handleOpenModal}>Create new slot</Button>
-            <Input
-                placeholder="Search veterinarian name"
-                prefix={<SearchOutlined />}
-                onChange={(e) => handleSearch(e.target.value)}
-                style={{ margin: 16, width: '60%' }}
-            />
-            <Table
-                dataSource={filteredData}
-                columns={columns}
-                pagination={{ pageSize: 7 }}
-                rowKey="slotId"
-            />
-            <Modal onOk={() => form.submit()} title="Create new Slot" open={openModal} onCancel={handleCloseModal}>
-                <Form onFinish={handleSubmitSlot} form={form}>
-                    <Form.Item label="Veterinarian" name="veterinarianId" rules={[{ required: true, message: "Please input veterinarian id!" }]}>
+           <> <div className="row mb-3">
+                <div className="col-12 col-md-6 col-lg-4 mb-2">
+                    <Button onClick={handleOpenModal} className="w-100">Create new slot</Button>
+                </div>
+                <div className="col-12 col-md-6 col-lg-8 mb-2">
+                    <Input
+                        placeholder="Search veterinarian name"
+                        prefix={<SearchOutlined />}
+                        onChange={(e) => handleSearch(e.target.value)}
+                        className="w-100"
+                    />
+                </div>
+            </div>
+            <div className="row">
+                <div className="col-12">
+                    <Table
+                        dataSource={filteredData}
+                        columns={columns}
+                        pagination={{ pageSize: 7 }}
+                        rowKey="slotId"
+                        className="w-100"
+                    />
+                </div>
+            </div>
+            <Modal 
+                onOk={() => form.submit()} 
+                title="Create new Slot" 
+                open={openModal} 
+                onCancel={handleCloseModal}
+                width="90%"
+                style={{ maxWidth: '600px' }}
+            >
+                <Form onFinish={handleSubmitSlot} form={form} layout="vertical">
+                    <Form.Item label="Veterinarian" name="veterinarianId" rules={[{ required: true, message: "Please select a veterinarian!" }]}>
                         <Select options={veterinarians.map(veterinarian => ({
                             label: veterinarian.user.fullname,
                             value: veterinarian.veterinarianId
@@ -213,9 +234,16 @@ const SlotManagement = () => {
                     </Form.Item>
                 </Form>
             </Modal>
-            <Modal onOk={() => form.submit()} title="Edit Slot" open={openModalEdit} onCancel={handleCloseModalEdit}>
-                <Form onFinish={handleEditSlot} form={form}>
-                    <Form.Item label="Veterinarian" name="veterinarianId" rules={[{ required: true, message: "Please input veterinarian id!" }]}>
+            <Modal 
+                onOk={() => form.submit()} 
+                title="Edit Slot" 
+                open={openModalEdit} 
+                onCancel={handleCloseModalEdit}
+                width="90%"
+                style={{ maxWidth: '600px' }}
+            >
+                <Form onFinish={handleEditSlot} form={form} layout="vertical">
+                    <Form.Item label="Veterinarian" name="veterinarianId" rules={[{ required: true, message: "Please select a veterinarian!" }]}>
                         <Select options={veterinarians.map(veterinarian => ({
                             label: veterinarian.user.fullname,
                             value: veterinarian.veterinarianId
@@ -226,7 +254,7 @@ const SlotManagement = () => {
                     </Form.Item>
                 </Form>
             </Modal>
-        </div>
+        </>
     );
 };
 
