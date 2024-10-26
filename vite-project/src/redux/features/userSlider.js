@@ -11,7 +11,7 @@ const userSlice = createSlice({
         logout: () => {
             return null;
         },
-        updateUser: (state, action) => {
+        updateUser: (state, token, action) => {
             const updatedUser = action.payload;
             return updatedUser;
         }

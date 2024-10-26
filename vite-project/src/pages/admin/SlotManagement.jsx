@@ -192,6 +192,16 @@ const SlotManagement = () => {
         },
     ];
 
+    const validateSlotTimeId = (_, value) => {
+        if (!value) {
+            return Promise.reject('Please input the time slot ID!');
+        }
+        if (!/^\d+$/.test(value)) {
+            return Promise.reject('Time slot ID must be a number!');
+        }
+        return Promise.resolve();
+    };
+
     return (
            <> <div className="row mb-3">
                 <div className="col-12 col-md-6 col-lg-4 mb-2">
@@ -226,13 +236,21 @@ const SlotManagement = () => {
                 style={{ maxWidth: '600px' }}
             >
                 <Form onFinish={handleSubmitSlot} form={form} layout="vertical">
-                    <Form.Item label="Veterinarian" name="veterinarianId" rules={[{ required: true, message: "Please select a veterinarian!" }]}>
+                    <Form.Item 
+                        label="Veterinarian" 
+                        name="veterinarianId" 
+                        rules={[{ required: true, message: "Please select a veterinarian!" }]}
+                    >
                         <Select options={veterinarians.map(veterinarian => ({
                             label: veterinarian.user.fullname,
                             value: veterinarian.veterinarianId
                         }))} />
                     </Form.Item>
-                    <Form.Item label="Time Slot ID" name="slotTimeId" rules={[{ required: true, message: "Please input time slot id!" }]}>
+                    <Form.Item 
+                        label="Time Slot ID" 
+                        name="slotTimeId" 
+                        rules={[{ validator: validateSlotTimeId }]}
+                    >
                         <Input />
                     </Form.Item>
                 </Form>
@@ -246,13 +264,21 @@ const SlotManagement = () => {
                 style={{ maxWidth: '600px' }}
             >
                 <Form onFinish={handleEditSlot} form={form} layout="vertical">
-                    <Form.Item label="Veterinarian" name="veterinarianId" rules={[{ required: true, message: "Please select a veterinarian!" }]}>
+                    <Form.Item 
+                        label="Veterinarian" 
+                        name="veterinarianId" 
+                        rules={[{ required: true, message: "Please select a veterinarian!" }]}
+                    >
                         <Select options={veterinarians.map(veterinarian => ({
                             label: veterinarian.user.fullname,
                             value: veterinarian.veterinarianId
                         }))} />
                     </Form.Item>
-                    <Form.Item label="Time Slot ID" name="slotTimeId" rules={[{ required: true, message: "Please input time slot id!" }]}>
+                    <Form.Item 
+                        label="Time Slot ID" 
+                        name="slotTimeId" 
+                        rules={[{ validator: validateSlotTimeId }]}
+                    >
                         <Input />
                     </Form.Item>
                 </Form>

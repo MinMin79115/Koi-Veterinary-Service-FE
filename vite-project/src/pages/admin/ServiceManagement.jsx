@@ -157,6 +157,32 @@ const ServiceManagement = () => {
         },
     ];
 
+    const validateServiceName = (_, value) => {
+        if (!value) {
+            return Promise.reject('Please input the service name!');
+        }
+        if (value.length < 3) {
+            return Promise.reject('Service name must be at least 3 characters long!');
+        }
+        if (value.length > 50) {
+            return Promise.reject('Service name cannot exceed 50 characters!');
+        }
+        return Promise.resolve();
+    };
+
+    const validateServiceDescription = (_, value) => {
+        if (!value) {
+            return Promise.reject('Please input the service description!');
+        }
+        if (value.length < 10) {
+            return Promise.reject('Description must be at least 10 characters long!');
+        }
+        if (value.length > 500) {
+            return Promise.reject('Description cannot exceed 500 characters!');
+        }
+        return Promise.resolve();
+    };
+
     return (
         <>
             <div className="row mb-3">
@@ -195,14 +221,18 @@ const ServiceManagement = () => {
                     <Form.Item
                         name="serviceName"
                         label="Service Name"
-                        rules={[{ required: true, message: "Please input the service name!" }]}
+                        rules={[
+                            { validator: validateServiceName }
+                        ]}
                     >
                         <Input />
                     </Form.Item>
                     <Form.Item
                         name="serviceDescription"
                         label="Description"
-                        rules={[{ required: true, message: "Please input the service description!" }]}
+                        rules={[
+                            { validator: validateServiceDescription }
+                        ]}
                     >
                         <Input.TextArea rows={4} />
                     </Form.Item>
@@ -220,14 +250,18 @@ const ServiceManagement = () => {
                     <Form.Item
                         name="serviceName"
                         label="Service Name"
-                        rules={[{ required: true, message: "Please input the service name!" }]}
+                        rules={[
+                            { validator: validateServiceName }
+                        ]}
                     >
                         <Input />
                     </Form.Item>
                     <Form.Item
                         name="serviceDescription"
                         label="Description"
-                        rules={[{ required: true, message: "Please input the service description!" }]}
+                        rules={[
+                            { validator: validateServiceDescription }
+                        ]}
                     >
                         <Input.TextArea rows={4} />
                     </Form.Item>

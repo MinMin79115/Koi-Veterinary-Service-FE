@@ -157,12 +157,15 @@ const BookingPage  = () => {
           <p style='font-size: 16px;'>You have successfully booked an appointment.</p>
           <p style='font-size: 16px;'>Your service is: ${selectedService.split(' || ')[0]} will start at <i>${selectedHour} ${selectedDateTime}</i> <i>with ${selectedDoctor}</i>.</p>
           <p style='font-size: 16px;'>Thank you for choosing our service!</p>
-        </body>
+          <p style='font-size: 16px;'>Please proceed to the payment page to complete your booking.</p>
+          <p style='font-size: 16px;'>Best regards,</p>
+          <p style='font-size: 16px;'>The KOI FISH CARE Team</p>
+          </body>
       </html>
     `;
 
     const format = {
-      subject: "Booking Confirmation",
+      subject: "Booking Successful",
       body: emailContent
     };
 
@@ -331,6 +334,7 @@ const BookingPage  = () => {
             <div className="card-body">
               <h2 className="text-center mb-4">Book a Service</h2>
               <Form onFinish={handleSubmit} className="booking-form">
+                {/* Service Name */}
                 <div className="mb-3">
                   <label htmlFor="serviceName" className="form-label">Service Name:</label>
                   <Form.Item>
@@ -373,6 +377,7 @@ const BookingPage  = () => {
                       </select>
                     </Form.Item>
                 </div>
+                {/* Date and Time */}
                 <div className="mb-3">
                   {isInterviewService && selectedService ? (
                     <>                
