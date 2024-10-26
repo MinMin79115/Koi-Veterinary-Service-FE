@@ -26,10 +26,6 @@ const Footer = () => {
       <div className="footer-bottom">
         <p>&copy; 2024 KOI Fish Care. All rights reserved.</p>
       </div>
-<<<<<<< HEAD
-      
-=======
->>>>>>> be0869eaf5d981e5045dbd09818a5d79b2d28ac0
     </footer>
   );
 };
