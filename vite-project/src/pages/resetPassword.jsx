@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import  api  from '../config/axios'; 
 import 'bootstrap/dist/css/bootstrap.min.css';
-
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 function ResetPassword() {
     const [formData, setFormData] = useState({
         username: '',
         password: '',
         confirmPassword: ''
     });
+    const navigate = useNavigate();
 
     const [notify, setNotify] = useState('');
     const validate = () => {
@@ -25,9 +27,12 @@ function ResetPassword() {
     const onSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await api.post(`auth/reset-password`, formData);
-            toast.success(response.data.message);
+            const response = await api.put(`auth/reset-password`, formData);
+            toast.success(response.data);
             console.log(response.data);
+            setTimeout(() => {
+                navigate('/login');
+            }, 2000);
         } catch (error) {
             console.log(error);
         }

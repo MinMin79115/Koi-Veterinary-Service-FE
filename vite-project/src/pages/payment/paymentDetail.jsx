@@ -50,7 +50,7 @@ function PaymentDetail() {
   return (
     <div className="container py-5">
       <div className="row justify-content-center">
-        <div className="col-md-8 col-lg-8">
+        <div className="col-lg-8 col-md-12">
           <div className="card shadow-lg border-0 rounded-lg">
             <div className="card-header bg-light text-white text-center py-4">
               <div className="text-center mb-4">

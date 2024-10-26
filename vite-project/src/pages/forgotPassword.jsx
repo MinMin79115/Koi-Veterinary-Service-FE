@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import api from '../config/axios';
+import { toast } from 'react-toastify';
 
 function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -17,6 +18,8 @@ function ForgotPassword() {
     }
     try {
       const res = await api.post(`mail/send/${email}`, format);
+      toast.success("Email sent successfully!");
+      setEmail('');
       console.log(res);
     } catch (error) {
       console.error("Error sending email:", error);
@@ -24,8 +27,8 @@ function ForgotPassword() {
   }
 
   return (
-    <div className="container mt-5 d-flex justify-content-center">
-      <div className="card p-4 shadow-sm" style={{ maxWidth: '600px', width: '100%' }}>
+    <div className="container py-5 d-flex justify-content-center">
+      <div className=" p-4 shadow-sm" style={{ maxWidth: '600px', width: '100%' }}>
         <h1 className="text-center mb-4">Forgot Password</h1>
         <form onSubmit={handleSend}>
           <div className="mb-3">
