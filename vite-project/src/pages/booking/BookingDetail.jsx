@@ -193,7 +193,7 @@ const BookingDetail = () => {
             )
           ) : user?.role === 'VETERINARIAN' ? (
             record.status === "COMPLETED" ? (
-              <p className='fst-italic fs-6 text-info'>HAS BEEN COMPLETED</p>
+              <p className='fst-italic fs-6 text-info'>COMPLETED</p>
             ) : record.status === "CANCELLED" ? (
               <p className='fst-italic fs-6 text-danger'>CANCELLED</p>
             ) : (
@@ -296,7 +296,7 @@ const BookingDetail = () => {
           Authorization: `Bearer ${token}`
         }
       })
-      console.log(resMail)
+      console.log(resMail.data)
     }
   };
 
