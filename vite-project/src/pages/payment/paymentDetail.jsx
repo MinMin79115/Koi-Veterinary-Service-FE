@@ -26,7 +26,7 @@ function PaymentDetail() {
       bookingId: bookingId,
       serviceName: serviceName,
       serviceTime: serviceTime,
-      price: price,
+      price: price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
     });
   }, []);
 
