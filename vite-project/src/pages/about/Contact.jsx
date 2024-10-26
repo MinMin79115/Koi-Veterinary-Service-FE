@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './Contact.css';
 import axios from 'axios';
-// import contactImage from '../assets/koi-contact.jpg'; // Make sure to add this image to your assets folder
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -30,14 +29,13 @@ const Contact = () => {
       template_id: 'template_m34rh8h',
       user_id: 'uZakHIt2R-31PAW-1',
       template_params: {
-            form_name: formData.name,
-            form_email: formData.email,
-            form_message: formData.message,
+            name: formData.name,
+            email: formData.email,
+            message: formData.message,
         }
       };
       try{
         const response = await axios.post('https://api.emailjs.com/api/v1.0/email/send', data);
-        console.log(response.data)
       }catch(error){
         console.log(error)
       }
