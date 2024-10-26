@@ -200,7 +200,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <div className="container-fluid mt-4" >
+      <div className="container-fluid my-6" >
         <div className="row mb-4">
           <div className="col-md-4 mb-3">
             <div className="card text-dark h-100" style={{ backgroundColor: '#E27D60' }}>
@@ -228,7 +228,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="row">
+        <div className="row d-flex align-items-center justify-content-around mt-3">
           <div className="col-lg-8 col-md-12">
             <div className="card" style={{ height: 'calc(100vh - 200px)' }}>
               <div className="card-body">
@@ -237,17 +237,17 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-          <div className="col-lg-4 col-md-12 mb-3" >
-            <div className="card" style={{ height: 'calc(100vh - 200px)' }}>
+          <div className="col-lg-4 col-md-8" >
+            <div className="card" style={{ height: 'calc(100vh - 200px)'}}>
               <div className="card-body">
-                <h5 className="card-title fs-6 fs-md-5 fs-lg-4">Service Type Distribution</h5>
+                <h5 className="card-title">Service Type Distribution</h5>
                 <Pie data={serviceTypeStats} options={chartOptions} />
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div className="table-container">
+      <div className="table-container mt-6">
         <h1 className="table-title">Booking List</h1>
         <Table pagination={{ pageSize: 6 }} dataSource={dataSource} columns={columns} />
       </div>
