@@ -1,42 +1,20 @@
 import React, { useState, useEffect } from 'react';
-<<<<<<< HEAD
-import { useLocation } from 'react-router-dom';
-import './Booking.css';
-import { toast } from 'react-toastify';
-
-const Booking = () => {
-  const [type, setType] = useState('');
-  const [service, setService] = useState('');
-  const [slot, setSlot] = useState('');
-  const [doctor, setDoctor] = useState('');
-
-  const doctors = {
-    '9am-10am': 'Dr. John Smith',
-    '10am-11am': 'Dr. Emily Johnson',
-    '11am-12pm': 'Dr. Michael Brown',
-    '1pm-2pm': 'Dr. Sarah Davis',
-    '2pm-3pm': 'Dr. Lisa Wilson',
-    '3pm-4pm': 'Dr. David Lee',
-    '4pm-5pm': 'Dr. Anna Taylor',
-  };
-
-
-  const location = useLocation();
-=======
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import './Booking.css';
 import { toast } from 'react-toastify';
 import api from '../../config/axios';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { booking } from '../../redux/features/bookingSlider';
 import { Form, DatePicker } from 'antd';
 import moment from 'moment';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const Booking = () => {
+const BookingPage  = () => {
   const user = useSelector(state => state.user);
+  const token = user.accessToken; 
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const [slots, setSlots] = useState([]); // Change this line
   const [services, setServices] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState('');
@@ -54,6 +32,10 @@ const Booking = () => {
   const [selectedDateTime, setSelectedDateTime] = useState('')
   const [isInterviewService, setIsInterviewService] = useState(false)
   const [uniqueSlots, setUniqueSlots] = useState({});
+  
+  const [selectedServiceName, setSelectedServiceName] = useState('');
+  const [selectedServiceType, setSelectedServiceType] = useState('');
+  const [groupedServices, setGroupedServices] = useState({});
 
   //Hàm validate chọn time
   const validateTimeRange = (_, value) => {
@@ -81,15 +63,12 @@ const Booking = () => {
 
   const fetchSlots = async () => {
     try {
-      const token = sessionStorage.getItem('token')
       const response = await api.get('bookings/timeslots', {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
       console.log(response.data);
-      setSlots(response.data);
-      
       // Gộp 1 Slot chứa nhiều bác sĩ
       const processedSlots = response.data.reduce((acc, slot) => {
         const timeKey = `${slot.timeSlot.startTime} - ${slot.timeSlot.endTime}`;
@@ -106,20 +85,30 @@ const Booking = () => {
       
       setUniqueSlots(processedSlots);
     } catch (error) {
-      toast.error('Error fetching slots:', error.response.data);
+      toast.error('Error fetching slots:', error);
     }
   }
 
   const fetchServices = async () => {
-    //Lấy dữ liệu từ be
     try {
       const response = await api.get('bookings/services', {
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem('token')}`
+          Authorization: `Bearer ${token}`
         }
       });
-      // const response = await axios.get(api);
-      console.log(response.data)
+      console.log(response.data);
+      
+      // Group services by serviceName
+      const grouped = response.data.reduce((acc, service) => {
+        const serviceName = service.serviceId.serviceName;
+        if (!acc[serviceName]) {
+          acc[serviceName] = [];
+        }
+        acc[serviceName].push(service);
+        return acc;
+      }, {});
+      
+      setGroupedServices(grouped);
       setServices(response.data);
     } catch (error) {
       toast.error('Error fetching services:', error.response.data);
@@ -131,7 +120,7 @@ const Booking = () => {
     try {
       const response = await api.get('bookings/veterinarians', {
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem('token')}`
+          Authorization: `Bearer ${token}`
         }
       });
       console.log(response.data)
@@ -147,13 +136,11 @@ const Booking = () => {
     fetchDoctors();
     
   }, []);
->>>>>>> be0869eaf5d981e5045dbd09818a5d79b2d28ac0
 
   useEffect(() => {
     if (location.hash === '#booking') {
       window.scrollTo(90, 200);
     }
-<<<<<<< HEAD
   }, [location]);
 
   useEffect(() => {
@@ -242,13 +229,11 @@ const Booking = () => {
 
         <button type="submit" className="submit-btn">Book Now</button>
       </form>
-=======
 
   }, [location]);
 
   //có send email
   const handleSubmit = async () => {
-    const token = sessionStorage.getItem('token')
     console.log('Values to send:', valuesToSend);
     console.log(user.email);
 
@@ -260,12 +245,15 @@ const Booking = () => {
           <p style='font-size: 16px;'>You have successfully booked an appointment.</p>
           <p style='font-size: 16px;'>Your service is: ${selectedService.split(' || ')[0]} will start at <i>${selectedHour} ${selectedDateTime}</i> <i>with ${selectedDoctor}</i>.</p>
           <p style='font-size: 16px;'>Thank you for choosing our service!</p>
-        </body>
+          <p style='font-size: 16px;'>Please proceed to the payment page to complete your booking.</p>
+          <p style='font-size: 16px;'>Best regards,</p>
+          <p style='font-size: 16px;'>The KOI FISH CARE Team</p>
+          </body>
       </html>
     `;
 
     const format = {
-      subject: "Booking Confirmation",
+      subject: "Booking Successful",
       body: emailContent
     };
 
@@ -275,19 +263,9 @@ const Booking = () => {
             headers: {
                 Authorization: `Bearer ${token}`
             }
-          });
-          
-          const resMail = await api.post(`mail/send/${user.email}`, format, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-          });
+        });
         console.log('Booking submitted:', response.data);
-        console.log('Email sent: ', resMail)
-        sessionStorage.setItem('bookingId', response.data.bookingId);
-        sessionStorage.setItem('price', totalPrice);
-        sessionStorage.setItem('serviceName', selectedService.split(' || ')[0]);
-        sessionStorage.setItem('serviceTime', selectedDateTime);
+        dispatch(booking(response.data))
         toast.success('Booking submitted successfully!');
         setSelectedService('');
         setSelectedSlot('');
@@ -299,6 +277,13 @@ const Booking = () => {
       } catch (error) {
         console.log(error);
         toast.error(error.response?.data || 'An error occurred while booking');
+      } finally {
+        const resMail = await api.post(`mail/send/${user.email}`, format, {
+          headers: {
+              Authorization: `Bearer ${token}`
+          }
+        });
+        console.log('Email sent: ', resMail)
       }
     } else {
       toast.error('Please login to book a service');
@@ -342,6 +327,20 @@ const Booking = () => {
       }));
     }
   };
+
+  const handleServiceNameChange = (e) => {
+    const serviceName = e.target.value;
+    setSelectedServiceName(serviceName);
+    setSelectedServiceType('');
+    setSelectedService('');
+  }
+
+  const handleServiceTypeChange = (e) => {
+    const selectedService = e.target.value;
+    setSelectedServiceType(selectedService);
+    setSelectedService(selectedService);
+    handleServiceChange({ target: { value: selectedService } });
+  }
 
   const handleServiceChange = (e) => {
     const selectedService = e.target.value;
@@ -423,27 +422,50 @@ const Booking = () => {
             <div className="card-body">
               <h2 className="text-center mb-4">Book a Service</h2>
               <Form onFinish={handleSubmit} className="booking-form">
+                {/* Service Name */}
                 <div className="mb-3">
-                  <label htmlFor="service" className="form-label">Services:</label>
+                  <label htmlFor="serviceName" className="form-label">Service Name:</label>
                   <Form.Item>
-                  <select
-                    id="service"
-                    name='servicesDetailId'
-                    value={selectedService}
-                    onChange={handleServiceChange}
-                    required
-                    className="form-select"
-                  >
-                    <option value="">Select a service</option>
-                    {services.map((service) => (
-                      <option key={service.servicesDetailId} value={`${service.serviceId.serviceName} || ${service.servicesDetailId} || ${service.serviceTypeId.service_type} || ${service.serviceTypeId.price}`}>
-                        {service.serviceId.serviceName} - {service.serviceTypeId.service_type}
-                      </option>
-                    ))}
-                  </select>
+                    <select
+                      id="serviceName"
+                      value={selectedServiceName}
+                      onChange={handleServiceNameChange}
+                      required
+                      className="form-select"
+                    >
+                      <option value="">Select a service</option>
+                      {Object.keys(groupedServices).map((serviceName) => (
+                        <option key={serviceName} value={serviceName}>
+                          {serviceName}
+                        </option>
+                      ))}
+                    </select>
                   </Form.Item>
                 </div>
-
+                {/* Service Type */}
+                <div className="mb-3">
+                    <label htmlFor="serviceType" className="form-label">Service Type:</label>
+                    <Form.Item>
+                      <select
+                        id="serviceType"
+                        value={selectedServiceType}
+                        onChange={handleServiceTypeChange}
+                        required
+                        className="form-select"
+                      >
+                        <option value="">Select a service type</option>
+                        {groupedServices[selectedServiceName]?.map((service) => (
+                          <option 
+                            key={service.servicesDetailId} 
+                            value={`${service.serviceId.serviceName} || ${service.servicesDetailId} || ${service.serviceTypeId.service_type} || ${service.serviceTypeId.price}`}
+                          >
+                            {service.serviceTypeId.service_type}
+                          </option>
+                        ))}
+                      </select>
+                    </Form.Item>
+                </div>
+                {/* Date and Time */}
                 <div className="mb-3">
                   {isInterviewService && selectedService ? (
                     <>                
@@ -558,13 +580,9 @@ const Booking = () => {
           </div>
         </div>
       </div>
->>>>>>> be0869eaf5d981e5045dbd09818a5d79b2d28ac0
     </div>
   );
 };
 
-<<<<<<< HEAD
-export default Booking;
-=======
-export default Booking;
->>>>>>> be0869eaf5d981e5045dbd09818a5d79b2d28ac0
+export default BookingPage;
+

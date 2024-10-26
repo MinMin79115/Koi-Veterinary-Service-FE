@@ -13,6 +13,7 @@ import {
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './AdminPage.css'; // We'll create this for any additional custom styles
 import api from '../../config/axios';
+import { Table, Tag } from 'antd';
 
 // Register the required components
 ChartJS.register(
@@ -26,13 +27,16 @@ ChartJS.register(
 );
 
 const Dashboard = () => {
+  const [dataSource, setDataSource] = useState([]);
+  const [customerList, setCustomerList] = useState([]);
   const [bookingStats, setBookingStats] = useState({
-    labels: ['Pond Check Quality', 'Take Care of Fish', 'Interview with Customer'],
+    labels: ['Pond Quality', 'Fish Health', 'Interview'],
     datasets: [
       {
         label: 'Number of Bookings',
         data: [0, 0, 0], // Initialize with zeros
-        backgroundColor: ['rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)', 'rgba(75, 192, 192, 0.6)'],
+        backgroundColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(75, 192, 192, 1)'],
+        fontSize: 'fs-6 fs-md-5 fs-lg-4',
       },
     ],
   });
@@ -51,9 +55,27 @@ const Dashboard = () => {
   const [totalCustomer, setTotalCustomer] = useState(0);
   const [totalBooking, setTotalBooking] = useState(0);
 
+  const columns = [
+    { title: 'Booking ID', dataIndex: 'bookingId' },
+    { title: 'Customer', dataIndex: 'customerName' },
+    { title: 'Service', dataIndex: 'serviceName' },
+    { title: 'Time', dataIndex: 'time' },
+    { title: 'Status', dataIndex: 'status', render: (_, record) => <Tag color={record.status === 'COMPLETED' ? 'green' : ''}>{record.status}</Tag> },
+  ];
+
+  const customerColumns = [
+    { title: 'Customer ID', dataIndex: 'customerId', width: 10 },
+    { title: 'Customer', dataIndex: 'customerName', width: 50 },
+    { title: 'Email', dataIndex: 'customerEmail', width: 30 },
+    { title: 'Address', dataIndex: 'customerAddress', width: 400 },
+    { title: 'Phone', dataIndex: 'customerPhone', width: 20 },
+
+  ];
+
   const fetchBookingStats = async () => {
     try {
       const response = await api.get('bookings');
+
       let totalPrice = 0;
       let uniqueCustomers = new Set();
       let totalBookings = 0;
@@ -61,28 +83,65 @@ const Dashboard = () => {
       // Reset counts
       const serviceCounts = { 1: 0, 2: 0, 3: 0 };
       const serviceTypeCounts = {};
-    
+      setDataSource([]);
+      setCustomerList([]);
+
+
       response.data.forEach(booking => {
         if (booking.status === "COMPLETED") {
           const serviceId = booking.servicesDetail.serviceId.serviceId;
           const serviceType = booking.servicesDetail.serviceTypeId.service_type;
           const customerId = booking.user.id;
-          
+
           if (serviceCounts[serviceId] !== undefined) {
             serviceCounts[serviceId] += 1;
           }
-          
+
           if (serviceTypeCounts[serviceType] === undefined) {
             serviceTypeCounts[serviceType] = 1;
           } else {
             serviceTypeCounts[serviceType] += 1;
           }
-          
+
           totalPrice += booking.servicesDetail.serviceTypeId.price;
           totalBookings += 1;
           uniqueCustomers.add(customerId);
+          console.log(response.data);
+          setDataSource(prevData => [...prevData, {
+            bookingId: booking.bookingId,
+            customerName: booking.user.fullname,
+            serviceName: booking.servicesDetail.serviceTypeId.service_type,
+            time: booking.serviceTime,
+            status: booking.status,
+          }]);
         }
       });
+
+      const uniqueCustomersSet = new Set();
+      const newCustomerList = [];
+
+      response.data.forEach(booking => {
+        if (booking.status === "COMPLETED") {
+          const customerId = booking.user.id;
+
+          // Check if the customer ID is already in the Set
+          if (!uniqueCustomersSet.has(customerId)) {
+            uniqueCustomersSet.add(customerId); // Add to Set to track uniqueness
+
+            // Add the customer to the newCustomerList
+            newCustomerList.push({
+              customerId: customerId,
+              customerName: booking.user.fullname,
+              customerEmail: booking.user.email,
+              customerPhone: booking.user.phone,
+              customerAddress: booking.user.address,
+            });
+          }
+        }
+      });
+
+      // Set the customer list with unique entries
+      setCustomerList(newCustomerList);
 
       setTotalPrice(totalPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }));
       setTotalCustomer(uniqueCustomers.size);
@@ -101,7 +160,7 @@ const Dashboard = () => {
       // Set service type stats for pie chart
       const serviceTypeLabels = Object.keys(serviceTypeCounts);
       const serviceTypeData = Object.values(serviceTypeCounts);
-      const serviceTypeColors = serviceTypeLabels.map(() => 
+      const serviceTypeColors = serviceTypeLabels.map(() =>
         `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.6)`
       );
 
@@ -137,54 +196,66 @@ const Dashboard = () => {
     },
   };
 
-  return (
-    <div className="container-fluid mt-4">
-      <div className="row mb-4">
-        <div className="col-md-4 ">
-          <div className="card text-dark bg-warning">
-            <div className="card-body">
-              <h5 className="card-title">Total Bookings</h5>
-              <p className="card-text display-4">{totalBooking}</p>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-4 ">
-          <div className="card text-white bg-success">
-            <div className="card-body">
-              <h5 className="card-title">Total Profit</h5>
-              <p className="card-text display-4">{totalPrice}</p>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-4 ">
-          <div className="card text-dark bg-info">
-            <div className="card-body">
-              <h5 className="card-title">Total Customers</h5>
-              <p className="card-text display-4">{totalCustomer}</p>
-            </div>
-          </div>
-        </div>
-      </div>
+ 
 
-      <div className="row">
-        <div className="col-md-8">
-          <div className="card">
-            <div className="card-body">
-              <h5 className="card-title">Booking Statistics by Service</h5>
-              <Bar data={bookingStats} options={chartOptions} />
+  return (
+    <>
+      <div className="container-fluid my-6" >
+        <div className="row mb-4">
+          <div className="col-md-4 mb-3">
+            <div className="card text-dark h-100" style={{ backgroundColor: '#E27D60' }}>
+              <div className="card-body d-flex flex-column justify-content-center">
+                <h5 className="card-title text-white fs-6 fs-md-5 fs-lg-4">Total Bookings</h5>
+                <p className="card-text text-white mb-0 fs-1 fs-md-2 fs-lg-1">{totalBooking}</p>
+              </div>
+            </div>
+          </div>
+          <div className="col-md-4 mb-3">
+            <div className="card text-white h-100" style={{ backgroundColor: '#AFD275' }}>
+              <div className="card-body d-flex flex-column justify-content-center">
+                <h5 className="card-title text-white fs-6 fs-md-5 fs-lg-4">Total Profit</h5>
+                <p className="card-text text-white mb-0 fs-1 fs-md-2 fs-lg-1">{totalPrice}</p>
+              </div>
+            </div>
+          </div>
+          <div className="col-md-4 mb-3">
+            <div className="card text-dark h-100" style={{ backgroundColor: '#E7717D' }}>
+              <div className="card-body d-flex flex-column justify-content-center">
+                <h5 className="card-title text-white fs-6 fs-md-5 fs-lg-4">Total Customers</h5>
+                <p className="card-text text-white mb-0 fs-1 fs-md-2 fs-lg-1">{totalCustomer}</p>
+              </div>
             </div>
           </div>
         </div>
-        <div className="col-md-4 mb-3">
-          <div className="card">
-            <div className="card-body">
-              <h5 className="card-title">Service Type Distribution</h5>
-              <Pie data={serviceTypeStats} options={chartOptions} />
+
+        <div className="row d-flex align-items-center justify-content-around mt-3">
+          <div className="col-lg-8 col-md-12">
+            <div className="card" style={{ height: 'calc(100vh - 200px)' }}>
+              <div className="card-body">
+                <h5 className="card-title fs-6 fs-md-5 fs-lg-4">Booking Statistics by Service</h5>
+                <Bar className='h-100' data={bookingStats} options={chartOptions} />
+              </div>
+            </div>
+          </div>
+          <div className="col-lg-4 col-md-8" >
+            <div className="card" style={{ height: 'calc(100vh - 200px)'}}>
+              <div className="card-body">
+                <h5 className="card-title">Service Type Distribution</h5>
+                <Pie data={serviceTypeStats} options={chartOptions} />
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+      <div className="table-container mt-6">
+        <h1 className="table-title">Booking List</h1>
+        <Table pagination={{ pageSize: 6 }} dataSource={dataSource} columns={columns} />
+      </div>
+      <div className="table-container">
+        <h1 className="table-title">List of Typical Customers</h1>
+        <Table pagination={{ pageSize: 6 }} dataSource={customerList} columns={customerColumns} />
+      </div>
+    </>
   );
 };
 

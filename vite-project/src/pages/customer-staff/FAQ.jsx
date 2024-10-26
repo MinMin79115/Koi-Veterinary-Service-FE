@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Container } from 'react-bootstrap';
 import { Table, Button, Input, Form, Modal, message, Popconfirm } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { toast } from 'react-toastify';
@@ -22,7 +23,6 @@ const FAQManagement = () => {
       setFaqData(response.data);
     } catch (error) {
       console.error('Error fetching FAQ data:', error);
-      toast.error('Failed to fetch FAQ data');
     }
   };
 
@@ -73,8 +73,6 @@ const FAQManagement = () => {
     }
   };
 
-  
-
   const handleSearch = (value) => {
     setSearchTerm(value);
   };
@@ -123,15 +121,16 @@ const FAQManagement = () => {
   ];
 
   return (
-    <div>
+    <Container className='mt-5'>
+      <h1 className='text-center mb-4'>FAQ Management</h1>
       <Input
-        placeholder="Search questions"
+        placeholder="Search by question"
         prefix={<SearchOutlined />}
         onChange={(e) => handleSearch(e.target.value)}
-        style={{ marginBottom: 16}}
+        style={{ marginBottom: 16, padding: 10}}
+        fontSize={20}
       />
       <Table dataSource={filteredFaqData} columns={columns} />
-
       <Modal
         title="Edit Answer"
         visible={isModalVisible}
@@ -151,7 +150,7 @@ const FAQManagement = () => {
           </Form.Item>
         </Form>
       </Modal>
-    </div>
+    </Container>
   );
 };
 

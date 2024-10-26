@@ -29,26 +29,67 @@
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
 }
 
-<<<<<<< HEAD
 
-=======
 .card {
     transition: transform 0.2s;
-  }
-  
-  .card:hover {
+    height: 100%;
+}
+
+.card:hover {
     transform: translateY(-5px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-  }
-  
-  .display-4 {
-    font-size: 2.5rem;
-  }
-  
-  @media (max-width: 768px) {
-    .display-4 {
-      font-size: 2rem;
-    }
-  }
->>>>>>> be0869eaf5d981e5045dbd09818a5d79b2d28ac0
+}
 
+.display-4 {
+    font-size: 2.5rem;
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Responsive font sizes */
+@media (max-width: 767px) {
+  .fs-6 {
+    font-size: 1rem !important;
+  }
+  .fs-1 {
+    font-size: 2rem !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  .fs-md-5 {
+    font-size: 1.25rem !important;
+  }
+  .fs-md-2 {
+    font-size: 2.5rem !important;
+  }
+}
+
+@media (min-width: 992px) {
+  .fs-lg-4 {
+    font-size: 1.5rem !important;
+  }
+  .fs-lg-1 {
+    font-size: 3rem !important;
+  }
+}
+
+.table-container {
+    margin-top: 2rem; /* Space above the tables */
+    background-color: #ffffff; /* White background for the table container */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    padding: 1.5rem; /* Padding inside the container */
+}
+
+
+.table-title {
+    font-size: 1.5rem; /* Title font size */
+    color: #ff9966; /* Title color */
+    margin-bottom: 1rem; /* Space below the title */
+    text-align: center; /* Center the title */
+}

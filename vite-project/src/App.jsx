@@ -10,20 +10,22 @@ import FishTypes from './pages/about/FishTypes';
 import Contact from './pages/about/Contact';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import CustomerPage from './pages/customer/CustomerPage';
+import CustomerPage from './pages/customer-staff/CustomerPage';
 import Booking from './pages/service/Booking';
 import Services from './pages/service/Services';
 import Manager from './pages/admin/Manager';
 import AboutUs from './pages/about/AboutUs'; // Add this line
 import StaffManagement from './pages/admin/StaffManagement';
 import NotFound from './pages/NotFound';
+import FAQManagement from './pages/customer-staff/FAQ';
 import BookingManagement from './pages/booking/BookingManagement';
 import ServiceManagement from './pages/admin/ServiceManagement';
 import SlotManagement from './pages/admin/SlotManagement';
 import BookingDetail from './pages/booking/BookingDetail';
 import PaySuccess from './pages/payment/paySuccess';
-import PaymentDetail from './pages/service/paymentDetail';
-
+import PaymentDetail from './pages/payment/paymentDetail';
+import ForgotPassword from './pages/forgotPassword'
+import ResetPassword from './pages/resetPassword'
 const App = () => {
 
   const ProtectedRoute = ({ children }) => {
@@ -67,7 +69,9 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/success" element={<PaySuccess />} />
+        <Route path="/forgot-password" element={<ForgotPassword/>} />
         <Route path="/payment-detail" element={<PaymentDetail />} />
+        <Route path='/reset-password' element={<ResetPassword/>} />
         {/* Routes with Header and Footer */}
         <Route element={
           <div className="App">
@@ -82,6 +86,7 @@ const App = () => {
                   <Route path="/fish-types" element={<FishTypes />} />
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/booking-management" element={<ProtectedRouteStaff><BookingManagement/></ProtectedRouteStaff>}/>
+                  <Route path="/faq-management" element={<ProtectedRouteStaff><FAQManagement/></ProtectedRouteStaff>}/>
                   <Route path="/customer-profile" element={<ProtectedRouteCustomer><CustomerPage /></ProtectedRouteCustomer>} />
                   <Route path="/booking" element={<Booking />} />
                   <Route path="/booking-detail" element={<BookingDetail />} />
@@ -103,6 +108,7 @@ const App = () => {
           <Route path="/booking" element={<Booking />} />
           <Route path="/booking-detail" element={<BookingDetail />} />
           <Route path="/booking-management" element={<BookingManagement />} />
+          <Route path="/faq-management" element={<FAQManagement />} />
           <Route path="/about" element={<AboutUs />} />
         </Route>
 

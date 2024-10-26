@@ -4,28 +4,31 @@ import { DeleteOutlined, FileDoneOutlined, PayCircleOutlined } from '@ant-design
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './BookingDetail.css';
 import api from '../../config/axios'
-import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 
 const BookingDetail = () => {
+  const token = useSelector(state => state.user.accessToken);
   const [bookings, setBookings] = useState([]);
-  const navigate = useNavigate();
+  const [payStatus, setPayStatus] = useState('')
   const user = useSelector((state) => state.user);
 
   const [bills, setBills] = useState([]);
 
   const fetchBill = async () => {
     try {
-      const response = await api.get(`bills`, {
+      const response = await api.get(`payment`, {
         headers: {
-          'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         }
       })
-      setBills(response.data);
+      const values = response.data.map(bill => ({
+        id: bill.booking.bookingId,
+      }));
+      setBills(values);
+      console.log('bills:', bills);
     } catch (error) {
       console.log(error);
-
     }
   }
 
@@ -34,7 +37,7 @@ const BookingDetail = () => {
       if (user.role === 'CUSTOMER') {
         const response = await api.get(`bookings/user/${user.id}`, {
           headers: {
-            'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+            'Authorization': `Bearer ${token}`
           }
         });
         console.log(response.data);
@@ -53,7 +56,7 @@ const BookingDetail = () => {
       } else {
         const response = await api.get(`bookings/veterinarian/${user.id}`, {
           headers: {
-            'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+            'Authorization': `Bearer ${token}`
           }
         });
         console.log(response.data);
@@ -78,7 +81,10 @@ const BookingDetail = () => {
   useEffect(() => {
     fetchBooking();
     fetchBill();
+
   }, []);
+
+
 
   const columns = [
     {
@@ -150,11 +156,19 @@ const BookingDetail = () => {
         <div className="d-flex flex-column flex-md-row justify-content-center">
           {user?.role === 'CUSTOMER' ? (
             record.status === "COMPLETED" ? (
-              <p className='fst-italic fs-6 text-info'>HAS BEEN COMPLETED</p>
+              <p className='fst-italic fs-6 text-info'>COMPLETED</p>
             ) : record.status === "CANCELLED" ? (
               <p className='fst-italic fs-6 text-danger'>CANCELLED</p>
-            ) : record.id !== bills.find(bill => bill.bookingId === record.id) ? (
+            )  : record.status === "CONFIRMED" ? (
+              <p className='fst-italic fs-6 text-success'>CONFIRMED</p>
+            ): bills.find(bill => bill.id === record.id) ? (
               <>
+                {setPayStatus('PAID')}
+                <p className='fst-italic fs-6 text-success'>{payStatus}</p>
+              </>
+            ) : (
+              <>
+                <p className='fst-italic fs-6 text-warning'>{bills.id}</p>
                 <div className='d-flex justify-content-around'>
                   <Button
                     type='none'
@@ -176,8 +190,6 @@ const BookingDetail = () => {
                   </Popconfirm>
                 </div>
               </>
-            ) : (
-              <p className='fst-italic fs-6 text-success'>PAID</p>
             )
           ) : user?.role === 'VETERINARIAN' ? (
             record.status === "COMPLETED" ? (
@@ -195,7 +207,9 @@ const BookingDetail = () => {
               </Button>
             )
           ) : (
-            <></>
+            <>
+              <p className='fst-italic fs-6 text-warning'>{payStatus}</p>
+            </>
           )}
         </div>
       )
@@ -206,7 +220,7 @@ const BookingDetail = () => {
     try {
       const response = await api.put(`bookings/delete/${record.id}`, {
         headers: {
-          'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         }
       })
       toast.success('Deleted successful.')
@@ -229,7 +243,7 @@ const BookingDetail = () => {
       const amount = Math.round(priceValue);
       const resPayment = await api.get(`payment/vnpay?amount=${amount}&bankCode=NCB&bookingId=${record.id}`, {
         headers: {
-          'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         }
       });
       console.log(resPayment.data);
@@ -247,11 +261,7 @@ const BookingDetail = () => {
   };
 
   const handleComplete = async (record) => {
-    try {
-      const valuesToUpdate = {
-        status: 'COMPLETED'
-      }
-      const emailContent = `
+    const emailContent = `
     <html>
       <body>
         <h1 style='color: blue;'>Welcome, ${record.customerName}</h1>
@@ -264,26 +274,29 @@ const BookingDetail = () => {
     `;
       const format = {
         subject: "Booking Completion",
-        body: emailContent
+      body: emailContent
+    }
+    try {
+      const valuesToUpdate = {
+        status: 'COMPLETED'
       }
-      const resMail = await api.post(`mail/send/${record.email}`, format, {
-        headers: {
-          Authorization: `Bearer ${sessionStorage.getItem('token')}`
-        }
-      })
-      console.log(resMail)
       const response = await api.put(`bookings/${record.id}`, valuesToUpdate, {
         headers: {
-          'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         }
       })
       //Update the booking status to COMPLETED
-      //Need to send mail to customer (user.emai)
-      console.log(resMail)
       toast.success('Complete successful.')
       fetchBooking()
     } catch (error) {
       console.log(error.response.data)
+    }finally{
+      const resMail = await api.post(`mail/send/${record.email}`, format, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      console.log(resMail)
     }
   };
 

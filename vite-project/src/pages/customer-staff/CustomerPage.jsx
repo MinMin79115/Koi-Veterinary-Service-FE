@@ -10,12 +10,14 @@ import { SendOutlined } from '@ant-design/icons'
 import userImage from '../../assets/user.png'
 import { updateUser } from '../../redux/features/userSlider';
 import { useDispatch } from 'react-redux';
+
 function CustomerPage() {
-  const dispatch = useDispatch();
   const location = useLocation();
   const [customer, setCustomer] = useState([]);
   const [newPassword, setNewPassword] = useState('');
   const user = useSelector((state) => state.user);
+  const token = user.accessToken;
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (location.hash === '#profile') {
@@ -24,8 +26,7 @@ function CustomerPage() {
   }, [location]);
 
   const fetchCustomer = async () => {
-    const token = sessionStorage.getItem('token');
-    try {
+      try {
       const response = await api.get(`customers/${user.id}`, {
         headers: {
           Authorization: `Bearer ${token}`
@@ -41,7 +42,6 @@ function CustomerPage() {
       setCustomer(userProfile);
     } catch (error) {
       console.error('Error fetching customer data:', error);
-      toast.error('Failed to load customer data. Please try again.');
     }
   };
 
@@ -69,33 +69,75 @@ function CustomerPage() {
     }
   };
 
+  const validateForm = () => {
+    let newErrors = {};
+
+    // Fullname validation
+    if (!customer.fullname) {
+      newErrors.fullname = 'Full name is required';
+    } else if (customer.fullname.length < 2 || customer.fullname.length > 50) {
+      newErrors.fullname = 'Full name must be between 2 and 50 characters';
+    }
+
+    // Email validation
+    if (!customer.email) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(customer.email)) {
+      newErrors.email = 'Email is invalid';
+    }
+
+    // Phone validation
+    if (!customer.phone) {
+      newErrors.phone = 'Phone number is required';
+    } else if (!/^(0[1-9]{1}[0-9]{8}|(84[1-9]{1}[0-9]{8}))$/.test(customer.phone)) {
+      newErrors.phone = 'Phone number is invalid';
+    }
+
+    // Address validation
+    if (!customer.address) {
+      newErrors.address = 'Address is required';
+    } else if (customer.address.length < 5 || customer.address.length > 200) {
+      newErrors.address = 'Address must be between 5 and 200 characters';
+    }
+
+    // Password validation (only if a new password is provided)
+    if (newPassword && newPassword.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters long';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const token = sessionStorage.getItem('token');
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
-      const updatedCustomer = { ...customer };
-
-      if (newPassword.trim() !== '') {
-        updatedCustomer.password = newPassword;
-      }
-
-      console.log(updatedCustomer);
-      const response = await api.put(`customers/${user.id}`, updatedCustomer, {
-        headers: {
-          Authorization: `Bearer ${token}`
+    if (validateForm()) {
+      try {
+        if (!token) {
+          throw new Error('No authentication token found');
         }
-      });
-      dispatch(updateUser(response.data));
-      console.log('Updated customer information:', response.data);
-      toast.success('Profile updated successfully!');
-      setNewPassword('');
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      toast.error(error.response?.data?.message || 'Failed to update profile. Please try again.');
+
+        const updatedCustomer = { ...customer };
+
+        if (newPassword.trim() !== '') {
+          updatedCustomer.password = newPassword;
+        }
+
+        console.log(updatedCustomer);
+        const response = await api.put(`customers/${user.id}`, updatedCustomer, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        console.log('Updated customer information:', response.data);
+        toast.success('Profile updated successfully!');
+        setNewPassword('');
+      } catch (error) {
+        console.error('Error updating profile:', error);
+        toast.error(error.response?.data?.message || 'Failed to update profile. Please try again.');
+      }
+    } else {
+      toast.error('Please correct the errors in the form.');
     }
   };
 
@@ -111,14 +153,20 @@ function CustomerPage() {
           </div>
         </div>
       ) : (
+        <>
         <div className="row mb-4">
           <div className="col-12 d-flex justify-content-end align-items-center my-4">
-            <SendOutlined className="me-2" />
-            <Link className="btn btn-outline-info btn-sm me-2" to="/booking-management">
+            <SendOutlined className="me-1" />
+            <Link className="btn btn-outline-info btn-sm me-3" to="/booking-management">
               Manage Bookings
+            </Link>
+            <SendOutlined className="me-1 mx-1" />
+            <Link className="btn btn-outline-info btn-sm me-3" to="/faq-management">
+              Manage FAQs
             </Link>
           </div>
         </div>
+      </>
       )}
       <div className={`${styles.padding} m-5`}>
         <div className={`row container d-flex justify-content-center `}>
@@ -142,12 +190,12 @@ function CustomerPage() {
                           <p className={`${styles.mB10} ${styles.fW600}`}>Full Name</p>
                           <input
                             type="text"
-                            className={`${styles.formControl} ${styles.textMuted} ${styles.fW400}`}
+                            className={`${styles.formControl} ${styles.textMuted} ${styles.fW400} ${errors.fullname ? 'is-invalid' : ''}`}
                             name="fullname"
                             value={customer.fullname}
                             onChange={handleInputChange}
-                            required
                           />
+                          {errors.fullname && <div className="invalid-feedback">{errors.fullname}</div>}
                         </div>
                       </div>
                       <div className={`col-md-6`}>
@@ -155,12 +203,12 @@ function CustomerPage() {
                           <p className={`mb-1 ${styles.fW600}`}>Email</p>
                           <input
                             type="email"
-                            className={`${styles.formControl} ${styles.textMuted} ${styles.fW400}`}
+                            className={`${styles.formControl} ${styles.textMuted} ${styles.fW400} ${errors.email ? 'is-invalid' : ''}`}
                             name="email"
                             value={customer.email}
                             onChange={handleInputChange}
-                            required
                           />
+                          {errors.email && <div className="invalid-feedback">{errors.email}</div>}
                         </div>
                       </div>
                       <div className={`col-md-6 mx-auto`}>
@@ -168,12 +216,12 @@ function CustomerPage() {
                           <p className={`mb-1 ${styles.fW600}`}>Phone</p>
                           <input
                             type="tel"
-                            className={`${styles.formControl} ${styles.textMuted} ${styles.fW400}`}
+                            className={`${styles.formControl} ${styles.textMuted} ${styles.fW400} ${errors.phone ? 'is-invalid' : ''}`}
                             name="phone"
                             value={customer.phone}
                             onChange={handleInputChange}
-                            required
                           />
+                          {errors.phone && <div className="invalid-feedback">{errors.phone}</div>}
                         </div>
                       </div>
                     </div>
@@ -182,11 +230,12 @@ function CustomerPage() {
                         <p className={`mb-1 ${styles.fW600}`}>Password</p>
                         <input
                           type="password"
-                          className={`${styles.formControl} ${styles.textMuted} ${styles.fW400}`}
+                          className={`${styles.formControl} ${styles.textMuted} ${styles.fW400} ${errors.password ? 'is-invalid' : ''}`}
                           name="password"
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
                         />
+                        {errors.password && <div className="invalid-feedback">{errors.password}</div>}
                       </div>
                     </div>
                     <div className={`row`}>
@@ -195,12 +244,12 @@ function CustomerPage() {
                           <p className={`${styles.mB10} ${styles.fW600}`}>Address</p>
                           <input
                             type="text"
-                            className={`${styles.formControl} ${styles.textMuted} ${styles.fW400}`}
+                            className={`${styles.formControl} ${styles.textMuted} ${styles.fW400} ${errors.address ? 'is-invalid' : ''}`}
                             name="address"
                             value={customer.address}
                             onChange={handleInputChange}
-                            required
                           />
+                          {errors.address && <div className="invalid-feedback">{errors.address}</div>}
                         </div>
                       </div>
                     </div>

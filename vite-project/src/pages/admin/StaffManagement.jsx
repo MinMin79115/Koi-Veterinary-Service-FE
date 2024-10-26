@@ -2,10 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Button, Table, Modal, Form, Input, Popconfirm, Select } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 import { toast } from 'react-toastify';
+import { SearchOutlined } from '@ant-design/icons';
 import api from '../../config/axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useSelector } from 'react-redux';
+
 const StaffManagement = () => {
+  const token = useSelector(state => state.user.accessToken);
   const [staffs, setStaffs] = useState([]);
+  const [veterinarians, setVeterinarians] = useState([]);
   const [editingStaff, setEditingStaff] = useState(null);
   const [openModalEdit, setOpenModalEdit] = useState(false);
   const [openModal, setOpenModal] = useState(false);
@@ -18,17 +23,62 @@ const StaffManagement = () => {
     try {
       const response = await api.get('customers', {
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem('token')}`
+          Authorization: `Bearer ${token}`
         }
       });
       setStaffs(response.data);
     } catch (error) {
-      toast.error('Error fetching staffs:', error.response?.data || error.message);
+      console.error('Error fetching staffs:', error.response?.data || error.message);
     }
+  };
+
+  const fetchVeterinarians = async () => {
+    try {
+      const response = await api.get('veterinarian', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      setVeterinarians(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.error('Error fetching veterinarians:', error.response?.data || error.message);
+    }
+  };
+
+  const validatePhone = (_, value) => {
+    if (!value) {
+      return Promise.reject('Please input the phone number!');
+    }
+    if (!/^(0[1-9]{1}[0-9]{8}|(84[1-9]{1}[0-9]{8}))$/.test(value)) {
+      return Promise.reject('Invalid phone number format!');
+    }
+    return Promise.resolve();
+  };
+
+  const validateFullname = (_, value) => {
+    if (!value) {
+      return Promise.reject('Please input the full name!');
+    }
+    if (value.length < 2 || value.length > 50) {
+      return Promise.reject('Full name must be between 2 and 50 characters!');
+    }
+    return Promise.resolve();
+  };
+
+  const validateAddress = (_, value) => {
+    if (!value) {
+      return Promise.reject('Please input the address!');
+    }
+    if (value.length < 5 || value.length > 200) {
+      return Promise.reject('Address must be between 5 and 200 characters!');
+    }
+    return Promise.resolve();
   };
 
   useEffect(() => {
     fetchStaffs();
+    fetchVeterinarians();
   }, []);
 
   const handleOpenModal = () => {
@@ -63,11 +113,15 @@ const StaffManagement = () => {
         serviceTypeId: values.serviceTypeId
       }, {
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem('token')}`
+          Authorization: `Bearer ${token}`
         }
       });
       toast.success("Successfully updated!");
+      setOpenModalEdit(false);
+      setEditingStaff(null);
+      form.resetFields();
       fetchStaffs();
+      fetchVeterinarians();
     } catch (err) {
       toast.error(err.response?.data || "An error occurred while updating the staff.");
     }
@@ -87,7 +141,7 @@ const StaffManagement = () => {
       setSubmitting(true);
       const response = await api.post('auth/addstaff', valuesToSend, {
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem('token')}`
+          Authorization: `Bearer ${token}`
         }
       });
 
@@ -104,11 +158,6 @@ const StaffManagement = () => {
 
   const handleDelete = async (id) => {
     try {
-      const token = sessionStorage.getItem('token');
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
       const res = await api.delete(`customers/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`
@@ -130,6 +179,8 @@ const StaffManagement = () => {
   const filteredData = staffs.filter(item =>
     item.fullname.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  filteredData.sort((a, b) => b.id - a.id);
 
   const columns = [
     {
@@ -164,7 +215,11 @@ const StaffManagement = () => {
         <div className='d-flex gap-2 justify-content-center'>
           {record.role === 'VETERINARIAN' ? (
             <>
-              <Button type='primary' onClick={() => handleOpenModalEdit(record)}>Edit</Button>
+              {veterinarians.find((e) => e.user.id === record.id)  ? (
+                <></>
+              ) : (
+                <Button type='primary' onClick={() => handleOpenModalEdit(record)}>Edit</Button>
+              )}
               <Popconfirm
                 title="Delete"
                 description="Are you sure you want to delete this staff?"
@@ -192,29 +247,57 @@ const StaffManagement = () => {
   ];
 
   return (
-    <div>
-      <Button onClick={handleOpenModal}>Create new staff</Button>
-      <Input
-        placeholder="Search name"
-        onChange={(e) => handleSearch(e.target.value)}
-        style={{ margin: 16, width: '60%' }}
-      />
-      <Table dataSource={filteredData} columns={columns} pagination={{ pageSize: 7 }} />
+    <>
+      <div className="row mb-3">
+        <div className="col-12 col-md-6 col-lg-4 mb-2">
+          <Button onClick={handleOpenModal} className="w-100">Create new staff</Button>
+        </div>
+        <div className="col-12 col-md-6 col-lg-8 mb-2">
+          <Input
+            placeholder="Search name"
+            onChange={(e) => handleSearch(e.target.value)}
+            className="w-100"
+          />
+        </div>
+      </div>
+      <div className="row">
+        <div className="col-12">
+          <Table 
+            dataSource={filteredData} 
+            columns={columns}
+            pagination={{ pageSize: 7 }}
+            className="w-100"
+          />
+        </div>
+      </div>
       <Modal onOk={() => form.submit()} title="Create new Staff" open={openModal} onCancel={handleCloseModal}>
-        <Form onFinish={handleSubmitStaffs} form={form}>
-          <Form.Item label="Staff name" name="fullname" rules={[{ required: true, message: "Please input name!" }]}>
+        <Form onFinish={handleSubmitStaffs} form={form} layout="vertical">
+          <Form.Item 
+            label="Staff name" 
+            name="fullname" 
+            rules={[{ validator: validateFullname }]}
+          >
             <Input />
           </Form.Item>
-          <Form.Item label="Staff phone" name="phone" rules={[
-            { required: true, message: "Please input your staff phone!" },
-            { pattern: '^(0[1-9]{1}[0-9]{8}|(84[1-9]{1}[0-9]{8}))$', message: "Invalid format!" }
-          ]}>
+          <Form.Item 
+            label="Staff phone" 
+            name="phone" 
+            rules={[{ validator: validatePhone }]}
+          >
             <Input placeholder='+84' />
           </Form.Item>
-          <Form.Item label="Address" name="address" rules={[{ required: true, message: "Please input staff's address!" }]}>
+          <Form.Item 
+            label="Address" 
+            name="address" 
+            rules={[{ validator: validateAddress }]}
+          >
             <Input />
           </Form.Item>
-          <Form.Item label="Role" name="role" rules={[{ required: true, message: "Please select a role!" }]}>
+          <Form.Item 
+            label="Role" 
+            name="role" 
+            rules={[{ required: true, message: "Please select a role!" }]}
+          >
             <Select>
               {roles.map((role, index) => (
                 <Select.Option key={index} value={role.role}>
@@ -226,14 +309,51 @@ const StaffManagement = () => {
         </Form>
       </Modal>
       <Modal onOk={() => form.submit()} title="Edit Staff" open={openModalEdit} onCancel={handleCloseModalEdit}>
-        <Form onFinish={handleSubmitEdit} form={form}>
-          <Form.Item label="Service Type ID: 1 - Online, null" name="serviceTypeId" rules={[{ message: "Please select a service type!" }]}>
+        <Form onFinish={handleSubmitEdit} form={form} layout="vertical">
+          <Form.Item 
+            label="Staff name" 
+            name="fullname" 
+            rules={[{ validator: validateFullname }]}
+          >
             <Input />
           </Form.Item>
-          
+          <Form.Item 
+            label="Staff phone" 
+            name="phone" 
+            rules={[{ validator: validatePhone }]}
+          >
+            <Input placeholder='+84' />
+          </Form.Item>
+          <Form.Item 
+            label="Address" 
+            name="address" 
+            rules={[{ validator: validateAddress }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item 
+            label="Role" 
+            name="role" 
+            rules={[{ required: true, message: "Please select a role!" }]}
+          >
+            <Select>
+              {roles.map((role, index) => (
+                <Select.Option key={index} value={role.role}>
+                  {role.role}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item 
+            label="Service Type ID: 1 - Online, null" 
+            name="serviceTypeId" 
+            rules={[{ message: "Please select a service type!" }]}
+          >
+            <Input />
+          </Form.Item>
         </Form>
       </Modal>
-    </div>
+    </>
   );
 };
 
