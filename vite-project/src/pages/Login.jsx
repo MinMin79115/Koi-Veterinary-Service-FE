@@ -53,10 +53,7 @@ const Login = () => {
       const response = await api.post('auth/login', values);
       // const response = await api.post('login', values);
       dispatch(login(response.data))
-      const {role, accessToken} = response.data
-      const userProfile = response.data;
-      sessionStorage.setItem("token",accessToken)
-      sessionStorage.setItem("userToken",JSON.stringify(userProfile))
+      const {role} = response.data
       if(role === 'CUSTOMER' || role ==='VETERINARIAN' || role === "STAFF" ){
         navigate('/')
       }else if(role === 'ADMIN'){
@@ -77,8 +74,7 @@ const Login = () => {
         const token = credential.accessToken;
         // The signed-in user info.
         const user = result.user;
-        sessionStorage.setItem("user",(user))
-        sessionStorage.setItem("userToken",(token))
+        
         // IdP data available using getAdditionalUserInfo(result)
         navigate("/")
       }).catch((error) => {

@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 
 const BookingPage = () => {
     const user = useSelector(state => state.user);
+    const token = user.accessToken;
     const [bookings, setBookings] = useState([]);
     const [bills, setBills] = useState([]);
 
@@ -16,7 +17,7 @@ const BookingPage = () => {
         try {
             const response = await api.get('payment', {
                 headers: {
-                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+                    'Authorization': `Bearer ${token}`
                 }
             });
             const values = response.data.map(bill => ({
@@ -32,7 +33,7 @@ const BookingPage = () => {
         try {
             const response = await api.get('bookings', {
                 headers: {
-                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+                    'Authorization': `Bearer ${token}`
                 }
             });
             console.log(response.data);
@@ -49,8 +50,7 @@ const BookingPage = () => {
 
             setBookings(values); // Set bookings to an array of booking objects
         } catch (error) {
-            toast.error("Fetching booking failed.");
-            console.log(error);
+            console.log(error.response.data);
         }
     };
 
@@ -138,6 +138,7 @@ const BookingPage = () => {
                     ) : record.status === "CANCELLED" ? (
                         <p className='fst-italic fs-6 text-danger'>CANCELLED</p>
                     ) : (
+                        <>
                         <Button
                             type='none'
                             className="btn-custom btn btn-danger d-flex justify-content-center m-1"
@@ -146,8 +147,8 @@ const BookingPage = () => {
                         >
                             Delete
                         </Button>
+                        </>
                     )}
-
                 </div>
             )
         }
@@ -176,7 +177,7 @@ const BookingPage = () => {
         try {
             const response = await api.put(`bookings/${record.id}`, valuesToSend, {
                 headers: {
-                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+                    'Authorization': `Bearer ${token}`
                 }
             });
             toast.success('Confirmed.')
@@ -186,7 +187,7 @@ const BookingPage = () => {
         } finally {
             const resMail = await api.post(`mail/send/${record.email}`, format, {
                 headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem('token')}`
+                    Authorization: `Bearer ${token}`
                 }
             })
             console.log('Email sent: ', resMail)
@@ -195,8 +196,7 @@ const BookingPage = () => {
     };
 
     const handleDeleteBooking = async (record) => {
-        try {
-            const emailContent = `
+        const emailContent = `
             <html>
               <body>
                 <h1 style='color: blue;'>Welcome, ${record.customerName}</h1>
@@ -208,22 +208,25 @@ const BookingPage = () => {
             `;
             const format = {
                 subject: "Booking Deletion",
-                html: emailContent
+                body: emailContent
             }
-            const resMail = await api.post(`mail/send/${record.email}`, format, {
-                headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem('token')}`
-                }
-            })
+        try {    
             const response = await api.put(`bookings/delete/${record.id}`, {
                 headers: {
-                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+                    'Authorization': `Bearer ${token}`
                 }
             });
             toast.success('Delete successful.')
             fetchBooking();
         } catch (error) {
             console.log(error.response.data)
+        }finally{
+            const resMail = await api.post(`mail/send/${record.email}`, format, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            console.log('Email sent: ', resMail)
         }
     };
 

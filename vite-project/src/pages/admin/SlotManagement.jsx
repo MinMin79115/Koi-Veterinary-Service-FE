@@ -5,8 +5,10 @@ import { toast } from 'react-toastify';
 import { SearchOutlined } from '@ant-design/icons';
 import api from '../../config/axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useSelector } from 'react-redux';
 
 const SlotManagement = () => {
+    const token = useSelector(state => state.user.accessToken);
     const [slots, setSlots] = useState([]);
     const [veterinarians, setVeterinarians] = useState([]);
     const [openModal, setOpenModal] = useState(false);
@@ -20,12 +22,12 @@ const SlotManagement = () => {
         try {
             const response = await api.get('veterinarian/slot', {
                 headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem('token')}`
+                    Authorization: `Bearer ${token}`
                 }
             });
             setSlots(response.data);
         } catch (error) {
-            toast.error('Error fetching slots:', error.response?.data || error.message);
+            console.log('Error fetching slots:', error.response?.data || error.message);
         }
     };
 
@@ -33,7 +35,7 @@ const SlotManagement = () => {
         try {
             const response = await api.get('veterinarian', {
                 headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem('token')}`
+                    Authorization: `Bearer ${token}`
                 }
             });
             const filteredVeterinarians = response.data.filter(veterinarian => 
@@ -85,7 +87,7 @@ const SlotManagement = () => {
             setSubmitting(true);
             await api.post('veterinarian/slot', values, {
                 headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem('token')}`
+                    Authorization: `Bearer ${token}`
                 }
             });
             toast.success("Slot successfully added!");
@@ -104,7 +106,7 @@ const SlotManagement = () => {
             setSubmitting(true);
             await api.put(`veterinarian/slot/${editingSlot.slotId}`, values, {
                 headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem('token')}`
+                    Authorization: `Bearer ${token}`
                 }
             });
             toast.success("Slot successfully updated!");
@@ -123,7 +125,7 @@ const SlotManagement = () => {
         try {
             await api.delete(`veterinarian/slot/${id}`, {
                 headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem('token')}`
+                    Authorization: `Bearer ${token}`
                 }
             });
             toast.success("Slot deleted successfully!");
@@ -141,6 +143,7 @@ const SlotManagement = () => {
         item.veterinarian.user.fullname.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    filteredData.sort((a, b) => b.slotId - a.slotId);
     const columns = [
         {
             title: "Slot ID",

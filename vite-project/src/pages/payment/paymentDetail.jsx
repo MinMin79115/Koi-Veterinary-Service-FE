@@ -3,7 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FaCheckCircle, FaHome, FaCreditCard } from 'react-icons/fa';
 import api from '../../config/axios';
+import { useSelector } from 'react-redux';
 function PaymentDetail() {
+  const booking = useSelector(state => state.booking);
+  const token = useSelector(state => state.user.accessToken);
   const [bookingDetails, setBookingDetails] = useState({
     bookingId: '',
     serviceName: '',
@@ -14,10 +17,10 @@ function PaymentDetail() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const bookingId = sessionStorage.getItem('bookingId');
-    const serviceName = sessionStorage.getItem('serviceName');
-    const serviceTime = sessionStorage.getItem('serviceTime');
-    const price = sessionStorage.getItem('price');
+    const bookingId = booking.bookingId;
+    const serviceName = booking.servicesDetail.serviceId.serviceName;
+    const serviceTime = booking.serviceTime;
+    const price = booking.servicesDetail.serviceTypeId.price;
 
     setBookingDetails({
       bookingId: bookingId,
@@ -28,7 +31,6 @@ function PaymentDetail() {
   }, []);
 
   const handlePayment = async () => {
-    const token = sessionStorage.getItem('token');
     try {
       const resPayment = await api.get(`payment/vnpay?amount=${bookingDetails.price}&bankCode=NCB&bookingId=${bookingDetails.bookingId}`, {
         headers: {

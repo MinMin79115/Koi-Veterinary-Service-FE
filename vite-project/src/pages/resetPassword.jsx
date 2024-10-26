@@ -25,8 +25,9 @@ function ResetPassword() {
     const onSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await api.post(`auth/reset-password`, formData);
-            console.log(res);
+            const response = await api.post(`auth/reset-password`, formData);
+            toast.success(response.data.message);
+            console.log(response.data);
         } catch (error) {
             console.log(error);
         }

@@ -4,8 +4,10 @@ import { useForm } from 'antd/es/form/Form';
 import { toast } from 'react-toastify';
 import api from '../../config/axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useSelector } from 'react-redux';
 
 const StaffManagement = () => {
+  const token = useSelector(state => state.user.accessToken);
   const [staffs, setStaffs] = useState([]);
   const [veterinarians, setVeterinarians] = useState([]);
   const [editingStaff, setEditingStaff] = useState(null);
@@ -20,12 +22,12 @@ const StaffManagement = () => {
     try {
       const response = await api.get('customers', {
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem('token')}`
+          Authorization: `Bearer ${token}`
         }
       });
       setStaffs(response.data);
     } catch (error) {
-      toast.error('Error fetching staffs:', error.response?.data || error.message);
+      console.error('Error fetching staffs:', error.response?.data || error.message);
     }
   };
 
@@ -33,13 +35,13 @@ const StaffManagement = () => {
     try {
       const response = await api.get('veterinarian', {
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem('token')}`
+          Authorization: `Bearer ${token}`
         }
       });
       setVeterinarians(response.data);
       console.log(response.data);
     } catch (error) {
-      toast.error('Error fetching veterinarians:', error.response?.data || error.message);
+      console.error('Error fetching veterinarians:', error.response?.data || error.message);
     }
   };
 
@@ -82,7 +84,7 @@ const StaffManagement = () => {
         serviceTypeId: values.serviceTypeId
       }, {
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem('token')}`
+          Authorization: `Bearer ${token}`
         }
       });
       toast.success("Successfully updated!");
@@ -110,7 +112,7 @@ const StaffManagement = () => {
       setSubmitting(true);
       const response = await api.post('auth/addstaff', valuesToSend, {
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem('token')}`
+          Authorization: `Bearer ${token}`
         }
       });
 
@@ -127,11 +129,6 @@ const StaffManagement = () => {
 
   const handleDelete = async (id) => {
     try {
-      const token = sessionStorage.getItem('token');
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
       const res = await api.delete(`customers/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`
@@ -153,6 +150,8 @@ const StaffManagement = () => {
   const filteredData = staffs.filter(item =>
     item.fullname.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  filteredData.sort((a, b) => b.id - a.id);
 
   const columns = [
     {

@@ -16,7 +16,7 @@ function CustomerPage() {
   const [customer, setCustomer] = useState([]);
   const [newPassword, setNewPassword] = useState('');
   const user = useSelector((state) => state.user);
-
+  const token = user.accessToken;
   useEffect(() => {
     if (location.hash === '#profile') {
       window.scrollTo(0, 180);
@@ -24,8 +24,7 @@ function CustomerPage() {
   }, [location]);
 
   const fetchCustomer = async () => {
-    const token = sessionStorage.getItem('token');
-    try {
+      try {
       const response = await api.get(`customers/${user.id}`, {
         headers: {
           Authorization: `Bearer ${token}`
@@ -41,7 +40,6 @@ function CustomerPage() {
       setCustomer(userProfile);
     } catch (error) {
       console.error('Error fetching customer data:', error);
-      toast.error('Failed to load customer data. Please try again.');
     }
   };
 
@@ -72,7 +70,6 @@ function CustomerPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = sessionStorage.getItem('token');
       if (!token) {
         throw new Error('No authentication token found');
       }
@@ -111,14 +108,20 @@ function CustomerPage() {
           </div>
         </div>
       ) : (
+        <>
         <div className="row mb-4">
           <div className="col-12 d-flex justify-content-end align-items-center my-4">
-            <SendOutlined className="me-2" />
-            <Link className="btn btn-outline-info btn-sm me-2" to="/booking-management">
+            <SendOutlined className="me-1" />
+            <Link className="btn btn-outline-info btn-sm me-3" to="/booking-management">
               Manage Bookings
+            </Link>
+            <SendOutlined className="me-1 mx-1" />
+            <Link className="btn btn-outline-info btn-sm me-3" to="/faq-management">
+              Manage FAQs
             </Link>
           </div>
         </div>
+      </>
       )}
       <div className={`${styles.padding} m-5`}>
         <div className={`row container d-flex justify-content-center `}>

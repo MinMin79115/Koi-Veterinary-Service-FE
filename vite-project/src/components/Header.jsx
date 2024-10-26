@@ -4,6 +4,7 @@ import koiLogo from '../assets/koi-logo.png'; // Import the image
 import './Header.css';
 import { FaRegUserCircle } from "react-icons/fa";
 import { logout } from '../redux/features/userSlider';
+import { bookingReset } from '../redux/features/bookingSlider';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
@@ -15,21 +16,14 @@ const Header = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check login status using token from secureLocalStorage
-    const checkLogin = sessionStorage.getItem("userToken");
-    if (checkLogin) {
-      setIsLoggedIn(true);
-    }
-    // Adjust the key as needed
     setIsLoggedIn(!!user); // Set true if token exists
-  }, []);
+    console.log(user);
+  }, [user]);
 
   const handleLogout = () => {
-    // Clear all items from sessionStorage
-    sessionStorage.clear();
     // Dispatch logout action to clear Redux state
     dispatch(logout());
-
+    dispatch(bookingReset());
   };
 
   const handleLinkClick = () => {

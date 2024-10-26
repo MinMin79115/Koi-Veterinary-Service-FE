@@ -4,13 +4,12 @@ import { DeleteOutlined, FileDoneOutlined, PayCircleOutlined } from '@ant-design
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './BookingDetail.css';
 import api from '../../config/axios'
-import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 
 const BookingDetail = () => {
+  const token = useSelector(state => state.user.accessToken);
   const [bookings, setBookings] = useState([]);
-  const [checkBookingId, setCheckBookingId] = useState('');
   const [payStatus, setPayStatus] = useState('')
   const user = useSelector((state) => state.user);
 
@@ -20,7 +19,7 @@ const BookingDetail = () => {
     try {
       const response = await api.get(`payment`, {
         headers: {
-          'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         }
       })
       const values = response.data.map(bill => ({
@@ -38,7 +37,7 @@ const BookingDetail = () => {
       if (user.role === 'CUSTOMER') {
         const response = await api.get(`bookings/user/${user.id}`, {
           headers: {
-            'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+            'Authorization': `Bearer ${token}`
           }
         });
         console.log(response.data);
@@ -57,7 +56,7 @@ const BookingDetail = () => {
       } else {
         const response = await api.get(`bookings/veterinarian/${user.id}`, {
           headers: {
-            'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+            'Authorization': `Bearer ${token}`
           }
         });
         console.log(response.data);
@@ -221,7 +220,7 @@ const BookingDetail = () => {
     try {
       const response = await api.put(`bookings/delete/${record.id}`, {
         headers: {
-          'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         }
       })
       toast.success('Deleted successful.')
@@ -244,7 +243,7 @@ const BookingDetail = () => {
       const amount = Math.round(priceValue);
       const resPayment = await api.get(`payment/vnpay?amount=${amount}&bankCode=NCB&bookingId=${record.id}`, {
         headers: {
-          'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         }
       });
       console.log(resPayment.data);
@@ -283,7 +282,7 @@ const BookingDetail = () => {
       }
       const response = await api.put(`bookings/${record.id}`, valuesToUpdate, {
         headers: {
-          'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         }
       })
       //Update the booking status to COMPLETED
@@ -292,10 +291,9 @@ const BookingDetail = () => {
     } catch (error) {
       console.log(error.response.data)
     }finally{
-     
       const resMail = await api.post(`mail/send/${record.email}`, format, {
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem('token')}`
+          Authorization: `Bearer ${token}`
         }
       })
       console.log(resMail)

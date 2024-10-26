@@ -9,7 +9,11 @@ function ForgotPassword() {
     e.preventDefault();
     const format = {
       subject: 'Forgot Password',
-      body: `Click the link below to reset your password: http://localhost:5173/reset-password/${email}`
+      body: `<html><body>
+      <h1>Are you forgot your password?</h1>
+      <p>Click the link below to reset your password: <a href="http://localhost:5173/reset-password/">Reset Password</a></p>
+      </body>
+      </html>`
     }
     try {
       const res = await api.post(`mail/send/${email}`, format);

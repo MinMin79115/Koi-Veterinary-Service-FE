@@ -3,13 +3,16 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import './Booking.css';
 import { toast } from 'react-toastify';
 import api from '../../config/axios';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { booking } from '../../redux/features/bookingSlider';
 import { Form, DatePicker } from 'antd';
 import moment from 'moment';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const Booking = () => {
+const BookingPage  = () => {
   const user = useSelector(state => state.user);
+  const token = user.accessToken; 
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const [services, setServices] = useState([]);
@@ -29,6 +32,10 @@ const Booking = () => {
   const [selectedDateTime, setSelectedDateTime] = useState('')
   const [isInterviewService, setIsInterviewService] = useState(false)
   const [uniqueSlots, setUniqueSlots] = useState({});
+  
+  const [selectedServiceName, setSelectedServiceName] = useState('');
+  const [selectedServiceType, setSelectedServiceType] = useState('');
+  const [groupedServices, setGroupedServices] = useState({});
 
   //Hàm validate chọn time
   const validateTimeRange = (_, value) => {
@@ -56,7 +63,6 @@ const Booking = () => {
 
   const fetchSlots = async () => {
     try {
-      const token = sessionStorage.getItem('token')
       const response = await api.get('bookings/timeslots', {
         headers: {
           Authorization: `Bearer ${token}`
@@ -84,15 +90,25 @@ const Booking = () => {
   }
 
   const fetchServices = async () => {
-    //Lấy dữ liệu từ be
     try {
       const response = await api.get('bookings/services', {
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem('token')}`
+          Authorization: `Bearer ${token}`
         }
       });
-      // const response = await axios.get(api);
-      console.log(response.data)
+      console.log(response.data);
+      
+      // Group services by serviceName
+      const grouped = response.data.reduce((acc, service) => {
+        const serviceName = service.serviceId.serviceName;
+        if (!acc[serviceName]) {
+          acc[serviceName] = [];
+        }
+        acc[serviceName].push(service);
+        return acc;
+      }, {});
+      
+      setGroupedServices(grouped);
       setServices(response.data);
     } catch (error) {
       toast.error('Error fetching services:', error.response.data);
@@ -104,7 +120,7 @@ const Booking = () => {
     try {
       const response = await api.get('bookings/veterinarians', {
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem('token')}`
+          Authorization: `Bearer ${token}`
         }
       });
       console.log(response.data)
@@ -130,7 +146,6 @@ const Booking = () => {
 
   //có send email
   const handleSubmit = async () => {
-    const token = sessionStorage.getItem('token')
     console.log('Values to send:', valuesToSend);
     console.log(user.email);
 
@@ -159,10 +174,7 @@ const Booking = () => {
             }
         });
         console.log('Booking submitted:', response.data);
-        sessionStorage.setItem('bookingId', response.data.bookingId);
-        sessionStorage.setItem('price', totalPrice);
-        sessionStorage.setItem('serviceName', selectedService.split(' || ')[0]);
-        sessionStorage.setItem('serviceTime', selectedDateTime);
+        dispatch(booking(response.data))
         toast.success('Booking submitted successfully!');
         setSelectedService('');
         setSelectedSlot('');
@@ -224,6 +236,20 @@ const Booking = () => {
       }));
     }
   };
+
+  const handleServiceNameChange = (e) => {
+    const serviceName = e.target.value;
+    setSelectedServiceName(serviceName);
+    setSelectedServiceType('');
+    setSelectedService('');
+  }
+
+  const handleServiceTypeChange = (e) => {
+    const selectedService = e.target.value;
+    setSelectedServiceType(selectedService);
+    setSelectedService(selectedService);
+    handleServiceChange({ target: { value: selectedService } });
+  }
 
   const handleServiceChange = (e) => {
     const selectedService = e.target.value;
@@ -306,26 +332,47 @@ const Booking = () => {
               <h2 className="text-center mb-4">Book a Service</h2>
               <Form onFinish={handleSubmit} className="booking-form">
                 <div className="mb-3">
-                  <label htmlFor="service" className="form-label">Services:</label>
+                  <label htmlFor="serviceName" className="form-label">Service Name:</label>
                   <Form.Item>
-                  <select
-                    id="service"
-                    name='servicesDetailId'
-                    value={selectedService}
-                    onChange={handleServiceChange}
-                    required
-                    className="form-select"
-                  >
-                    <option value="">Select a service</option>
-                    {services.map((service) => (
-                      <option key={service.servicesDetailId} value={`${service.serviceId.serviceName} || ${service.servicesDetailId} || ${service.serviceTypeId.service_type} || ${service.serviceTypeId.price}`}>
-                        {service.serviceId.serviceName} - {service.serviceTypeId.service_type}
-                      </option>
-                    ))}
-                  </select>
+                    <select
+                      id="serviceName"
+                      value={selectedServiceName}
+                      onChange={handleServiceNameChange}
+                      required
+                      className="form-select"
+                    >
+                      <option value="">Select a service</option>
+                      {Object.keys(groupedServices).map((serviceName) => (
+                        <option key={serviceName} value={serviceName}>
+                          {serviceName}
+                        </option>
+                      ))}
+                    </select>
                   </Form.Item>
                 </div>
-
+                {/* Service Type */}
+                <div className="mb-3">
+                    <label htmlFor="serviceType" className="form-label">Service Type:</label>
+                    <Form.Item>
+                      <select
+                        id="serviceType"
+                        value={selectedServiceType}
+                        onChange={handleServiceTypeChange}
+                        required
+                        className="form-select"
+                      >
+                        <option value="">Select a service type</option>
+                        {groupedServices[selectedServiceName]?.map((service) => (
+                          <option 
+                            key={service.servicesDetailId} 
+                            value={`${service.serviceId.serviceName} || ${service.servicesDetailId} || ${service.serviceTypeId.service_type} || ${service.serviceTypeId.price}`}
+                          >
+                            {service.serviceTypeId.service_type}
+                          </option>
+                        ))}
+                      </select>
+                    </Form.Item>
+                </div>
                 <div className="mb-3">
                   {isInterviewService && selectedService ? (
                     <>                
@@ -444,4 +491,4 @@ const Booking = () => {
   );
 };
 
-export default Booking;
+export default BookingPage;
