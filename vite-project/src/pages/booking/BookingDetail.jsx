@@ -363,8 +363,8 @@ const BookingDetail = () => {
                   <Input.TextArea size='large' rows={6} value={selectedRecord?.note} onChange={(e) => setSelectedRecord({ ...selectedRecord, note: e.target.value })} />
                 ) : (
                   <>
-                    <p>Your prescription:</p>
-                    <p>{selectedRecord?.note}</p>
+                    <span className='fw-bold'>Your prescription:</span>
+                    <p>{selectedRecord?.note || 'No note available'}</p>
                   </>
                 )}
               </Modal>
