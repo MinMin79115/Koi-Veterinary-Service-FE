@@ -29,7 +29,6 @@
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
 }
 
-
 .card {
     transition: transform 0.2s;
     height: 100%;
@@ -85,7 +84,6 @@
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
     padding: 1.5rem; /* Padding inside the container */
 }
-
 
 .table-title {
     font-size: 1.5rem; /* Title font size */

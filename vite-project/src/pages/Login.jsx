@@ -53,6 +53,7 @@ const Login = () => {
       const response = await api.post('auth/login', values);
       // const response = await api.post('login', values);
       dispatch(login(response.data))
+      toast.success('Login successfully.')
       const {role} = response.data
       if(role === 'CUSTOMER' || role ==='VETERINARIAN' || role === "STAFF" ){
         navigate('/')

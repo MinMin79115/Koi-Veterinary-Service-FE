@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Popconfirm } from 'antd';
+import { Table, Button, Popconfirm, Modal, Input } from 'antd';
 import { DeleteOutlined, FileDoneOutlined, PayCircleOutlined } from '@ant-design/icons';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './BookingDetail.css';
@@ -12,8 +12,21 @@ const BookingDetail = () => {
   const [bookings, setBookings] = useState([]);
   const [payStatus, setPayStatus] = useState('')
   const user = useSelector((state) => state.user);
-
+  const [noteModal, setNoteModal] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState(null);
   const [bills, setBills] = useState([]);
+
+
+  //Open the note modal
+  const openNoteModal = (record) => {
+    setNoteModal(true);
+    setSelectedRecord(record);
+  }
+
+  const closeNoteModal = () => {
+    setNoteModal(false);
+    setSelectedRecord(null);
+  }
 
   const fetchBill = async () => {
     try {
@@ -49,7 +62,8 @@ const BookingDetail = () => {
           service: booking.servicesDetail.serviceId.serviceName,
           serviceType: booking.servicesDetail.serviceTypeId.service_type,
           status: booking.status,
-          price: booking.servicesDetail.serviceTypeId.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
+          price: booking.servicesDetail.serviceTypeId.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
+          note: booking.note
         }));
 
         setBookings(values); //Set bookings to an array of booking objects      
@@ -68,7 +82,8 @@ const BookingDetail = () => {
           service: booking.servicesDetail.serviceId.serviceName,
           serviceType: booking.servicesDetail.serviceTypeId.service_type,
           status: booking.status,
-          price: booking.servicesDetail.serviceTypeId.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
+          price: booking.servicesDetail.serviceTypeId.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
+          note: booking.note
         }));
 
         setBookings(values); //Set bookings to an array of booking objects
@@ -156,7 +171,7 @@ const BookingDetail = () => {
         <div className="d-flex flex-column flex-md-row justify-content-center">
           {user?.role === 'CUSTOMER' ? (
             record.status === "COMPLETED" ? (
-              <p className='fst-italic fs-6 text-info'>COMPLETED</p>
+              <Button onClick={() => openNoteModal(record)} type='none' className="btn-custom btn btn-info d-flex justify-content-center m-1 text-white">NOTE</Button>
             ) : record.status === "CANCELLED" ? (
               <p className='fst-italic fs-6 text-danger'>CANCELLED</p>
             )  : record.status === "CONFIRMED" ? (
@@ -193,7 +208,7 @@ const BookingDetail = () => {
             )
           ) : user?.role === 'VETERINARIAN' ? (
             record.status === "COMPLETED" ? (
-              <p className='fst-italic fs-6 text-info'>HAS BEEN COMPLETED</p>
+              <Button onClick={() => openNoteModal(record)} type='none' className="btn-custom btn btn-info d-flex justify-content-center m-1 text-white">NOTE</Button>
             ) : record.status === "CANCELLED" ? (
               <p className='fst-italic fs-6 text-danger'>CANCELLED</p>
             ) : (
@@ -215,6 +230,25 @@ const BookingDetail = () => {
       )
     }
   ];
+
+  const handleNote = async () => {
+    const valuesToUpdate = {
+      note: selectedRecord.note
+    }
+    try {
+      const response = await api.put(`bookings/${selectedRecord.id}`, valuesToUpdate, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      toast.success('Note saved.')
+      console.log(response.data);
+      fetchBooking()
+      closeNoteModal()
+    } catch (error) {
+      console.log(error.response.data)
+    }
+  }
 
   const handleDeleteBooking = async (record) => {
     try {
@@ -296,7 +330,7 @@ const BookingDetail = () => {
           Authorization: `Bearer ${token}`
         }
       })
-      console.log(resMail)
+      console.log(resMail.data)
     }
   };
 
@@ -318,6 +352,22 @@ const BookingDetail = () => {
                   className="table"
                 />
               </div>
+              <Modal
+                title="Note"
+                open={noteModal}
+                onCancel={closeNoteModal}
+                onOk={() => handleNote(selectedRecord)}
+                okText="Save"
+              >
+                {user.role === 'VETERINARIAN' ? (
+                  <Input.TextArea size='large' rows={6} value={selectedRecord?.note} onChange={(e) => setSelectedRecord({ ...selectedRecord, note: e.target.value })} />
+                ) : (
+                  <>
+                    <span className='fw-bold'>Your prescription:</span>
+                    <p>{selectedRecord?.note || 'No note available'}</p>
+                  </>
+                )}
+              </Modal>
             </div>
           </div>
         </div>
