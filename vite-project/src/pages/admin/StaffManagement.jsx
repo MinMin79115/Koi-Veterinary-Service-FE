@@ -332,7 +332,9 @@ const StaffManagement = () => {
             <Input />
           </Form.Item>
           <Form.Item 
-            label="Service Type ID: 1 - Online, null" 
+            label="Service Type ID: 
+            1 - Online & At_Home,
+            null is other types" 
             name="serviceTypeId" 
           >
             <Input />

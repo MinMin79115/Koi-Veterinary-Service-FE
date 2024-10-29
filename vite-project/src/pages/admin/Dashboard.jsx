@@ -14,6 +14,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './AdminPage.css'; // We'll create this for any additional custom styles
 import api from '../../config/axios';
 import { Table, Tag } from 'antd';
+import { useSelector } from 'react-redux';
 
 // Register the required components
 ChartJS.register(
@@ -27,8 +28,10 @@ ChartJS.register(
 );
 
 const Dashboard = () => {
+  const token = useSelector((state) => state.accessToken);
   const [dataSource, setDataSource] = useState([]);
   const [customerList, setCustomerList] = useState([]);
+  const [bills, setBills] = useState([]);
   const [bookingStats, setBookingStats] = useState({
     labels: ['Pond Quality', 'Fish Health', 'Interview'],
     datasets: [
@@ -71,6 +74,36 @@ const Dashboard = () => {
     { title: 'Phone', dataIndex: 'customerPhone', width: 20 },
 
   ];
+
+  const columnsBill = [
+    { title: 'ID', dataIndex: 'ID' },
+    { title: 'BookingId', dataIndex: 'BookingId'  },
+    {title: 'Customer', dataIndex: 'Customer'},
+    { title: 'Date', dataIndex: 'Date' },
+  ];
+
+  const fetchBills = async () => {
+    try{
+
+      const response = await api.get(`payment`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      setBills([])
+      response.data.forEach(payment => {
+      setBills(prevData => [...prevData, {
+        ID: payment.billId,
+        BookingId: payment.booking.bookingId,
+        Customer: payment.booking.user.fullname,
+        Date: payment.paymentDate.replace('T', ' at ')+[]
+      }])
+    })
+    console.log(bills)
+    }catch(error){
+      console.log(error)
+    }
+  }
 
   const fetchBookingStats = async () => {
     try {
@@ -181,6 +214,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchBookingStats();
+    fetchBills();
   }, []);
 
   const chartOptions = {
@@ -254,6 +288,10 @@ const Dashboard = () => {
       <div className="table-container">
         <h1 className="table-title">List of Typical Customers</h1>
         <Table pagination={{ pageSize: 6 }} dataSource={customerList} columns={customerColumns} />
+      </div>
+      <div className="table-container">
+        <h1 className="table-title">History Payment</h1>
+        <Table pagination={{ pageSize: 6 }} dataSource={bills} columns={columnsBill} />
       </div>
     </>
   );
