@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 function PaymentDetail() {
   const booking = useSelector(state => state.booking);
   const token = useSelector(state => state.user.accessToken);
+  console.log(token)
   const [bookingDetails, setBookingDetails] = useState({
     bookingId: '',
     serviceName: '',
@@ -32,7 +33,15 @@ function PaymentDetail() {
 
   const handlePayment = async () => {
     try {
-      const resPayment = await api.get(`payment/vnpay?amount=${bookingDetails.price}&bankCode=NCB&bookingId=${bookingDetails.bookingId}`, {
+      const priceValue = parseFloat(bookingDetails.price.replace(/[^\d,]/g, '').replace(',', '.'));
+      
+      if (isNaN(priceValue)) {
+        throw new Error('Invalid price format');
+      }
+
+      // Convert to smallest currency unit (e.g., cents)
+      const amount = Math.round(priceValue);
+      const resPayment = await api.get(`payment/vnpay?amount=${amount}&bankCode=NCB&bookingId=${bookingDetails.bookingId}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
