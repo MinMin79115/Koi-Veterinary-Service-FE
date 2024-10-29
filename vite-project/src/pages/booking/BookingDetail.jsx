@@ -221,7 +221,7 @@ const BookingDetail = () => {
             ) : record.status === "CANCELLED" ? (
               <p className='fst-italic fs-6 text-danger'>CANCELLED</p>
             ) : (
-              <p>Wating for confirmed.</p>
+              <p className='text-primary'>Waiting for confirming</p>
             )
           ) : (
             <>
