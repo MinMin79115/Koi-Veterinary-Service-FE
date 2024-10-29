@@ -207,11 +207,7 @@ const BookingDetail = () => {
               </>
             )
           ) : user?.role === 'VETERINARIAN' ? (
-            record.status === "COMPLETED" ? (
-              <Button onClick={() => openNoteModal(record)} type='none' className="btn-custom btn btn-info d-flex justify-content-center m-1 text-white">NOTE</Button>
-            ) : record.status === "CANCELLED" ? (
-              <p className='fst-italic fs-6 text-danger'>CANCELLED</p>
-            ) : (
+            record.status === "CONFIRMED" ? (
               <Button
                 type='none'
                 icon={<FileDoneOutlined />}
@@ -220,6 +216,12 @@ const BookingDetail = () => {
               >
                 Complete
               </Button>
+            ) : record.status === "COMPLETED" ? (
+              <Button onClick={() => openNoteModal(record)} type='none' className="btn-custom btn btn-info d-flex justify-content-center m-1 text-white">NOTE</Button>
+            ) : record.status === "CANCELLED" ? (
+              <p className='fst-italic fs-6 text-danger'>CANCELLED</p>
+            ) : (
+              <p>Wating for confirmed.</p>
             )
           ) : (
             <>
