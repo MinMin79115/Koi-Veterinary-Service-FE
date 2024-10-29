@@ -332,22 +332,8 @@ const StaffManagement = () => {
             <Input />
           </Form.Item>
           <Form.Item 
-            label="Role" 
-            name="role" 
-            rules={[{ required: true, message: "Please select a role!" }]}
-          >
-            <Select>
-              {roles.map((role, index) => (
-                <Select.Option key={index} value={role.role}>
-                  {role.role}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-          <Form.Item 
             label="Service Type ID: 1 - Online, null" 
             name="serviceTypeId" 
-            rules={[{ message: "Please select a service type!" }]}
           >
             <Input />
           </Form.Item>
