@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Bar, Pie } from 'react-chartjs-2';
+import { Bar, Pie, Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -9,6 +9,8 @@ import {
   Title,
   Tooltip,
   Legend,
+  LineElement,
+  PointElement,
 } from 'chart.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './AdminPage.css'; // We'll create this for any additional custom styles
@@ -22,6 +24,8 @@ ChartJS.register(
   LinearScale,
   BarElement,
   ArcElement,
+  LineElement,
+  PointElement,
   Title,
   Tooltip,
   Legend
@@ -57,6 +61,18 @@ const Dashboard = () => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [totalCustomer, setTotalCustomer] = useState(0);
   const [totalBooking, setTotalBooking] = useState(0);
+
+  const [weeklyProfits, setWeeklyProfits] = useState({
+    labels: [],
+    datasets: [
+      {
+        label: 'Weekly Profit',
+        data: [],
+        borderColor: 'rgb(75, 192, 192)',
+        tension: 0.1,
+      },
+    ],
+  });
 
   const columns = [
     { title: 'Booking ID', dataIndex: 'bookingId' },
@@ -104,6 +120,40 @@ const Dashboard = () => {
       console.log(error)
     }
   }
+
+  const calculateWeeklyProfits = (bookings) => {
+    const weeklyData = {};
+    
+    bookings.forEach(booking => {
+      if (booking.status === "COMPLETED") {
+        const date = new Date(booking.serviceTime);
+        const weekStart = new Date(date.setDate(date.getDate() - date.getDay())).toISOString().split('T')[0];
+        
+        if (!weeklyData[weekStart]) {
+          weeklyData[weekStart] = 0;
+        }
+        weeklyData[weekStart] += booking.servicesDetail.serviceTypeId.price;
+      }
+    });
+
+    // Sort weeks and get last 8 weeks
+    const sortedWeeks = Object.keys(weeklyData).sort().slice(-8);
+    
+    setWeeklyProfits({
+      labels: sortedWeeks.map(date => {
+        const [year, month, day] = date.split('-');
+        return `${month}/${day}`;
+      }),
+      datasets: [
+        {
+          label: 'Weekly Profit (VND)',
+          data: sortedWeeks.map(week => weeklyData[week]),
+          borderColor: 'rgb(75, 192, 192)',
+          tension: 0.1,
+        },
+      ],
+    });
+  };
 
   const fetchBookingStats = async () => {
     try {
@@ -207,6 +257,8 @@ const Dashboard = () => {
         ],
       });
 
+      calculateWeeklyProfits(response.data);
+
     } catch (error) {
       console.error('Error fetching booking stats: ', error);
     }
@@ -230,7 +282,28 @@ const Dashboard = () => {
     },
   };
 
- 
+  const lineChartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'Weekly Profit Trend',
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          callback: function(value) {
+            return value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+          }
+        }
+      }
+    }
+  };
 
   return (
     <>
@@ -261,7 +334,6 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-
         <div className="row d-flex align-items-center justify-content-around mt-3">
           <div className="col-lg-8 col-md-12">
             <div className="card" style={{ height: 'calc(100vh - 200px)' }}>
@@ -279,6 +351,16 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
+          <div className="row mb-4">
+          <div className="col-12 mt-4">
+            <div className="card">
+              <div className="card-body">
+                <h5 className="card-title">Weekly Profit Trend</h5>
+                <Line data={weeklyProfits} options={lineChartOptions} />
+              </div>
+            </div>
+          </div>
+        </div>
         </div>
       </div>
       <div className="table-container mt-6">

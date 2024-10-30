@@ -79,6 +79,7 @@ const BookingDetail = () => {
           id: booking.bookingId,
           customerName: booking.user.fullname,
           email: booking.user.email,
+          address: booking.user.address,
           service: booking.servicesDetail.serviceId.serviceName,
           serviceType: booking.servicesDetail.serviceTypeId.service_type,
           status: booking.status,
@@ -119,12 +120,20 @@ const BookingDetail = () => {
       hidden: user?.role === 'VETERINARIAN' || user?.role === 'CUSTOMER'
     },
     {
-      title: 'Customer Name',
+      title: 'Customer',
       dataIndex: 'customerName',
       key: 'customerName',
       width: '20%',
       align: 'center',
       className: 'column-border'
+    },
+    {
+      title: 'Address',
+      dataIndex: 'address',
+      key: 'address',
+      width: '20%',
+      align: 'center',
+      hidden: user?.role === 'CUSTOMER'
     },
     {
       title: 'Service',
@@ -169,14 +178,31 @@ const BookingDetail = () => {
       className: 'column-border',
       render: (_, record) => (
         <div className="d-flex flex-column flex-md-row justify-content-center">
-          {user?.role === 'CUSTOMER' ? (
+          {user?.role === 'CUSTOMER'? (
             record.status === "COMPLETED" ? (
-              <Button onClick={() => openNoteModal(record)} type='none' className="btn-custom btn btn-info d-flex justify-content-center m-1 text-white">NOTE</Button>
+              // Đang fix ở đây
+              record.note ? 
+              <Button 
+                onClick={() => openNoteModal(record)} 
+                type='primary'
+                className="btn-custom d-flex justify-content-center m-1 text-white"
+              >
+                You Have A Note
+              </Button> :
+              record.serviceType !== "At_Center" ?
+              <Button 
+                type='default' 
+                className="btn-custom d-flex justify-content-center m-1"
+                disabled
+              >
+                No Note Available
+              </Button> :
+              <i className='text-info'>COMPLETED</i>
             ) : record.status === "CANCELLED" ? (
               <p className='fst-italic fs-6 text-danger'>CANCELLED</p>
             )  : record.status === "CONFIRMED" ? (
               <p className='fst-italic fs-6 text-success'>CONFIRMED</p>
-            ): bills.find(bill => bill.id === record.id) ? (
+            ): bills.find(bill => bill.id === record.id)? (
               <>
                 {setPayStatus('PAID')}
                 <p className='fst-italic fs-6 text-success'>{payStatus}</p>
@@ -206,7 +232,7 @@ const BookingDetail = () => {
                 </div>
               </>
             )
-          ) : user?.role === 'VETERINARIAN' ? (
+          ) : user?.role === 'VETERINARIAN'  ? (
             record.status === "CONFIRMED" ? (
               <Button
                 type='none'
@@ -217,7 +243,15 @@ const BookingDetail = () => {
                 Complete
               </Button>
             ) : record.status === "COMPLETED" ? (
-              <Button onClick={() => openNoteModal(record)} type='none' className="btn-custom btn btn-info d-flex justify-content-center m-1 text-white">NOTE</Button>
+              record.serviceType !== "At_Center" ? 
+              <Button 
+                onClick={() => openNoteModal(record)} 
+                type='primary' 
+                className="btn-custom d-flex justify-content-center m-1 text-white"
+              >
+                Note
+              </Button> :
+              <i className='text-info'>COMPLETED</i>
             ) : record.status === "CANCELLED" ? (
               <p className='fst-italic fs-6 text-danger'>CANCELLED</p>
             ) : (
@@ -297,6 +331,20 @@ const BookingDetail = () => {
   };
 
   const handleComplete = async (record) => {
+    const URLMeet = "https://meet.google.com/fgy-kvct-gtf"
+    const emailContentOnline = `
+    <html>
+      <body>
+        <h1 style='color: blue;'>Welcome, ${record.customerName}</h1>
+        <p style='font-size: 16px;'>Your booking service has been completed.</p>
+        <p style='font-size: 16px;'>Your link Google Meet here: ${URLMeet}</p>
+        <p style='font-size: 16px;'>Thank you for choosing our service!</p>
+        <p style='font-size: 16px;'>If you have any questions, please contact us at <b>KOI FISH CARE Centre</b></p>
+        <p style='font-size: 16px;'>Best regards, <b>KOI FISH CARE Centre</b></p>
+      </body>
+    </html>
+    `;
+
     const emailContent = `
     <html>
       <body>
@@ -308,10 +356,15 @@ const BookingDetail = () => {
       </body>
     </html>
     `;
-      const format = {
+    const format = {
         subject: "Booking Completion",
       body: emailContent
     }
+
+    const formatOnline = {
+      subject: "Booking Completion",
+      body: emailContentOnline
+  }
     try {
       const valuesToUpdate = {
         status: 'COMPLETED'
@@ -327,12 +380,21 @@ const BookingDetail = () => {
     } catch (error) {
       console.log(error.response.data)
     }finally{
-      const resMail = await api.post(`mail/send/${record.email}`, format, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      console.log(resMail.data)
+      if(record.serviceType === "Online"){
+        const resMail = await api.post(`mail/send/${record.email}`, formatOnline, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        console.log(resMail.data)
+      }else{
+        const resMail = await api.post(`mail/send/${record.email}`, format, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        console.log(resMail.data)
+      }
     }
   };
 
@@ -359,7 +421,7 @@ const BookingDetail = () => {
                 open={noteModal}
                 onCancel={closeNoteModal}
                 onOk={() => handleNote(selectedRecord)}
-                okText="Save"
+                okButtonProps={{ style: { display: user.role === 'CUSTOMER' ? 'none' : 'inline-block' } }} // Hide OK button for CUSTOMER
               >
                 {user.role === 'VETERINARIAN' ? (
                   <Input.TextArea size='large' rows={6} value={selectedRecord?.note} onChange={(e) => setSelectedRecord({ ...selectedRecord, note: e.target.value })} />

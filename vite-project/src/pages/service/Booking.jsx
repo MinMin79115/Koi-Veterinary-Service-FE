@@ -164,6 +164,8 @@ const BookingPage  = () => {
       </html>
     `;
 
+    
+
     const format = {
       subject: "Booking Successful",
       body: emailContent

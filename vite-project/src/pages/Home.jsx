@@ -23,7 +23,6 @@ const Home = () => {
       setFaqs(sortedFaqs);
     } catch (error) {
       console.error('Error fetching FAQs:', error);
-      toast.error('Failed to fetch FAQs');
     }
   };
 

@@ -75,8 +75,8 @@ function CustomerPage() {
     // Fullname validation
     if (!customer.fullname) {
       newErrors.fullname = 'Full name is required';
-    } else if (customer.fullname.length < 2 || customer.fullname.length > 50) {
-      newErrors.fullname = 'Full name must be between 2 and 50 characters';
+    } else if (customer.fullname.length < 6 || customer.fullname.length > 50) {
+      newErrors.fullname = 'Full name must be between 6 and 50 characters';
     }
 
     // Email validation

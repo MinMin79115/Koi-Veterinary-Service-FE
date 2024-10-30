@@ -53,7 +53,7 @@ function PaymentDetail() {
   };
 
   const handleGoHome = () => {
-    navigate('/');
+    navigate('/booking-detail');
   };
 
   return (
@@ -91,7 +91,7 @@ function PaymentDetail() {
                   <FaCreditCard className="me-2" /> Pay Now
                 </button>
                 <button className="btn btn-secondary btn-lg " onClick={handleGoHome}>
-                  <FaHome className="me-2" /> Go to Home
+                  <FaHome className="me-2" /> Go to History
                 </button>
               </div>
             </div>

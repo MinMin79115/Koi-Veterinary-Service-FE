@@ -8,6 +8,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useSelector } from 'react-redux';
 
 const SlotManagement = () => {
+    const user = useSelector(state => state.user)
     const token = useSelector(state => state.user.accessToken);
     const [slots, setSlots] = useState([]);
     const [veterinarians, setVeterinarians] = useState([]);
@@ -20,12 +21,27 @@ const SlotManagement = () => {
 
     const fetchSlots = async () => {
         try {
+            setSlots([]);
             const response = await api.get('veterinarian/slot', {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             });
-            setSlots(response.data);
+            // console.log(response.data)
+            const fetchedSlots = []; // Create an array to hold the fetched slots
+            response.data.forEach(slot => {
+                if (slot.slotStatus !== "DELETED") {
+                    fetchedSlots.push({ // Push each valid slot into the array
+                        veterinarianId: slot.veterinarian.veterinarianId,
+                        slotId: slot.slotId,
+                        slotStatus: slot.slotStatus,
+                        timeSlotId: slot.timeSlot.slotTimeId,
+                        fullName: slot.veterinarian.user.fullname,
+                    });
+                }
+            });
+            setSlots(fetchedSlots);
+            console.log(slots)
         } catch (error) {
             console.log('Error fetching slots:', error.response?.data || error.message);
         }
@@ -38,7 +54,7 @@ const SlotManagement = () => {
                     Authorization: `Bearer ${token}`
                 }
             });
-            const filteredVeterinarians = response.data.filter(veterinarian => 
+            const filteredVeterinarians = response.data.filter(veterinarian =>
                 veterinarian.serviceTypeId === null
             );
             setVeterinarians(filteredVeterinarians);
@@ -56,7 +72,7 @@ const SlotManagement = () => {
     const handleOpenModal = () => {
         form.setFieldsValue({
             veterinarianId: '',
-            slotTimeId: '',
+            timeSlotId: '',
         });
         setOpenModal(true);
     };
@@ -69,8 +85,8 @@ const SlotManagement = () => {
     const handleOpenModalEdit = (record) => {
         setEditingSlot(record);
         form.setFieldsValue({
-            slotTimeId: record.timeSlot.slotTimeId,
-            veterinarianId: record.veterinarian.veterinarianId,
+            timeSlotId: record.timeSlotId,
+            veterinarianId: record.veterinarianId,
         });
         setOpenModalEdit(true);
     };
@@ -121,17 +137,24 @@ const SlotManagement = () => {
         }
     };
 
-    const handleDelete = async (id) => {
+    const handleDelete = async (record) => {
+        const values = {
+            veterinarianId: record.veterinarianId,
+            slotTimeId: record.timeSlotId,
+            status: "DELETED"
+        }
         try {
-            await api.delete(`veterinarian/slot/${id}`, {
+            const res = await api.put(`veterinarian/slot/${record.slotId}`, values, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             });
             toast.success("Slot deleted successfully!");
+            console.log(res)
             fetchSlots();
         } catch (err) {
-            toast.error(err.response?.data || "An error occurred while deleting the slot.");
+            console.log(err)
+            toast.error(err || "Error while delete booking!");
         }
     };
 
@@ -140,11 +163,17 @@ const SlotManagement = () => {
     };
 
     const filteredData = slots.filter(item =>
-        item.veterinarian.user.fullname.toLowerCase().includes(searchTerm.toLowerCase())
+        item.fullName.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     filteredData.sort((a, b) => b.slotId - a.slotId);
     const columns = [
+        {
+            title: '',
+            dataIndex: "veterinarianId",
+            key: "veterinarianId",
+            hidden: user?.role === "ADMIN"
+        },
         {
             title: "Slot ID",
             dataIndex: "slotId",
@@ -159,13 +188,13 @@ const SlotManagement = () => {
         },
         {
             title: "Time Slot ID",
-            dataIndex: ['timeSlot', 'slotTimeId'],
+            dataIndex: ['timeSlotId'],
             key: "slotTimeId",
             width: "15%",
         },
         {
             title: "Veterinarian Name",
-            dataIndex: ['veterinarian', 'user', 'fullname'],
+            dataIndex: ['fullName'],
             key: "veterinarianName",
             width: "25%",
         },
@@ -181,7 +210,7 @@ const SlotManagement = () => {
                     </Button>
                     <Popconfirm
                         title="Are you sure you want to delete this slot?"
-                        onConfirm={() => handleDelete(record.slotId)}
+                        onConfirm={() => handleDelete(record)}
                         okText="Yes"
                         cancelText="No"
                     >
@@ -203,19 +232,19 @@ const SlotManagement = () => {
     };
 
     return (
-           <> <div className="row mb-3">
-                <div className="col-12 col-md-6 col-lg-4 mb-2">
-                    <Button onClick={handleOpenModal} className="w-100">Create new slot</Button>
-                </div>
-                <div className="col-12 col-md-6 col-lg-8 mb-2">
-                    <Input
-                        placeholder="Search veterinarian name"
-                        prefix={<SearchOutlined />}
-                        onChange={(e) => handleSearch(e.target.value)}
-                        className="w-100"
-                    />
-                </div>
+        <> <div className="row mb-3">
+            <div className="col-12 col-md-6 col-lg-4 mb-2">
+                <Button onClick={handleOpenModal} className="w-100">Create new slot</Button>
             </div>
+            <div className="col-12 col-md-6 col-lg-8 mb-2">
+                <Input
+                    placeholder="Search veterinarian name"
+                    prefix={<SearchOutlined />}
+                    onChange={(e) => handleSearch(e.target.value)}
+                    className="w-100"
+                />
+            </div>
+        </div>
             <div className="row">
                 <div className="col-12">
                     <Table
@@ -227,18 +256,18 @@ const SlotManagement = () => {
                     />
                 </div>
             </div>
-            <Modal 
-                onOk={() => form.submit()} 
-                title="Create new Slot" 
-                open={openModal} 
+            <Modal
+                onOk={() => form.submit()}
+                title="Create new Slot"
+                open={openModal}
                 onCancel={handleCloseModal}
                 width="90%"
                 style={{ maxWidth: '600px' }}
             >
                 <Form onFinish={handleSubmitSlot} form={form} layout="vertical">
-                    <Form.Item 
-                        label="Veterinarian" 
-                        name="veterinarianId" 
+                    <Form.Item
+                        label="Veterinarian"
+                        name="veterinarianId"
                         rules={[{ required: true, message: "Please select a veterinarian!" }]}
                     >
                         <Select options={veterinarians.map(veterinarian => ({
@@ -246,27 +275,28 @@ const SlotManagement = () => {
                             value: veterinarian.veterinarianId
                         }))} />
                     </Form.Item>
-                    <Form.Item 
-                        label="Time Slot ID" 
-                        name="slotTimeId" 
-                        rules={[{ validator: validateSlotTimeId }]}
-                    >
+                    <Form.Item
+                        label="Time Slot ID: 1 - 2 - 3 - 4"
+                        name="slotTimeId"
+                        rules={[{
+                            required: true, validator: validateSlotTimeId
+                        }]}                    >
                         <Input />
                     </Form.Item>
                 </Form>
             </Modal>
-            <Modal 
-                onOk={() => form.submit()} 
-                title="Edit Slot" 
-                open={openModalEdit} 
+            <Modal
+                onOk={() => form.submit()}
+                title="Edit Slot"
+                open={openModalEdit}
                 onCancel={handleCloseModalEdit}
                 width="90%"
                 style={{ maxWidth: '600px' }}
             >
                 <Form onFinish={handleEditSlot} form={form} layout="vertical">
-                    <Form.Item 
-                        label="Veterinarian" 
-                        name="veterinarianId" 
+                    <Form.Item
+                        label="Veterinarian"
+                        name="veterinarianId"
                         rules={[{ required: true, message: "Please select a veterinarian!" }]}
                     >
                         <Select options={veterinarians.map(veterinarian => ({
@@ -274,9 +304,9 @@ const SlotManagement = () => {
                             value: veterinarian.veterinarianId
                         }))} />
                     </Form.Item>
-                    <Form.Item 
-                        label="Time Slot ID" 
-                        name="slotTimeId" 
+                    <Form.Item
+                        label="Time Slot ID"
+                        name="slotTimeId"
                         rules={[{ validator: validateSlotTimeId }]}
                     >
                         <Input />
