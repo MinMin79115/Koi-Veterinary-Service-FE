@@ -36,6 +36,9 @@ const Dashboard = () => {
   const [dataSource, setDataSource] = useState([]);
   const [customerList, setCustomerList] = useState([]);
   const [bills, setBills] = useState([]);
+  const sortBooking = dataSource.sort((a, b) => b.bookingId - a.bookingId);
+  const sortCustomer = customerList.sort((a, b) => b.customerId - a.customerId);
+  const sortBills = bills.sort((a, b) => b.ID - a.ID);
   const [bookingStats, setBookingStats] = useState({
     labels: ['Pond Quality', 'Fish Health', 'Interview'],
     datasets: [
@@ -365,15 +368,15 @@ const Dashboard = () => {
       </div>
       <div className="table-container mt-6">
         <h1 className="table-title">Booking List</h1>
-        <Table pagination={{ pageSize: 6 }} dataSource={dataSource} columns={columns} />
+        <Table pagination={{ pageSize: 6 }} dataSource={sortBooking} columns={columns} />
       </div>
       <div className="table-container">
         <h1 className="table-title">List of Typical Customers</h1>
-        <Table pagination={{ pageSize: 6 }} dataSource={customerList} columns={customerColumns} />
+        <Table pagination={{ pageSize: 6 }} dataSource={sortCustomer} columns={customerColumns} />
       </div>
       <div className="table-container">
         <h1 className="table-title">History Payment</h1>
-        <Table pagination={{ pageSize: 6 }} dataSource={bills} columns={columnsBill} />
+        <Table pagination={{ pageSize: 6 }} dataSource={sortBills} columns={columnsBill} />
       </div>
     </>
   );
