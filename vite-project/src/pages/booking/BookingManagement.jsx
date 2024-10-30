@@ -139,14 +139,14 @@ const BookingPage = () => {
                         <p className='fst-italic fs-6 text-danger'>CANCELLED</p>
                     ) : (
                         <>
-                        <Button
-                            type='none'
-                            className="btn-custom btn btn-danger d-flex justify-content-center m-1"
-                            icon={<DeleteOutlined />}
-                            onClick={() => handleDeleteBooking(record)}
-                        >
-                            Delete
-                        </Button>
+                            <Button
+                                type='none'
+                                className="btn-custom btn btn-danger d-flex justify-content-center m-1"
+                                icon={<DeleteOutlined />}
+                                onClick={() => handleDeleteBooking(record)}
+                            >
+                                Delete
+                            </Button>
                         </>
                     )}
                 </div>
@@ -156,9 +156,22 @@ const BookingPage = () => {
 
 
     const handleConfirmBooking = async (record) => {
+        const URLMeet = "https://meet.google.com/fgy-kvct-gtf"
         const valuesToSend = {
             status: "CONFIRMED"
         }
+        const emailContentOnline = `
+        <html>
+          <body>
+            <h1 style='color: blue;'>Welcome, ${record.customerName}</h1>
+            <p style='font-size: 16px;'>Your booking service has been confirmed.</p>
+            <p style='font-size: 16px;'>Your link Google Meet here: ${URLMeet}</p>
+            <p style='font-size: 16px;'>Thank you for choosing our service!</p>
+            <p style='font-size: 16px;'>If you have any questions, please contact us at <b>KOI FISH CARE Centre</b></p>
+            <p style='font-size: 16px;'>Best regards, <b>KOI FISH CARE Centre</b></p>
+          </body>
+        </html>
+        `;
         const emailContent = `
         <html>
           <body>
@@ -174,6 +187,11 @@ const BookingPage = () => {
             subject: "Booking Confirmation",
             body: emailContent
         }
+
+        const formatOnline = {
+            subject: "Booking Completion",
+            body: emailContentOnline
+        }
         try {
             const response = await api.put(`bookings/${record.id}`, valuesToSend, {
                 headers: {
@@ -185,12 +203,21 @@ const BookingPage = () => {
         } catch (error) {
             console.log(error)
         } finally {
-            const resMail = await api.post(`mail/send/${record.email}`, format, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            })
-            console.log('Email sent: ', resMail)
+            if(record.serviceType === "Online"){
+                const resMail = await api.post(`mail/send/${record.email}`, formatOnline, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
+                console.log('Email sent: ', resMail)
+            } else {
+                const resMail = await api.post(`mail/send/${record.email}`, format, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
+                console.log('Email sent: ', resMail)
+            }
         }
 
     };
@@ -206,11 +233,11 @@ const BookingPage = () => {
               </body>
             </html>
             `;
-            const format = {
-                subject: "Booking Deletion",
-                body: emailContent
-            }
-        try {    
+        const format = {
+            subject: "Booking Deletion",
+            body: emailContent
+        }
+        try {
             const response = await api.put(`bookings/delete/${record.id}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -220,7 +247,7 @@ const BookingPage = () => {
             fetchBooking();
         } catch (error) {
             console.log(error.response.data)
-        }finally{
+        } finally {
             const resMail = await api.post(`mail/send/${record.email}`, format, {
                 headers: {
                     Authorization: `Bearer ${token}`

@@ -331,19 +331,7 @@ const BookingDetail = () => {
   };
 
   const handleComplete = async (record) => {
-    const URLMeet = "https://meet.google.com/fgy-kvct-gtf"
-    const emailContentOnline = `
-    <html>
-      <body>
-        <h1 style='color: blue;'>Welcome, ${record.customerName}</h1>
-        <p style='font-size: 16px;'>Your booking service has been completed.</p>
-        <p style='font-size: 16px;'>Your link Google Meet here: ${URLMeet}</p>
-        <p style='font-size: 16px;'>Thank you for choosing our service!</p>
-        <p style='font-size: 16px;'>If you have any questions, please contact us at <b>KOI FISH CARE Centre</b></p>
-        <p style='font-size: 16px;'>Best regards, <b>KOI FISH CARE Centre</b></p>
-      </body>
-    </html>
-    `;
+    
 
     const emailContent = `
     <html>
@@ -361,10 +349,6 @@ const BookingDetail = () => {
       body: emailContent
     }
 
-    const formatOnline = {
-      subject: "Booking Completion",
-      body: emailContentOnline
-  }
     try {
       const valuesToUpdate = {
         status: 'COMPLETED'
@@ -380,21 +364,12 @@ const BookingDetail = () => {
     } catch (error) {
       console.log(error.response.data)
     }finally{
-      if(record.serviceType === "Online"){
-        const resMail = await api.post(`mail/send/${record.email}`, formatOnline, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        })
-        console.log(resMail.data)
-      }else{
         const resMail = await api.post(`mail/send/${record.email}`, format, {
           headers: {
             Authorization: `Bearer ${token}`
           }
         })
         console.log(resMail.data)
-      }
     }
   };
 
