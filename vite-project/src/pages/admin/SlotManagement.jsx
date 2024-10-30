@@ -32,11 +32,11 @@ const SlotManagement = () => {
             response.data.forEach(slot => {
                 if (slot.slotStatus !== "DELETED") {
                     fetchedSlots.push({ // Push each valid slot into the array
-                        veterinarianId: slot.veterinarian.veterinarianId,
+                        veterinarianId: slot.veterinarian?.veterinarianId,
                         slotId: slot.slotId,
                         slotStatus: slot.slotStatus,
-                        timeSlotId: slot.timeSlot.slotTimeId,
-                        fullName: slot.veterinarian.user.fullname,
+                        timeSlotId: slot.timeSlot?.slotTimeId,
+                        fullName: slot.veterinarian?.user?.fullname,
                     });
                 }
             });
@@ -139,8 +139,8 @@ const SlotManagement = () => {
 
     const handleDelete = async (record) => {
         const values = {
-            veterinarianId: record.veterinarianId,
-            slotTimeId: record.timeSlotId,
+            veterinarianId: record?.veterinarianId,
+            slotTimeId: record?.timeSlotId,
             status: "DELETED"
         }
         try {

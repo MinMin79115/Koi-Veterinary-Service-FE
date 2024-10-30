@@ -93,10 +93,10 @@ const StaffManagement = () => {
   const handleOpenModalEdit = (record) => {
     setEditingStaff(record);
     form.setFieldsValue({
-      fullname: record.fullname,
-      phone: record.phone,
-      address: record.address,
-      role: record.role,
+      fullname: record?.fullname,
+      phone: record?.phone,
+      address: record?.address,
+      role: record?.role,
     });
     setOpenModalEdit(true);
   };

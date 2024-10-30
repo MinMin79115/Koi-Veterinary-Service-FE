@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FaCheckCircle, FaHome, FaCreditCard } from 'react-icons/fa';
 import api from '../../config/axios';
 import { useSelector } from 'react-redux';
+import secureLocalStorage from 'react-secure-storage';
 function PaymentDetail() {
+  const type = secureLocalStorage.getItem('bonusAtHome');
+  console.log(type)
   const booking = useSelector(state => state.booking);
   const token = useSelector(state => state.user.accessToken);
   console.log(token)
@@ -19,9 +22,9 @@ function PaymentDetail() {
 
   useEffect(() => {
     const bookingId = booking.bookingId;
-    const serviceName = booking.servicesDetail.serviceId.serviceName;
+    const serviceName = booking.servicesDetail?.serviceId?.serviceName;
     const serviceTime = booking.serviceTime;
-    const price = booking.servicesDetail.serviceTypeId.price;
+    const price = booking.servicesDetail?.serviceTypeId?.price;
 
     setBookingDetails({
       bookingId: bookingId,
@@ -71,21 +74,27 @@ function PaymentDetail() {
               <div className="mb-4">
                 <div className="row mb-3">
                   <div className="col-sm-4 col-md-2" style={{fontWeight: 'bold'}}>Booking ID:</div>
-                  <div className="col-sm-4 col-md-4">{bookingDetails.bookingId}</div>
+                  <div className="col-sm-4 col-md-6">{bookingDetails.bookingId}</div>
                 </div>
                 <div className="row mb-3">
                   <div className="col-sm-4 col-md-2" style={{fontWeight: 'bold'}}>Service:</div>
-                  <div className="col-sm-4 col-md-4">{bookingDetails.serviceName}</div>
+                  <div className="col-sm-4 col-md-6">{bookingDetails.serviceName}</div>
                 </div>
                 <div className="row mb-3">
                   <div className="col-sm-4 col-md-2" style={{fontWeight: 'bold'}}>Service Time:</div>
-                  <div className="col-sm-4 col-md-4">{bookingDetails.serviceTime}</div>
+                  <div className="col-sm-4 col-md-6">{bookingDetails.serviceTime}</div>
                 </div>
                 <div className="row mb-3">
                   <div className="col-sm-4 col-md-2" style={{fontWeight: 'bold'}}>Price:</div>
-                  <div className="col-sm-4 col-md-4">{bookingDetails.price}</div>
+                  <div className="col-sm-4 col-md-6">{bookingDetails.price}</div>
                 </div>
               </div>
+              {type && (
+                <div className="row mb-3">
+                  <div className="col-sm-4 col-md-2" style={{fontWeight: 'bold'}}>Bonus:</div>
+                  <div className="col-sm-4 col-md-6 text-success">{type}</div>
+                </div>
+              )}
               <div className="d-flex justify-content-around">
                 <button className="btn btn-primary btn-lg " onClick={handlePayment}>
                   <FaCreditCard className="me-2" /> Pay Now

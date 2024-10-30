@@ -15,6 +15,7 @@ const BookingDetail = () => {
   const [noteModal, setNoteModal] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [bills, setBills] = useState([]);
+  const [showCancelled, setShowCancelled] = useState(false);
 
 
   //Open the note modal
@@ -57,12 +58,12 @@ const BookingDetail = () => {
 
         const values = response.data.map(booking => ({
           id: booking.bookingId,
-          customerName: booking.user.fullname,
-          email: booking.user.email,
-          service: booking.servicesDetail.serviceId.serviceName,
-          serviceType: booking.servicesDetail.serviceTypeId.service_type,
+          customerName: booking.user?.fullname,
+          email: booking.user?.email,
+          service: booking.servicesDetail?.serviceId?.serviceName,
+          serviceType: booking.servicesDetail?.serviceTypeId?.service_type,
           status: booking.status,
-          price: booking.servicesDetail.serviceTypeId.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
+          price: booking.servicesDetail?.serviceTypeId?.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
           note: booking.note
         }));
 
@@ -77,13 +78,13 @@ const BookingDetail = () => {
 
         const values = response.data.map(booking => ({
           id: booking.bookingId,
-          customerName: booking.user.fullname,
-          email: booking.user.email,
-          address: booking.user.address,
-          service: booking.servicesDetail.serviceId.serviceName,
-          serviceType: booking.servicesDetail.serviceTypeId.service_type,
+          customerName: booking.user?.fullname,
+          email: booking.user?.email,
+          address: booking.user?.address,
+          service: booking.servicesDetail?.serviceId?.serviceName,
+          serviceType: booking.servicesDetail?.serviceTypeId?.service_type,
           status: booking.status,
-          price: booking.servicesDetail.serviceTypeId.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
+          price: booking.servicesDetail?.serviceTypeId?.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
           note: booking.note
         }));
 
@@ -170,7 +171,10 @@ const BookingDetail = () => {
       key: 'price',
       width: '15%',
       align: 'center',
-      className: 'column-border'
+      className: 'column-border',
+      render: (_, record) => (
+        record.serviceType === 'At_Home' && record.status !== 'CANCELLED' ? <span>{record.price} <br /> <span className='text-success'>+10% each km (if above 10km)</span></span> : <span>{record.price}</span>
+      )
     },
     {
       title: 'Action',
@@ -322,7 +326,7 @@ const BookingDetail = () => {
       if (resPayment.data && resPayment.data.data && resPayment.data.data.paymentUrl) {
         window.open(resPayment.data.data.paymentUrl, '_blank');
       } else {
-        toast.error('Payment URL not found in the response');
+        console.log('Payment URL not found');
       }
     } catch (error) {
       console.error('Payment error:', error);
@@ -332,7 +336,6 @@ const BookingDetail = () => {
 
   const handleComplete = async (record) => {
     
-
     const emailContent = `
     <html>
       <body>
@@ -374,7 +377,10 @@ const BookingDetail = () => {
   };
 
   //Lấy 10 booking mới nhất xếp theo id giảm dần
-  const newestBookings = bookings.slice(-10).sort((a, b) => b.id - a.id);
+  const filteredBookings = bookings
+    .filter(booking => showCancelled ? booking.status === "CANCELLED" : booking.status !== "CANCELLED")
+    .sort((a, b) => b.id - a.id)
+    .slice(showCancelled ? 10 : 0);
 
   return (
     <div className="container-fluid mt-5">
@@ -383,9 +389,18 @@ const BookingDetail = () => {
         <div className="col-12">
           <div className="card">
             <div className="card-body">
+              <div className="d-flex justify-content-end mb-3">
+                <Button 
+                  type={showCancelled ? "primary" : "default"}
+                  onClick={() => setShowCancelled(!showCancelled)}
+                  className="mb-3"
+                >
+                  {showCancelled ? "Show Active Bookings" : "Show Cancelled Bookings"}
+                </Button>
+              </div>
               <div className="table-responsive">
                 <Table
-                  dataSource={newestBookings}
+                  dataSource={filteredBookings}
                   columns={columns}
                   pagination={{ pageSize: 6 }}
                   className="table"

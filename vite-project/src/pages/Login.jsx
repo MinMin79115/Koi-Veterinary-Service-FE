@@ -23,10 +23,6 @@ const Login = () => {
     const handleBeforeUnload = () => {
       // Clear the user state
       dispatch(logout());
-
-      // Remove token from sessionStorage
-      sessionStorage.removeItem('token');
-      sessionStorage.removeItem('userToken');
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);

@@ -174,7 +174,7 @@ function CustomerPage() {
                             type="text"
                             className={`${styles.formControl} ${styles.textMuted} ${styles.fW400} ${errors.fullname ? 'is-invalid' : ''}`}
                             name="fullname"
-                            value={customer.fullname}
+                            value={customer?.fullname}
                             onChange={handleInputChange}
                           />
                           {errors.fullname && <div className="invalid-feedback">{errors.fullname}</div>}
@@ -187,7 +187,7 @@ function CustomerPage() {
                             type="email"
                             className={`${styles.formControl} ${styles.textMuted} ${styles.fW400} ${errors.email ? 'is-invalid' : ''}`}
                             name="email"
-                            value={customer.email}
+                            value={customer?.email}
                             onChange={handleInputChange}
                           />
                           {errors.email && <div className="invalid-feedback">{errors.email}</div>}
@@ -200,7 +200,7 @@ function CustomerPage() {
                             type="tel"
                             className={`${styles.formControl} ${styles.textMuted} ${styles.fW400} ${errors.phone ? 'is-invalid' : ''}`}
                             name="phone"
-                            value={customer.phone}
+                            value={customer?.phone}
                             onChange={handleInputChange}
                           />
                           {errors.phone && <div className="invalid-feedback">{errors.phone}</div>}
@@ -228,7 +228,7 @@ function CustomerPage() {
                             type="text"
                             className={`${styles.formControl} ${styles.textMuted} ${styles.fW400} ${errors.address ? 'is-invalid' : ''}`}
                             name="address"
-                            value={customer.address}
+                            value={customer?.address}
                             onChange={handleInputChange}
                           />
                           {errors.address && <div className="invalid-feedback">{errors.address}</div>}

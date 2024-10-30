@@ -113,8 +113,8 @@ const Dashboard = () => {
       response.data.forEach(payment => {
       setBills(prevData => [...prevData, {
         ID: payment.billId,
-        BookingId: payment.booking.bookingId,
-        Customer: payment.booking.user.fullname,
+        BookingId: payment.booking?.bookingId,
+        Customer: payment.booking?.user?.fullname,
         Date: payment.paymentDate.replace('T', ' at ')+[]
       }])
     })
@@ -175,9 +175,9 @@ const Dashboard = () => {
 
       response.data.forEach(booking => {
         if (booking.status === "COMPLETED") {
-          const serviceId = booking.servicesDetail.serviceId.serviceId;
-          const serviceType = booking.servicesDetail.serviceTypeId.service_type;
-          const customerId = booking.user.id;
+          const serviceId = booking.servicesDetail?.serviceId?.serviceId;
+          const serviceType = booking.servicesDetail?.serviceTypeId?.service_type;
+          const customerId = booking.user?.id;
 
           if (serviceCounts[serviceId] !== undefined) {
             serviceCounts[serviceId] += 1;
@@ -195,8 +195,8 @@ const Dashboard = () => {
           console.log(response.data);
           setDataSource(prevData => [...prevData, {
             bookingId: booking.bookingId,
-            customerName: booking.user.fullname,
-            serviceName: booking.servicesDetail.serviceTypeId.service_type,
+            customerName: booking.user?.fullname,
+            serviceName: booking.servicesDetail?.serviceTypeId?.service_type,
             time: booking.serviceTime,
             status: booking.status,
           }]);
@@ -208,7 +208,7 @@ const Dashboard = () => {
 
       response.data.forEach(booking => {
         if (booking.status === "COMPLETED") {
-          const customerId = booking.user.id;
+          const customerId = booking.user?.id;
 
           // Check if the customer ID is already in the Set
           if (!uniqueCustomersSet.has(customerId)) {
@@ -217,10 +217,10 @@ const Dashboard = () => {
             // Add the customer to the newCustomerList
             newCustomerList.push({
               customerId: customerId,
-              customerName: booking.user.fullname,
-              customerEmail: booking.user.email,
-              customerPhone: booking.user.phone,
-              customerAddress: booking.user.address,
+              customerName: booking.user?.fullname,
+              customerEmail: booking.user?.email,
+              customerPhone: booking.user?.phone,
+              customerAddress: booking.user?.address,
             });
           }
         }

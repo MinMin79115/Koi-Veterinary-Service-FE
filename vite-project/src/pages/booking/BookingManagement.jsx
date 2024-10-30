@@ -12,6 +12,8 @@ const BookingPage = () => {
     const token = user.accessToken;
     const [bookings, setBookings] = useState([]);
     const [bills, setBills] = useState([]);
+    const [showCancelled, setShowCancelled] = useState(false);
+
 
     const fetchBill = async () => {
         try {
@@ -40,17 +42,17 @@ const BookingPage = () => {
             const values = response.data.map(booking => ({
                 id: booking.bookingId,
                 customerName: booking.user.fullname,
-                veterinarian: booking.veterinarian.user.fullname,
-                email: booking.user.email,
-                service: booking.servicesDetail.serviceId.serviceName,
-                serviceType: booking.servicesDetail.serviceTypeId.service_type,
+                veterinarian: booking.veterinarian?.user.fullname,
+                email: booking.user?.email,
+                service: booking.servicesDetail?.serviceId?.serviceName,
+                serviceType: booking.servicesDetail?.serviceTypeId?.service_type,
                 status: booking.status,
-                price: booking.servicesDetail.serviceTypeId.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
+                price: booking.servicesDetail?.serviceTypeId?.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
             }));
 
             setBookings(values); // Set bookings to an array of booking objects
         } catch (error) {
-            console.log(error.response.data);
+            console.log(error);
         }
     };
 
@@ -203,7 +205,7 @@ const BookingPage = () => {
         } catch (error) {
             console.log(error)
         } finally {
-            if(record.serviceType === "Online"){
+            if (record.serviceType === "Online") {
                 const resMail = await api.post(`mail/send/${record.email}`, formatOnline, {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -218,6 +220,7 @@ const BookingPage = () => {
                 })
                 console.log('Email sent: ', resMail)
             }
+
         }
 
     };
@@ -257,8 +260,10 @@ const BookingPage = () => {
         }
     };
 
-    const bookingsSorted = bookings.sort((a, b) => b.id - a.id);
-
+    const filteredBookings = bookings
+        .filter(booking => showCancelled ? booking.status === "CANCELLED" : booking.status !== "CANCELLED")
+        .sort((a, b) => b.id - a.id)
+        .slice(showCancelled ? 15 : 0);
     return (
         <div className="container-fluid mt-5">
             <div className="row justify-content-center">
@@ -266,9 +271,18 @@ const BookingPage = () => {
                     <h2 className="mb-4 text-center">Booking Management</h2>
                     <div className="card">
                         <div className="card-body">
+                            <div className="d-flex justify-content-end mb-3">
+                                <Button
+                                    type={showCancelled ? "primary" : "default"}
+                                    onClick={() => setShowCancelled(!showCancelled)}
+                                    className="mb-3"
+                                >
+                                    {showCancelled ? "Show Active Bookings" : "Show Cancelled Bookings"}
+                                </Button>
+                            </div>
                             <div className="table-responsive">
                                 <Table
-                                    dataSource={bookingsSorted}
+                                    dataSource={filteredBookings}
                                     columns={columns}
                                     pagination={{ pageSize: 6 }}
                                     className="table "

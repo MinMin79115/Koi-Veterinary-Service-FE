@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { booking } from '../../redux/features/bookingSlider';
 import { Form, DatePicker } from 'antd';
 import moment from 'moment';
+import secureLocalStorage from 'react-secure-storage';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const BookingPage  = () => {
@@ -15,7 +16,7 @@ const BookingPage  = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const [services, setServices] = useState([]);
+  const [bonusAtHome, setBonusAtHome] = useState('');
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState('');
   const [selectedService, setSelectedService] = useState('');
@@ -71,13 +72,13 @@ const BookingPage  = () => {
       console.log(response.data);
       // Gộp 1 Slot chứa nhiều bác sĩ
       const processedSlots = response.data.reduce((acc, slot) => {
-        const timeKey = `${slot.timeSlot.startTime} - ${slot.timeSlot.endTime}`;
+        const timeKey = `${slot.timeSlot?.startTime} - ${slot.timeSlot?.endTime}`;
         if (!acc[timeKey]) {
           acc[timeKey] = { doctors: [] };
         }
         acc[timeKey].doctors.push({
-          id: slot.veterinarian.veterinarianId,
-          name: slot.veterinarian.user.fullname,
+          id: slot.veterinarian?.veterinarianId,
+          name: slot.veterinarian?.user?.fullname,
           slotId: slot.slotId
         });
         return acc;
@@ -100,7 +101,7 @@ const BookingPage  = () => {
       
       // Group services by serviceName
       const grouped = response.data.reduce((acc, service) => {
-        const serviceName = service.serviceId.serviceName;
+        const serviceName = service.serviceId?.serviceName;
         if (!acc[serviceName]) {
           acc[serviceName] = [];
         }
@@ -109,7 +110,6 @@ const BookingPage  = () => {
       }, {});
       
       setGroupedServices(grouped);
-      setServices(response.data);
     } catch (error) {
       toast.error('Error fetching services:', error.response.data);
     }
@@ -164,8 +164,6 @@ const BookingPage  = () => {
       </html>
     `;
 
-    
-
     const format = {
       subject: "Booking Successful",
       body: emailContent
@@ -179,7 +177,7 @@ const BookingPage  = () => {
             }
         });
         console.log('Booking submitted:', response.data);
-        dispatch(booking(response.data))
+        dispatch(booking({...response.data}))
         toast.success('Booking submitted successfully!');
         setSelectedService('');
         setSelectedSlot('');
@@ -194,15 +192,16 @@ const BookingPage  = () => {
       } finally {
         const resMail = await api.post(`mail/send/${user.email}`, format, {
           headers: {
-              Authorization: `Bearer ${token}`
-          }
-        });
+            Authorization: `Bearer ${token}`
+            }
+          });
         console.log('Email sent: ', resMail)
-      }
+      }  
     } else {
       toast.error('Please login to book a service');
       navigate("/login");
     }
+    
   };
 
   const handleSlotChange = (e) => {
@@ -266,6 +265,13 @@ const BookingPage  = () => {
     if (selectedService) {
       const [serviceName, servicesDetailId, serviceTypeName, totalPrice] = selectedService.split(' || ');
       setTotalPrice(totalPrice)
+      if(serviceTypeName === 'At_Home'){
+        setBonusAtHome('10,000 VNĐ -> 10% raise each km (if above 10km)');
+        secureLocalStorage.setItem('bonusAtHome', '10,000 VNĐ -> 10% raise each km (if above 10km) \n Pay bonus at home');
+      }else{
+        setBonusAtHome('')
+        secureLocalStorage.removeItem('bonusAtHome');
+      }
       console.log('Selected Service:', serviceName, 'ServicesDetailId:', servicesDetailId);
       setValuesToSend(prevValues => ({
         ...prevValues,
@@ -358,7 +364,12 @@ const BookingPage  = () => {
                 </div>
                 {/* Service Type */}
                 <div className="mb-3">
+                  {bonusAtHome && (
+                    <label htmlFor="serviceType" className="form-label">Service Type: <i className='text-success'>{bonusAtHome}</i></label>
+                  )}
+                  {!bonusAtHome && (
                     <label htmlFor="serviceType" className="form-label">Service Type:</label>
+                  )}
                     <Form.Item>
                       <select
                         id="serviceType"
