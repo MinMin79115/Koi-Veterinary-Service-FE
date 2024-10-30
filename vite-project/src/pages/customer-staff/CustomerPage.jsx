@@ -13,10 +13,11 @@ import { useDispatch } from 'react-redux';
 
 function CustomerPage() {
   const location = useLocation();
-  const [customer, setCustomer] = useState([]);
-  const [newPassword, setNewPassword] = useState('');
+  const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
   const token = user.accessToken;
+  const [customer, setCustomer] = useState([]);
+  const [newPassword, setNewPassword] = useState('');
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
@@ -25,29 +26,9 @@ function CustomerPage() {
     }
   }, [location]);
 
-  const fetchCustomer = async () => {
-      try {
-      const response = await api.get(`customers/${user.id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      const { fullname, email, phone, address } = response.data;
-      const userProfile = {
-        fullname: fullname,
-        email: email,
-        phone: phone,
-        address: address,
-      };
-      setCustomer(userProfile);
-    } catch (error) {
-      console.error('Error fetching customer data:', error);
-    }
-  };
-
   useEffect(() => {
     if (user && user.id) {
-      fetchCustomer();
+      setCustomer(user);
     }
   }, [user]);
 
@@ -129,6 +110,7 @@ function CustomerPage() {
             Authorization: `Bearer ${token}`
           }
         });
+        dispatch(updateUser({ token, updatedUser: response.data }));
         console.log('Updated customer information:', response.data);
         toast.success('Profile updated successfully!');
         setNewPassword('');
