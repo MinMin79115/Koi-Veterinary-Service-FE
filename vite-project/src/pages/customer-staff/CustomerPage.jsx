@@ -110,7 +110,7 @@ function CustomerPage() {
             Authorization: `Bearer ${token}`
           }
         });
-        dispatch(updateUser({ token, updatedUser: response.data }));
+        dispatch(updateUser({ updatedUser: response.data }));
         console.log('Updated customer information:', response.data);
         toast.success('Profile updated successfully!');
         setNewPassword('');
