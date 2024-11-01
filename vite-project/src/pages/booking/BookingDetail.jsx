@@ -6,6 +6,7 @@ import './BookingDetail.css';
 import api from '../../config/axios'
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
+import { Link } from 'react-router-dom';
 
 const BookingDetail = () => {
   const token = useSelector(state => state.user.accessToken);
@@ -194,13 +195,21 @@ const BookingDetail = () => {
                 You Have A Note
               </Button> :
               record.serviceType !== "At_Center" ?
-              <Button 
+              <><Button 
                 type='default' 
                 className="btn-custom d-flex justify-content-center m-1"
                 disabled
               >
                 No Note Available
-              </Button> :
+              </Button>
+              <Button 
+                type='primary' 
+                className="btn-custom d-flex justify-content-center m-1 text-white"
+              >
+                <Link className='text-white' to='/#rating' state={{booking: record}}>Rate Us</Link>
+              </Button>
+
+              </> :
               <i className='text-info'>COMPLETED</i>
             ) : record.status === "CANCELLED" ? (
               <p className='fst-italic fs-6 text-danger'>CANCELLED</p>
@@ -376,7 +385,7 @@ const BookingDetail = () => {
     }
   };
 
-  //Lấy 10 booking mới nhất xếp theo id giảm dần
+  //Lấy booking mới nhất xếp theo id giảm dần có nút ẩn/hiện booking cancel
   const filteredBookings = bookings
     .filter(booking => showCancelled ? booking.status === "CANCELLED" : booking.status !== "CANCELLED")
     .sort((a, b) => b.id - a.id)

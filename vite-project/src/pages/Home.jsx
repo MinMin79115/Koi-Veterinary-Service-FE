@@ -1,19 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import axios from 'axios'; // Import axios
 import { toast } from 'react-toastify'; // Import toast if you're using it
+import Box from '@mui/material/Box';
+import Rating from '@mui/material/Rating';
+import Typography from '@mui/material/Typography';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import koiImage1 from '../assets/koi-image1.jpg';
 import koiImage2 from '../assets/koi-image2.jpg';
 import koiImage3 from '../assets/koi-image3.jpg';
 import koiImage4 from '../assets/koi-image4.jpg';
 import './Home.css';
+import { Button, Form } from 'antd';
 
 const Home = () => {
+  const [value, setValue] = React.useState(1);
   const [faqs, setFaqs] = useState([]);
   const [newQuestion, setNewQuestion] = useState('');
   const [openIndex, setOpenIndex] = useState(null);
-
+  const location = useLocation();
+  const booking = location.state?.booking;
+  console.log(booking);
   const fetchFaqs = async () => {
     try {
       const response = await axios.get('https://66fa96f0afc569e13a9c5417.mockapi.io/FAQ');
@@ -29,6 +36,17 @@ const Home = () => {
   useEffect(() => {
     fetchFaqs();
   }, []);
+
+  useEffect(() => {
+    if (location.hash === '#rating') {
+      window.scrollTo(0, 2000);
+    }
+  }, [location]);
+
+  const handleSubmitRating = async (e) => {
+    e.preventDefault();
+    console.log(value);
+  }
 
   const handleAddFAQ = async (e) => {
     e.preventDefault();
@@ -113,6 +131,8 @@ const Home = () => {
         <h2>Schedule a Fish Exam</h2>
         <Link to="/booking">Schedule here.</Link>
       </div>
+      {/* Rating here */}
+      {/* FAQ here */}
       <div>
         <div className="container mt-5">
           <div className="row">
