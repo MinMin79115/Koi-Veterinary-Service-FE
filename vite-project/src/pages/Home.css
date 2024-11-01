@@ -229,8 +229,7 @@
   box-shadow: 0 4px 6px rgba(255, 153, 102, 0.2);
 }
 
-.button:hover{
+.button:hover {
   background-color: black;
   color: #ffffff;
 }
-

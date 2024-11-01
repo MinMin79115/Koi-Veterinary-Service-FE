@@ -11,7 +11,7 @@ import koiImage2 from '../assets/koi-image2.jpg';
 import koiImage3 from '../assets/koi-image3.jpg';
 import koiImage4 from '../assets/koi-image4.jpg';
 import './Home.css';
-import { Button, Form } from 'antd';
+import { Button} from 'antd';
 
 const Home = () => {
   const [value, setValue] = React.useState(1);
@@ -45,6 +45,7 @@ const Home = () => {
 
   const handleSubmitRating = async (e) => {
     e.preventDefault();
+    toast.success("Rating submitted!");
     console.log(value);
   }
 
@@ -132,6 +133,29 @@ const Home = () => {
         <Link to="/booking">Schedule here.</Link>
       </div>
       {/* Rating here */}
+      {booking && (
+        <Box
+          sx={{
+            '& > legend': { mt: 2 },
+          }}
+        >
+          <Typography component="legend">Your Rating</Typography>
+          <div className='d-flex justify-content-center'>
+            <div className='d-flex flex-column align-items-center'>
+              <form onSubmit={handleSubmitRating}>
+                <Typography>Booking ID: {booking.id}</Typography>
+                <Typography>Service Name: {booking.service}</Typography>
+                <Rating 
+                  name="simple-controlled" 
+                  value={value} 
+                  onChange={(event, newValue) => setValue(newValue)} 
+                />
+                <Button type='primary' htmlType='submit'>Submit Rating</Button>
+              </form>
+            </div>
+          </div>
+        </Box>
+      )}
       {/* FAQ here */}
       <div>
         <div className="container mt-5">
