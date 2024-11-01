@@ -1,7 +1,27 @@
+/* Reset default margins and paddings */
+body, html {
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow-x: hidden;
+  width: 100%;
+  position: relative;
+}
+
+/* Reset any Bootstrap container margins */
+.container, 
+.container-fluid {
+  margin: 0 !important;
+  padding: 0 !important;
+  max-width: 100% !important;
+}
+
 .home {
   text-align: center;
-  background-color: #fff9f5; /* Very light orange background */
-  color: #4a4a4a; /* Darker gray text for better readability */
+  background-color: #fff9f5;
+  color: #4a4a4a;
+  /* Remove any padding or margin here */
+  margin: 0;
+  padding: 0;
 }
 
 .hero {
@@ -232,4 +252,53 @@
 .button:hover {
   background-color: black;
   color: #ffffff;
+}
+
+/* Carousel styles */
+.carousel {
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  overflow-x: hidden;
+}
+
+.carousel-inner {
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+}
+
+.carousel-item {
+  width: 100vw;
+  height: 75vh;
+  margin: 0;
+  padding: 0;
+}
+
+.carousel-item img {
+  width: 100vw;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  margin: 0;
+  padding: 0;
+}
+
+.carousel-caption {
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.carousel-indicators{
+  display: none;
+}
+.carousel-control-next-icon{
+  display: none;
+}
+.carousel-control-prev-icon{
+  display: none;
 }
