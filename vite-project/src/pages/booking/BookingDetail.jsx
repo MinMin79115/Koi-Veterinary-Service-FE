@@ -283,6 +283,7 @@ const BookingDetail = () => {
           'Authorization': `Bearer ${token}`
         }
       })
+      console.log(response.data);
       toast.success('Deleted successful.')
       fetchBooking()
     } catch (error) {
@@ -365,13 +366,14 @@ const BookingDetail = () => {
   //Lấy booking mới nhất xếp theo id giảm dần có nút ẩn/hiện booking cancel
   const filteredBookings = bookings
     .filter(booking => showCancelled ? booking.status === "CANCELLED" : booking.status !== "CANCELLED")
-    .sort((a, b) => b.id - a.id)
-    .slice(showCancelled ? 10 : 0);
+    .slice(showCancelled ? 15 : 0)
+    .sort((a, b) =>  b.id - a.id)
+
 
   const showActionModal = (record) => {
     setSelectedBooking(record);
-    setActionModal(true);
-  };
+      setActionModal(true);
+    };
 
   const closeActionModal = () => {
     setActionModal(false);
@@ -381,10 +383,9 @@ const BookingDetail = () => {
   return (
     <div className="container-fluid py-2">
       <h2 className="mb-4 text-center fw-bold mt-5">Booking Detail</h2>
-      <div className="row justify-content-center">
-        <div className="col-12">
-          <div className="card">
-            <div className="card-body">
+        <div className="container">
+          <div className="bg-white rounded-3">
+            <div className="p-3">
               <div className="d-flex justify-content-end mb-3">
                 <Button
                   type= {showCancelled ? "" : "dashed"}
@@ -400,14 +401,12 @@ const BookingDetail = () => {
                   {showCancelled ? "Show Active Bookings" : "Show Cancelled Bookings"}
                 </Button>
               </div>
-              <div className="table-responsive">
                 <Table
                   dataSource={filteredBookings}
                   columns={columns}
                   pagination={{ pageSize: 6 }}
                   className="table"
                 />
-              </div>
               <Modal
                 title="Note"
                 open={noteModal}
@@ -629,7 +628,6 @@ const BookingDetail = () => {
           </div>
         </div>
       </div>
-    </div>
   );
 };
 

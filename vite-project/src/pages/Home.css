@@ -459,7 +459,7 @@ body, html {
 }
 
 .feedback-card:hover {
-  transform: translateY(-10px);
+  scale: 1.02;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
 }
 
@@ -671,3 +671,40 @@ body, html {
 .add-faq-section .button:hover {
   background-color: #ffb380;
 }
+
+/* Add these styles for the carousel */
+.carousel-fade .carousel-item {
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out !important;
+}
+
+.carousel-fade .carousel-item.active {
+  opacity: 1;
+}
+
+/* Remove the flash/light effect */
+.carousel-fade .active.carousel-item-start,
+.carousel-fade .active.carousel-item-end {
+  opacity: 0;
+  transition: opacity 0s;
+}
+
+/* Ensure images take full space and maintain aspect ratio */
+.carousel-item img {
+  width: 100%;
+  height: 100vh; /* or your desired height */
+  object-fit: cover;
+}
+
+/* Optional: Add a slight overlay to make text more readable */
+.carousel-item::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+

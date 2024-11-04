@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button } from 'antd';
+import { Table, Button, Popconfirm } from 'antd';
 import { CheckCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './BookingManagement.css';
@@ -128,6 +128,8 @@ const BookingPage = () => {
                         <p className='fst-italic text-info'>COMPLETED</p>
                     ) : record.status === "CONFIRMED" ? (
                         <p className='fst-italic text-success'> CONFIRMED</p>
+                    ) : record.status === "CANCELLED" ? (
+                        <p className='fst-italic fs-6 text-danger'>CANCELLED</p>
                     ) : record.status === "PENDING" && bills.some(bill => bill.id === record.id) ? (
                         <Button
                             type='none'
@@ -137,19 +139,22 @@ const BookingPage = () => {
                         >
                             Confirm
                         </Button>
-                    ) : record.status === "CANCELLED" ? (
-                        <p className='fst-italic fs-6 text-danger'>CANCELLED</p>
                     ) : (
-                        <>
-                            <Button
-                                type='none'
-                                className="btn-custom btn btn-danger d-flex justify-content-center m-1"
-                                icon={<DeleteOutlined />}
-                                onClick={() => handleDeleteBooking(record)}
+                        <Popconfirm
+                            title="Are you sure you want to delete this booking?"
+                            onConfirm={() => handleDeleteBooking(record)}
+                            okText="Yes"
+                            cancelText="No"
+                        >
+                            <Button 
+                                type="primary" 
+                                danger 
+                                icon={<DeleteOutlined />} 
+                                className="m-1"
                             >
                                 Delete
-                            </Button>
-                        </>
+                                </Button>
+                        </Popconfirm>
                     )}
                 </div>
             )
@@ -226,6 +231,7 @@ const BookingPage = () => {
     };
 
     const handleDeleteBooking = async (record) => {
+       
         const emailContent = `
             <html>
               <body>
@@ -241,7 +247,7 @@ const BookingPage = () => {
             body: emailContent
         }
         try {
-            const response = await api.put(`bookings/delete/${record.id}`, {
+            await api.put(`bookings/delete/${record.id}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -249,7 +255,7 @@ const BookingPage = () => {
             toast.success('Delete successful.')
             fetchBooking();
         } catch (error) {
-            console.log(error.response.data)
+            console.log(error)
         } finally {
             const resMail = await api.post(`mail/send/${record.email}`, format, {
                 headers: {
@@ -262,16 +268,13 @@ const BookingPage = () => {
 
     const filteredBookings = bookings
         .filter(booking => showCancelled ? booking.status === "CANCELLED" : booking.status !== "CANCELLED")
+        .slice(showCancelled ? 10 : 0)
         .sort((a, b) => b.id - a.id)
-        .slice(showCancelled ? 15 : 0);
     return (
         <div className="container-fluid mt-5">
-            <div className="row justify-content-center">
-                <div className="col-12 col-lg-10">
-                    <h2 className="mb-4 text-center">Booking Management</h2>
-                    <div className="card">
-                        <div className="card-body">
-                            <div className="d-flex justify-content-end mb-3">
+            <h2 className="mb-4 text-center mt-5">Booking Management</h2>
+            <div className="container bg-white rounded-3 p-3">
+                <div className="d-flex justify-content-end mb-3 py-2">
                                 <Button
                                     type={showCancelled ? "primary" : "default"}
                                     onClick={() => setShowCancelled(!showCancelled)}
@@ -280,19 +283,14 @@ const BookingPage = () => {
                                     {showCancelled ? "Show Active Bookings" : "Show Cancelled Bookings"}
                                 </Button>
                             </div>
-                            <div className="table-responsive">
                                 <Table
                                     dataSource={filteredBookings}
                                     columns={columns}
                                     pagination={{ pageSize: 6 }}
                                     className="table "
                                 />
-                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
     );
 };
 

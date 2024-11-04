@@ -139,7 +139,7 @@ const BookingPage  = () => {
 
   useEffect(() => {
     if (location.hash === '#booking') {
-      window.scrollTo(90, 200);
+      window.scrollTo(0, 90);
     }
 
   }, [location]);
