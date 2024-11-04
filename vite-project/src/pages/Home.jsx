@@ -102,6 +102,7 @@ const Home = () => {
           indicators={true}
           pause={false}
           touch={false}
+
         >
           <Carousel.Item>
             <img
@@ -254,6 +255,9 @@ const Home = () => {
                     Submit Rating & Feedback
                   </Button>
                 </form>
+                <Button style={{marginTop: 10}} type='primary' danger size='large' block onClick={() => setBooking(null)}>
+                  Cancel
+                </Button>
               </div>
             </div>
           </Box>
