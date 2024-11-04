@@ -552,3 +552,77 @@ body, html {
     display: none !important;
   }
 }
+
+/* Enhanced FAQ Section Styles */
+.faq-section {
+  padding: 4rem 2rem;
+  background: linear-gradient(135deg, #fff9f5, #fff);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.faq-section h2 {
+  text-align: center;
+  font-size: 2.5rem;
+  color: #ff9966;
+  margin-bottom: 3rem;
+  font-weight: 700;
+  position: relative;
+}
+
+.faq-section h2:after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 3px;
+  background: linear-gradient(90deg, #ff9966, #ff7f50);
+  border-radius: 2px;
+}
+
+.accordion-item {
+  border: none;
+  margin-bottom: 1rem;
+  background: white;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.accordion-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.accordion-button {
+  padding: 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #4a4a4a;
+  background: white;
+  border-radius: 12px !important;
+  transition: all 0.3s ease;
+}
+
+.accordion-button:not(.collapsed) {
+  color: #ff9966;
+  background: linear-gradient(145deg, #fff, #fff9f5);
+  box-shadow: none;
+}
+
+.accordion-button:focus {
+  box-shadow: none;
+  border-color: rgba(255, 153, 102, 0.25);
+}
+
+.accordion-button::after {
+  background-size: 1.25rem;
+  transition: all 0.3s ease;
+  color: #ff9966;
+}
+
+.accordion-button:not(.collapsed)::after {
+  transform: rotate(-180deg) scale(1.2);
+}
