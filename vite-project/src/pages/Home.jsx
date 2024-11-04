@@ -128,7 +128,7 @@ const Home = () => {
   return (
     <>
       <div >
-        <Carousel 
+        <Carousel
           fade={true}
           interval={3000}
           controls={false}
@@ -251,7 +251,7 @@ const Home = () => {
                 <form onSubmit={handleSubmitRating} className='w-100'>
                   <Typography>Booking ID: {booking.id}</Typography>
                   <Typography>Service Name: {booking.service}</Typography>
-                  
+
                   <div className='my-3'>
                     <Rating
                       name="simple-controlled"
@@ -280,17 +280,17 @@ const Home = () => {
                   </div>
 
                   <div className="d-flex gap-2">
-                    <Button 
-                      type='primary' 
+                    <Button
+                      type='primary'
                       htmlType='submit'
                       size='large'
                       block
                     >
                       Submit Rating
                     </Button>
-                    <Button 
-                      type='primary' 
-                      danger 
+                    <Button
+                      type='primary'
+                      danger
                       size='large'
                       block
                       onClick={handleCancelRating}
@@ -337,21 +337,21 @@ const Home = () => {
             >
               {feedbacks.map((feedback, index) => (
                 <SwiperSlide key={feedback.id}>
-                  <Card 
+                  <Card
                     className="feedback-card"
                     bordered={false}
                   >
                     <div className="feedback-header">
-                      <Avatar 
-                        size={64} 
+                      <Avatar
+                        size={64}
                         icon={<UserOutlined />}
                         className="feedback-avatar"
                       />
                       <div className="feedback-user-info">
                         <h4>{feedback.user?.fullname || 'Anonymous'}</h4>
-                        <Rate 
+                        <Rate
                           // disabled 
-                          defaultValue={feedback.rating} 
+                          defaultValue={feedback.rating}
                           character={<StarFilled />}
                           className="feedback-rating"
                         />
@@ -413,7 +413,7 @@ const Home = () => {
               </div>
 
               <div className="col-12 mt-5">
-                <div className="card">
+                <div className="card add-faq-section">
                   <div className="card-body">
                     <h3 className="card-title">Add your FAQ</h3>
                     <form onSubmit={handleAddFAQ}>

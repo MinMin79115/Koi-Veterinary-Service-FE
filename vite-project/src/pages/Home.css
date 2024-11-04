@@ -416,8 +416,10 @@ body, html {
 /* Feedback Section Styles */
 .feedback-section {
   padding: 4rem 2rem;
-  background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+  background: #f7f7f7; /* Light gray background for a clean look */
   margin: 2rem 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .feedback-title {
@@ -425,9 +427,20 @@ body, html {
   margin-bottom: 3rem;
   font-size: 2.5rem;
   font-weight: 600;
-  background: linear-gradient(145deg, #339af0, #228be6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #333; /* Darker text for better readability */
+  position: relative;
+}
+
+.feedback-title:after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 2px;
+  background: #ff9966; /* Accent color for underline */
+  border-radius: 1px;
 }
 
 .feedback-swiper {
@@ -442,6 +455,7 @@ body, html {
   height: 300px;
   display: flex;
   flex-direction: column;
+  padding: 1.5rem;
 }
 
 .feedback-card:hover {
@@ -556,59 +570,59 @@ body, html {
 /* Enhanced FAQ Section Styles */
 .faq-section {
   padding: 4rem 2rem;
-  background: linear-gradient(135deg, #fff9f5, #fff);
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  background: #f7f7f7; /* Light gray background for a clean look */
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Softer shadow */
 }
 
 .faq-section h2 {
   text-align: center;
-  font-size: 2.5rem;
-  color: #ff9966;
-  margin-bottom: 3rem;
-  font-weight: 700;
+  font-size: 2.2rem;
+  color: #333; /* Darker text for better readability */
+  margin-bottom: 2rem;
+  font-weight: 600;
   position: relative;
 }
 
 .faq-section h2:after {
   content: '';
   position: absolute;
-  bottom: -10px;
+  bottom: -8px;
   left: 50%;
   transform: translateX(-50%);
-  width: 100px;
-  height: 3px;
-  background: linear-gradient(90deg, #ff9966, #ff7f50);
-  border-radius: 2px;
+  width: 80px;
+  height: 2px;
+  background: #ff9966; /* Accent color for underline */
+  border-radius: 1px;
 }
 
 .accordion-item {
   border: none;
   margin-bottom: 1rem;
-  background: white;
-  border-radius: 12px !important;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  background: #fff;
+  border-radius: 8px; /* Slightly smaller radius for a sharper look */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Subtle shadow */
   transition: all 0.3s ease;
 }
 
 .accordion-item:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 .accordion-button {
-  padding: 1.5rem;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #4a4a4a;
-  background: white;
-  border-radius: 12px !important;
+  padding: 1.2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333; /* Consistent text color */
+  background: #fff;
+  border-radius: 8px;
   transition: all 0.3s ease;
 }
 
 .accordion-button:not(.collapsed) {
-  color: #ff9966;
-  background: linear-gradient(145deg, #fff, #fff9f5);
+  color: #ff9966; /* Accent color for active state */
+  background: #f9f9f9; /* Slightly different background for active state */
   box-shadow: none;
 }
 
@@ -618,11 +632,63 @@ body, html {
 }
 
 .accordion-button::after {
-  background-size: 1.25rem;
+  background-size: 1rem;
   transition: all 0.3s ease;
   color: #ff9966;
 }
 
 .accordion-button:not(.collapsed)::after {
-  transform: rotate(-180deg) scale(1.2);
+  transform: rotate(-180deg) scale(1.1);
+}
+
+.accordion-body {
+  padding: 1rem 1.5rem;
+  color: #555; /* Softer text color for body */
+  line-height: 1.6;
+}
+
+/* Add your FAQ Section Styles */
+.add-faq-section {
+  margin-top: 2rem;
+  padding: 2rem;
+  background: #f7f7f7; /* Match the FAQ section background */
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.add-faq-section h3 {
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.add-faq-section .form-label {
+  font-weight: 500;
+  color: #555;
+}
+
+.add-faq-section .form-control {
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  padding: 0.8rem;
+  transition: border-color 0.3s ease;
+}
+
+.add-faq-section .form-control:focus {
+  border-color: #ff9966;
+  box-shadow: none;
+}
+
+.add-faq-section .button {
+  background-color: #ff9966;
+  color: #ffffff;
+  padding: 0.8rem 1.5rem;
+  border-radius: 50px;
+  border: none;
+  transition: background-color 0.3s ease;
+  margin-top: 1rem;
+}
+
+.add-faq-section .button:hover {
+  background-color: #ffb380;
 }
