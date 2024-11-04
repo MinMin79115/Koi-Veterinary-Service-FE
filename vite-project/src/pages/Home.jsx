@@ -11,11 +11,15 @@ import koiImage1 from '../assets/koi-image1.jpg';
 import koiImage2 from '../assets/koi-image2.jpg';
 import koiImage3 from '../assets/koi-image3.jpg';
 import koiImage4 from '../assets/koi-image4.jpg';
+import api from '../config/axios';
 import './Home.css';
 import { Button } from 'antd';
+import { useSelector } from 'react-redux';
 
 const Home = () => {
+  const token = useSelector(state => state.user?.accessToken);
   const [value, setValue] = React.useState(1);
+  const [valuesToSend, setValuesToSend] = useState({});
   const [faqs, setFaqs] = useState([]);
   const [newQuestion, setNewQuestion] = useState('');
   const [openIndex, setOpenIndex] = useState(null);
@@ -45,8 +49,23 @@ const Home = () => {
   }, [location]);
 
   const handleSubmitRating = async (e) => {
+    setValuesToSend({
+      rating: value,
+      bookingId: booking.id
+    });
     e.preventDefault();
-    toast.success("Rating submitted!");
+    try {
+      const response = await api.post('feedback', valuesToSend, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      toast.success("Rating submitted!");
+      console.log(response.data);
+    } catch (error) {
+      console.error('Error submitting rating:', error);
+    }
+
     console.log(value);
   }
 
@@ -69,8 +88,15 @@ const Home = () => {
 
   return (
     <>
-      <div>
-        <Carousel>
+      <div >
+        <Carousel 
+          fade={true}
+          interval={5000}
+          controls={false}
+          indicators={true}
+          pause={false}
+          touch={false}
+        >
           <Carousel.Item>
             <img
               className="d-block w-100"

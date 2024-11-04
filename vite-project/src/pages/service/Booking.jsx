@@ -12,7 +12,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 const BookingPage  = () => {
   const user = useSelector(state => state.user);
-  const token = user.accessToken; 
+  const token = user?.accessToken; 
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -86,7 +86,7 @@ const BookingPage  = () => {
       
       setUniqueSlots(processedSlots);
     } catch (error) {
-      toast.error('Error fetching slots:', error);
+      console.log(error)
     }
   }
 
@@ -111,7 +111,7 @@ const BookingPage  = () => {
       
       setGroupedServices(grouped);
     } catch (error) {
-      toast.error('Error fetching services:', error.response.data);
+      console.log(error)
     }
   }
 
@@ -126,7 +126,7 @@ const BookingPage  = () => {
       console.log(response.data)
       setDoctors(response.data);
     } catch (error) {
-      toast.error('Error fetching doctors:', error.response.data);
+      console.log(error)
     }
   }
 
@@ -144,31 +144,8 @@ const BookingPage  = () => {
 
   }, [location]);
 
-  //có send email
   const handleSubmit = async () => {
     console.log('Values to send:', valuesToSend);
-    console.log(user.email);
-
-    // Construct the email content
-    const emailContent = `
-      <html>
-        <body>
-          <h1 style='color: blue;'>Welcome, ${user.fullname}</h1>
-          <p style='font-size: 16px;'>You have successfully booked an appointment.</p>
-          <p style='font-size: 16px;'>Your service is: ${selectedService.split(' || ')[0]} will start at <i>${selectedHour} ${selectedDateTime}</i> <i>with ${selectedDoctor}</i>.</p>
-          <p style='font-size: 16px;'>Thank you for choosing our service!</p>
-          <p style='font-size: 16px;'>Please proceed to the payment page to complete your booking.</p>
-          <p style='font-size: 16px;'>Best regards,</p>
-          <p style='font-size: 16px;'>The KOI FISH CARE Team</p>
-          </body>
-      </html>
-    `;
-
-    const format = {
-      subject: "Booking Successful",
-      body: emailContent
-    };
-
     if (user && totalPrice) {
       try {   
           const response = await api.post('bookings', valuesToSend, {
@@ -189,19 +166,11 @@ const BookingPage  = () => {
       } catch (error) {
         console.log(error);
         toast.error(error.response?.data || 'An error occurred while booking');
-      } finally {
-        const resMail = await api.post(`mail/send/${user.email}`, format, {
-          headers: {
-            Authorization: `Bearer ${token}`
-            }
-          });
-        console.log('Email sent: ', resMail)
-      }  
+      } 
     } else {
       toast.error('Please login to book a service');
       navigate("/login");
     }
-    
   };
 
   const handleSlotChange = (e) => {

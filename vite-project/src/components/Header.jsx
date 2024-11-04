@@ -33,9 +33,8 @@ const Header = () => {
   return (
     <header className="header">
       <div className="header-content">
-        <div className="logo">
+        <div className="logo" >
           <img src={koiLogo} alt="KOI Fish Care Logo" />
-
           <h1><Link className="h1-logo" to="/">Koi Fish Care</Link></h1>
         </div>
         <nav className={`main-nav ${isMenuOpen ? 'open' : ''}`}>
