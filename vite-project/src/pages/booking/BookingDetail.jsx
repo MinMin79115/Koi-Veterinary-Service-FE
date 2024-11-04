@@ -1,22 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Popconfirm, Modal, Input } from 'antd';
-import { DeleteOutlined, FileDoneOutlined, PayCircleOutlined } from '@ant-design/icons';
+import { DeleteOutlined, FileDoneOutlined, PayCircleOutlined, ClockCircleOutlined, CheckCircleOutlined, StarOutlined } from '@ant-design/icons';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './BookingDetail.css';
 import api from '../../config/axios'
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const BookingDetail = () => {
   const token = useSelector(state => state.user.accessToken);
   const [bookings, setBookings] = useState([]);
-  const [payStatus, setPayStatus] = useState('')
   const user = useSelector((state) => state.user);
   const [noteModal, setNoteModal] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [bills, setBills] = useState([]);
+  const [feedback, setFeedback] = useState([]);
   const [showCancelled, setShowCancelled] = useState(false);
+  const [actionModal, setActionModal] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const navigate = useNavigate();
 
 
   //Open the note modal
@@ -28,6 +31,23 @@ const BookingDetail = () => {
   const closeNoteModal = () => {
     setNoteModal(false);
     setSelectedRecord(null);
+  }
+
+  const fetchFeedback = async () => {
+    try {
+      const response = await api.get(`feedbacks/booking/${selectedBooking.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      const values = response.data.map(feedback => ({
+        id: feedback.bookingId,
+      }));
+      setFeedback(values)
+      console.log('feedback:', feedback);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   const fetchBill = async () => {
@@ -49,26 +69,35 @@ const BookingDetail = () => {
 
   const fetchBooking = async () => {
     try {
+      const feedbackResponse = await api.get('feedback', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const feedbacks = feedbackResponse.data;
+      console.log('feedbackss:', feedbacks);
       if (user.role === 'CUSTOMER') {
         const response = await api.get(`bookings/user/${user.id}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
-        console.log(response.data);
 
         const values = response.data.map(booking => ({
           id: booking.bookingId,
           customerName: booking.user?.fullname,
+          veterinarian: booking.veterinarian?.user?.fullname,
           email: booking.user?.email,
           service: booking.servicesDetail?.serviceId?.serviceName,
           serviceType: booking.servicesDetail?.serviceTypeId?.service_type,
           status: booking.status,
           price: booking.servicesDetail?.serviceTypeId?.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
-          note: booking.note
+          note: booking.note,
+          isPaid: bills.some(bill => bill.id === booking.bookingId),
+          hasRating: feedbacks.some(feedback => feedback.bookingId.bookingId === booking.bookingId) ? "true" : "false"
         }));
 
-        setBookings(values); //Set bookings to an array of booking objects      
+        setBookings(values);
       } else {
         const response = await api.get(`bookings/veterinarian/${user.id}`, {
           headers: {
@@ -86,10 +115,12 @@ const BookingDetail = () => {
           serviceType: booking.servicesDetail?.serviceTypeId?.service_type,
           status: booking.status,
           price: booking.servicesDetail?.serviceTypeId?.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
-          note: booking.note
+          note: booking.note,
+          isPaid: bills.some(bill => bill.id === booking.bookingId),
+          hasRating: feedbacks.some(feedback => feedback.bookingId.bookingId === booking.bookingId) ? "true" : "false"
         }));
 
-        setBookings(values); //Set bookings to an array of booking objects
+        setBookings(values);
       }
     } catch (error) {
       console.log(error);
@@ -97,14 +128,25 @@ const BookingDetail = () => {
   };
 
   useEffect(() => {
-    fetchBooking();
     fetchBill();
-
   }, []);
+
+  useEffect(() => {
+    fetchBooking();
+  }, [bills]);
 
 
 
   const columns = [
+    {
+      title: 'Rated',
+      dataIndex: 'hasRating',
+      key: 'hasRating',
+      width: '10%',
+      align: 'center',
+      className: 'column-border',
+      hidden: user?.role === 'VETERINARIAN' || user?.role === 'CUSTOMER'
+    },
     {
       title: 'ID',
       dataIndex: 'id',
@@ -127,7 +169,8 @@ const BookingDetail = () => {
       key: 'customerName',
       width: '20%',
       align: 'center',
-      className: 'column-border'
+      className: 'column-border',
+      hidden: user?.role === 'VETERINARIAN' || user?.role === 'CUSTOMER'
     },
     {
       title: 'Address',
@@ -135,7 +178,15 @@ const BookingDetail = () => {
       key: 'address',
       width: '20%',
       align: 'center',
-      hidden: user?.role === 'CUSTOMER'
+      hidden: user?.role === 'CUSTOMER' || user?.role === 'VETERINARIAN'
+    },
+    {
+      title: 'Veterinarian',
+      dataIndex: 'veterinarian',
+      key: 'veterinarian',
+      width: '20%',
+      align: 'center',
+      hidden: user?.role === 'CUSTOMER' || user?.role === 'VETERINARIAN'
     },
     {
       title: 'Service',
@@ -151,7 +202,8 @@ const BookingDetail = () => {
       key: 'serviceType',
       width: '15%',
       align: 'center',
-      className: 'column-border'
+      className: 'column-border',
+      hidden: user?.role === 'CUSTOMER' || user?.role === 'VETERINARIAN'
     },
     {
       title: 'Status',
@@ -161,7 +213,7 @@ const BookingDetail = () => {
       align: 'center',
       className: 'column-border',
       render: (status) => (
-        <span className={`badge ${status === 'PENDING' ? 'bg-warning' : status === 'COMPLETED' ? 'bg-info' : status === 'CANCELLED' ? 'bg-danger' : 'bg-success  '} d-flex justify-content-center py-2 fst-italic`}>
+        <span className={`badge ${status === 'PENDING' ? 'bg-warning' : status === 'COMPLETED' ? 'bg-info' : status === 'CANCELLED' ? 'bg-danger' : 'bg-success  '} d-flex justify-content-center py-2 fst-italic text-white`}>
           {status}
         </span>
       ),
@@ -170,7 +222,7 @@ const BookingDetail = () => {
       title: 'Total Price',
       dataIndex: 'price',
       key: 'price',
-      width: '15%',
+      width: '20%',
       align: 'center',
       className: 'column-border',
       render: (_, record) => (
@@ -182,100 +234,25 @@ const BookingDetail = () => {
       align: 'center',
       className: 'column-border',
       render: (_, record) => (
-        <div className="d-flex flex-column flex-md-row justify-content-center">
-          {user?.role === 'CUSTOMER'? (
-            record.status === "COMPLETED" ? (
-              // Đang fix ở đây
-              record.note ? 
-              <Button 
-                onClick={() => openNoteModal(record)} 
-                type='primary'
-                className="btn-custom d-flex justify-content-center m-1 text-white"
-              >
-                You Have A Note
-              </Button> :
-              record.serviceType !== "At_Center" ?
-              <><Button 
-                type='default' 
-                className="btn-custom d-flex justify-content-center m-1"
-                disabled
-              >
-                No Note Available
-              </Button>
-              <Button 
-                type='primary' 
-                className="btn-custom d-flex justify-content-center m-1 text-white"
-              >
-                <Link className='text-white' to='/#rating' state={{booking: record}}>Rate Us</Link>
-              </Button>
-
-              </> :
-              <i className='text-info'>COMPLETED</i>
-            ) : record.status === "CANCELLED" ? (
-              <p className='fst-italic fs-6 text-danger'>CANCELLED</p>
-            )  : record.status === "CONFIRMED" ? (
-              <p className='fst-italic fs-6 text-success'>CONFIRMED</p>
-            ): bills.find(bill => bill.id === record.id)? (
-              <>
-                {setPayStatus('PAID')}
-                <p className='fst-italic fs-6 text-success'>{payStatus}</p>
-              </>
-            ) : (
-              <>
-                <p className='fst-italic fs-6 text-warning'>{bills.id}</p>
-                <div className='d-flex justify-content-around'>
-                  <Button
-                    type='none'
-                    className="btn-custom btn btn-success d-flex justify-content-center m-1"
-                    icon={<PayCircleOutlined />}
-                    onClick={() => handlePay(record)}
-                  >
-                    Pay
-                  </Button>
-                  <Popconfirm
-                    title="Delete"
-                    description="Are you sure you want to delete this booking?"
-                    className="btn-custom btn btn-danger d-flex justify-content-center m-1"
-                    onConfirm={() => handleDeleteBooking(record)}
-                    okText="Yes"
-                    cancelText="No"
-                  >
-                    <Button  type='primary' icon={<DeleteOutlined />} danger>Delete</Button>
-                  </Popconfirm>
-                </div>
-              </>
-            )
-          ) : user?.role === 'VETERINARIAN'  ? (
-            record.status === "CONFIRMED" ? (
-              <Button
-                type='none'
-                icon={<FileDoneOutlined />}
-                className="btn-custom btn btn-success d-flex justify-content-center m-1"
-                onClick={() => handleComplete(record)}
-              >
-                Complete
-              </Button>
-            ) : record.status === "COMPLETED" ? (
-              record.serviceType !== "At_Center" ? 
-              <Button 
-                onClick={() => openNoteModal(record)} 
-                type='primary' 
-                className="btn-custom d-flex justify-content-center m-1 text-white"
-              >
-                Note
-              </Button> :
-              <i className='text-info'>COMPLETED</i>
-            ) : record.status === "CANCELLED" ? (
-              <p className='fst-italic fs-6 text-danger'>CANCELLED</p>
-            ) : (
-              <p className='text-primary'>Waiting for confirming</p>
-            )
-          ) : (
-            <>
-              <p className='fst-italic fs-6 text-warning'>{payStatus}</p>
-            </>
-          )}
-        </div>
+        <><Button 
+          onClick={() => showActionModal(record)}
+          className="details-button"
+        >
+          View Details
+        </Button>
+        {record.status === "COMPLETED" && record.hasRating === "false" && user?.role === 'CUSTOMER' && (
+          <Button
+            type="default"
+            icon={<StarOutlined />}
+            className="m-1 rate-button"
+            onClick={() => {
+              navigate('/#rating', { state: { booking: record } });
+            }}
+          >
+            Rate Us
+          </Button>
+        )}
+        </>
       )
     }
   ];
@@ -391,18 +368,34 @@ const BookingDetail = () => {
     .sort((a, b) => b.id - a.id)
     .slice(showCancelled ? 10 : 0);
 
+  const showActionModal = (record) => {
+    setSelectedBooking(record);
+    setActionModal(true);
+  };
+
+  const closeActionModal = () => {
+    setActionModal(false);
+    setSelectedBooking(null);
+  };
+
   return (
-    <div className="container-fluid mt-5">
-      <h2 className="mb-4 text-center fw-bold">Booking Detail</h2>
+    <div className="container-fluid py-2">
+      <h2 className="mb-4 text-center fw-bold mt-5">Booking Detail</h2>
       <div className="row justify-content-center">
         <div className="col-12">
           <div className="card">
             <div className="card-body">
               <div className="d-flex justify-content-end mb-3">
-                <Button 
-                  type={showCancelled ? "primary" : "default"}
+                <Button
+                  type= {showCancelled ? "" : "dashed"}
                   onClick={() => setShowCancelled(!showCancelled)}
                   className="mb-3"
+                  style={{
+                    border: 'none',
+                    padding: '20px 10px',
+                    background: showCancelled ? 'linear-gradient(145deg, #4dabf7, #339af0)' : 'black',
+                    color: 'white'
+                  }}
                 >
                   {showCancelled ? "Show Active Bookings" : "Show Cancelled Bookings"}
                 </Button>
@@ -429,6 +422,207 @@ const BookingDetail = () => {
                     <span className='fw-bold'>Your prescription:</span>
                     <p>{selectedRecord?.note || 'No note available'}</p>
                   </>
+                )}
+              </Modal>
+              <Modal
+                open={actionModal}
+                onCancel={closeActionModal}
+                footer={null}
+                centered
+                width="90%"
+                style={{ 
+                  maxWidth: '700px',
+                  minWidth: '300px'
+                }}
+                className="action-modal"
+              >
+                {selectedBooking && (
+                  <div className="booking-details">
+                    <div className="details-section">
+                      <h3>Booking Information</h3>
+                      <div className="info-grid">
+                        <div className="info-item">
+                          <label>Booking ID:</label>
+                          <span>{selectedBooking.id}</span>
+                        </div>
+                        {(user?.role === 'CUSTOMER' || user?.role === 'VETERINARIAN') && (
+                          <div className="info-item">
+                            <label>Customer:</label>
+                            <span>{selectedBooking.customerName}</span>
+                          </div>
+                        )}
+                        {user?.role === 'CUSTOMER' && (
+                          <div className="info-item">
+                            <label>Veterinarian:</label>
+                            <span>{selectedBooking?.veterinarian || 'No veterinarian available'}</span>
+                          </div>
+                        )}
+                        {user?.role === 'VETERINARIAN' && (
+                          <div className="info-item">
+                            <label>Address:</label>
+                            <span>{selectedBooking.address}</span>
+                          </div>
+                        )}
+                        
+                        <div className="info-item">
+                          <label>Service:</label>
+                          <span>{selectedBooking.service}</span>
+                        </div>
+                        <div className="info-item">
+                          <label>Type:</label>
+                          <span>{selectedBooking.serviceType}</span>
+                        </div>
+                        {selectedBooking.serviceType === "At_Home" && selectedBooking.status !== "CANCELLED" && (
+                          <div className="info-item">
+                            <label>Price:</label>
+                            <span>{selectedBooking.price} <br /> <span className='text-success'>+10% each km (if above 10km)</span></span>
+                          </div>
+                        )}
+                        {selectedBooking.serviceType !== "At_Home" && (
+                          <div className="info-item">
+                            <label>Price:</label>
+                            <span>{selectedBooking.price}</span>
+                          </div>
+                        )}
+                        <div className="info-item">
+                          <label>Email:</label>
+                          <span>{selectedBooking.email}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="status-progress">
+                      <div className="progress-container">
+                        <div className="progress-line">
+                          <div 
+                            className={`progress-fill ${
+                              selectedBooking.status === 'CANCELLED' ? 'cancelled' :
+                              selectedBooking.status === 'COMPLETED' ? 'completed' :
+                              selectedBooking.status === 'CONFIRMED' ? 'confirmed' : 'pending'
+                            }`}
+                            style={{
+                              width: selectedBooking.status === 'COMPLETED' ? '100%' :
+                                    selectedBooking.status === 'CONFIRMED' ? '66%' :
+                                    selectedBooking.status === 'PENDING' ? '33%' : '100%'
+                            }}
+                          />
+                        </div>
+                        {user?.role === 'CUSTOMER' && (
+                          <>
+                          <div className="progress-steps">
+                            <div className={`progress-step ${selectedBooking.status === 'PENDING' || selectedBooking.status === 'CONFIRMED' || selectedBooking.status === 'COMPLETED' ? 'active' : ''}`}>
+                              <div className="step-dot"></div>
+                              <span>Pending</span>
+                            </div>
+                            <div className={`progress-step ${selectedBooking.status === 'CONFIRMED' || selectedBooking.status === 'COMPLETED' ? 'active' : ''}`}>
+                              <div className="step-dot"></div>
+                              <span>Confirmed</span>
+                            </div>
+                            <div className={`progress-step ${selectedBooking.status === 'COMPLETED' ? 'active' : ''}`}>
+                              <div className="step-dot"></div>
+                              <span>Completed</span>
+                            </div>
+                          </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    <div className="actions-section">
+                      <h3>Available Actions</h3>
+                      <div className="action-buttons">
+                        {user?.role === 'CUSTOMER' ? (
+                          <>
+                            {selectedBooking.status === "COMPLETED" ? (
+                              selectedBooking.note ? (
+                                <Button 
+                                  onClick={() => {
+                                    closeActionModal();
+                                    openNoteModal(selectedBooking);
+                                  }}
+                                  type="primary"
+                                  className="m-1"
+                                >
+                                  View Note
+                                </Button>
+                              ) : (
+                                selectedBooking.serviceType !== "At_Center" ? (
+                                  <Button disabled className="m-1">No Note Available</Button>
+                                ) : (
+                                  <p>Note is not available for this service type.</p>
+                                )
+                              )
+                              
+                            ) : selectedBooking.status === "PENDING" && (
+                              <>
+                                {!selectedBooking.isPaid ? (
+                                  <Button
+                                    type="primary"
+                                    icon={<PayCircleOutlined />}
+                                    onClick={() => handlePay(selectedBooking)}
+                                    className="m-1"
+                                  >
+                                    Pay for service
+                                  </Button>
+                                ) : (
+                                  <div className='d-flex flex-column align-items-center'>
+                                    <p className='text-success'>Payment Completed <CheckCircleOutlined /></p>
+                                    <i>Waiting for confirmation</i>
+                                  </div>
+                                )}
+                                <Popconfirm
+                                  title="Delete Booking"
+                                  description="Are you sure you want to delete this booking?"
+                                  onConfirm={() => {
+                                    handleDeleteBooking(selectedBooking);
+                                    closeActionModal();
+                                  }}
+                                  okText="Yes"
+                                  cancelText="No"
+                                >
+                                  <Button 
+                                    type="primary" 
+                                    danger 
+                                    icon={<DeleteOutlined />} 
+                                    className="m-1"
+                                    hidden={selectedBooking.isPaid}
+                                  >
+                                    Delete
+                                  </Button>
+                                </Popconfirm>
+                              </>
+                            )}
+                          </>
+                        ) : user?.role === 'VETERINARIAN' && (
+                          <>
+                            {selectedBooking.status === "CONFIRMED" && (
+                              <Button
+                                type="primary"
+                                icon={<FileDoneOutlined />}
+                                onClick={() => {
+                                  handleComplete(selectedBooking);
+                                  closeActionModal();
+                                }}
+                                className="m-1"
+                              >
+                                Complete
+                              </Button>
+                            )}
+                            {selectedBooking.status === "COMPLETED" && selectedBooking.serviceType !== "At_Center" && (
+                              <Button 
+                                onClick={() => {
+                                  closeActionModal();
+                                  openNoteModal(selectedBooking);
+                                }}
+                                type="primary"
+                                className="m-1"
+                              >
+                                Manage Note
+                              </Button>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 )}
               </Modal>
             </div>

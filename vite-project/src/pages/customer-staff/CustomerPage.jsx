@@ -22,7 +22,7 @@ function CustomerPage() {
 
   useEffect(() => {
     if (location.hash === '#profile') {
-      window.scrollTo(0, 180);
+      window.scrollTo(0, 80);
     }
   }, [location]);
 

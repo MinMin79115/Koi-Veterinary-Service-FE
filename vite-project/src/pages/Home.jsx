@@ -13,7 +13,7 @@ import koiImage3 from '../assets/koi-image3.jpg';
 import koiImage4 from '../assets/koi-image4.jpg';
 import api from '../config/axios';
 import './Home.css';
-import { Button } from 'antd';
+import { Button, Input } from 'antd';
 import { useSelector } from 'react-redux';
 
 const Home = () => {
@@ -24,8 +24,10 @@ const Home = () => {
   const [newQuestion, setNewQuestion] = useState('');
   const [openIndex, setOpenIndex] = useState(null);
   const location = useLocation();
-  const booking = location.state?.booking;
+  const [booking, setBooking] = useState(location.state?.booking);
   console.log(booking);
+  const [feedbackText, setFeedbackText] = useState('');
+
   const fetchFaqs = async () => {
     try {
       const response = await axios.get('https://66fa96f0afc569e13a9c5417.mockapi.io/FAQ');
@@ -44,30 +46,34 @@ const Home = () => {
 
   useEffect(() => {
     if (location.hash === '#rating') {
-      window.scrollTo(0, 2000);
+      window.scrollTo(0, 1900);
     }
   }, [location]);
 
   const handleSubmitRating = async (e) => {
+    e.preventDefault();
     setValuesToSend({
       rating: value,
-      bookingId: booking.id
+      bookingId: booking.id,
+      feedback: feedbackText
     });
-    e.preventDefault();
+
     try {
       const response = await api.post('feedback', valuesToSend, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
-      toast.success("Rating submitted!");
+      toast.success("Rating and feedback submitted!");
+      setFeedbackText('');
+      setValue(1);
+      setBooking(null);
       console.log(response.data);
     } catch (error) {
       console.error('Error submitting rating:', error);
+      toast.error("Failed to submit rating");
     }
-
-    console.log(value);
-  }
+  };
 
   const handleAddFAQ = async (e) => {
     e.preventDefault();
@@ -91,7 +97,7 @@ const Home = () => {
       <div >
         <Carousel 
           fade={true}
-          interval={5000}
+          interval={3000}
           controls={false}
           indicators={true}
           pause={false}
@@ -197,20 +203,54 @@ const Home = () => {
           <Box
             sx={{
               '& > legend': { mt: 2 },
+              padding: '2rem',
+              backgroundColor: '#fff',
+              borderRadius: '8px',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              margin: '2rem auto',
+              maxWidth: '500px'
             }}
           >
-            <Typography component="legend">Your Rating</Typography>
+            <Typography variant="h5" component="legend" sx={{ mb: 2 }}>Your Rating</Typography>
             <div className='d-flex justify-content-center'>
-              <div className='d-flex flex-column align-items-center'>
-                <form onSubmit={handleSubmitRating}>
+              <div className='d-flex flex-column align-items-center w-100'>
+                <form onSubmit={handleSubmitRating} className='w-100'>
                   <Typography>Booking ID: {booking.id}</Typography>
                   <Typography>Service Name: {booking.service}</Typography>
-                  <Rating
-                    name="simple-controlled"
-                    value={value}
-                    onChange={(event, newValue) => setValue(newValue)}
-                  />
-                  <Button type='primary' htmlType='submit'>Submit Rating</Button>
+                  
+                  <div className='my-3'>
+                    <Rating
+                      name="simple-controlled"
+                      value={value}
+                      onChange={(e) => setValue(e.target.value)}
+                      size="large"
+                    />
+                  </div>
+
+                  <div className='mb-3'>
+                    <Typography component="legend" sx={{ mb: 1 }}>Your Feedback</Typography>
+                    <Input.TextArea
+                      className='form-control'
+                      value={feedbackText}
+                      onChange={(e) => setFeedbackText(e.target.value)}
+                      placeholder="Please share your experience..."
+                      rows={4}
+                      style={{
+                        resize: 'none',
+                        borderRadius: '8px',
+                        padding: '10px'
+                      }}
+                    />
+                  </div>
+
+                  <Button 
+                    type='primary' 
+                    htmlType='submit'
+                    size='large'
+                    block
+                  >
+                    Submit Rating & Feedback
+                  </Button>
                 </form>
               </div>
             </div>

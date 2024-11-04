@@ -1,13 +1,26 @@
 .table-responsive {
     overflow-x: auto;
+    background: linear-gradient(145deg, #ffffff, #f0f2f5);
+    border-radius: 15px;
+    padding: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
 .column-border {
-    border-right: 1px solid #dee2e6;
-    border-left: 1px solid #dee2e6;
+    position: relative;
 }
 
-.btn-custom:hover{
+.column-border::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 25%;
+    height: 50%;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, #e0e6ed, transparent);
+}
+
+.btn-custom:hover {
     opacity: 0.7;
 }
 
@@ -24,4 +37,518 @@
     .badge {
         font-size: 10px;
     }
+}
+
+/* Add these styles for the action modal */
+.action-modal .ant-modal-content {
+    border-radius: 12px;
+}
+
+.action-modal .ant-modal-header {
+    border-radius: 12px 12px 0 0;
+    background-color: #f8f9fa;
+    padding: 16px 24px;
+}
+
+.details-section,
+.actions-section {
+    margin-bottom: 24px;
+}
+
+.details-section h3,
+.actions-section h3 {
+    color: #333;
+    margin-bottom: 16px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.info-item label {
+    color: #666;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.info-item span {
+    color: #333;
+    font-size: 16px;
+}
+
+.actions-section {
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+}
+
+.action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.details-button {
+    min-width: 100px;
+}
+
+/* Status badge styles */
+.badge {
+    display: inline-block;
+    padding: 8px 12px;
+    border-radius: 30px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.badge.bg-warning {
+    background: linear-gradient(145deg, #ffd43b, #fab005) !important;
+}
+
+.badge.bg-success {
+    background: linear-gradient(145deg, #51cf66, #37b24d) !important;
+}
+
+.badge.bg-info {
+    background: linear-gradient(145deg, #339af0, #228be6) !important;
+}
+
+.badge.bg-danger {
+    background: linear-gradient(145deg, #ff6b6b, #fa5252) !important;
+}
+
+/* Responsive styles */
+@media (max-width: 576px) {
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .action-buttons button {
+        width: 100%;
+    }
+}
+
+/* Update progress line styles */
+.status-progress {
+    margin-top: 1rem;
+    padding: 0.2rem;
+    background-color: #f5f5f5;
+    border-radius: 12px;
+}
+
+.progress-container {
+    position: relative;
+    padding: 20px 0;
+}
+
+.progress-line {
+    height: 4px;
+    background-color: #e0e0e0;
+    border-radius: 4px;
+    position: relative;
+    margin: 20px 0;
+}
+
+.progress-fill {
+    position: absolute;
+    height: 100%;
+    left: 0;
+    top: 0;
+    border-radius: 4px;
+    transition: width 0.5s ease-in-out;
+}
+
+/* Status-specific colors for line */
+.progress-fill.pending {
+    background: linear-gradient(to right, #faad14 0%, #faad14 100%);
+    width: 33% !important;
+}
+
+.progress-fill.confirmed {
+    background: linear-gradient(to right, #faad14 0%, #52c41a 100%);
+    width: 66% !important;
+}
+
+.progress-fill.completed {
+    background: linear-gradient(to right, #faad14 0%, #52c41a 50%, #1890ff 100%);
+    width: 100% !important;
+}
+
+.progress-fill.cancelled {
+    background: #ff4d4f;
+    width: 100% !important;
+}
+
+.progress-steps {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin-top: 10px;
+}
+
+.progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    flex: 1;
+}
+
+/* Update step dots */
+.step-dot {
+    width: 16px;
+    height: 16px;
+    background-color: #e0e0e0;
+    border-radius: 50%;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+    border: 2px solid #fff;
+}
+
+/* Status-specific colors for dots */
+.progress-step:nth-child(1) .step-dot {
+    background-color: #faad14;
+    /* Pending color */
+}
+
+.progress-step:nth-child(2) .step-dot {
+    background-color: #52c41a;
+    /* Confirmed color */
+}
+
+.progress-step:nth-child(3) .step-dot {
+    background-color: #1890ff;
+    /* Completed color */
+}
+
+/* Active state for dots */
+.progress-step.active .step-dot {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 4px rgba(24, 144, 255, 0.2);
+}
+
+/* Inactive state for dots based on current status */
+.progress-step:not(.active) .step-dot {
+    opacity: 0.5;
+}
+
+.progress-step span {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.progress-step.active span {
+    color: #1890ff;
+    font-weight: 600;
+}
+
+/* Status-specific text colors */
+.progress-step:nth-child(1).active span {
+    color: #faad14;
+}
+
+.progress-step:nth-child(2).active span {
+    color: #52c41a;
+}
+
+.progress-step:nth-child(3).active span {
+    color: #1890ff;
+}
+
+/* Cancelled state */
+.progress-step.cancelled .step-dot {
+    background-color: #ff4d4f;
+}
+
+.progress-step.cancelled span {
+    color: #ff4d4f;
+}
+
+/* Animation */
+@keyframes progressFill {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: var(--target-width);
+    }
+}
+
+.progress-fill {
+    animation: progressFill 0.8s ease-out forwards;
+}
+
+/* Responsive styles */
+@media (max-width: 576px) {
+    .status-progress {
+        padding: 0.5rem;
+    }
+
+    .progress-step span {
+        font-size: 12px;
+    }
+
+    .step-dot {
+        width: 12px;
+        height: 12px;
+    }
+}
+
+/* Add these styles for modal responsiveness */
+.action-modal {
+    width: 90%;
+    max-width: 600px;
+}
+
+@media (max-width: 768px) {
+    .action-modal {
+        width: 95%;
+    }
+
+    .action-modal .ant-modal-body {
+        padding: 16px;
+    }
+}
+
+@media (max-width: 576px) {
+    .action-modal {
+        width: 100%;
+        margin: 10px;
+    }
+}
+
+/* Enhanced Table Styles */
+.table-responsive {
+    overflow-x: auto;
+    background: linear-gradient(145deg, #ffffff, #f0f2f5);
+    border-radius: 15px;
+    padding: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+/* Table Header */
+.ant-table-thead>tr>th {
+    background: linear-gradient(145deg, #f6f8fa, #ffffff) !important;
+    color: #2c3e50 !important;
+    font-weight: 600 !important;
+    padding: 16px 12px !important;
+    transition: all 0.3s ease !important;
+    border-bottom: 2px solid #e8eef3 !important;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.ant-table-thead>tr>th:hover {
+    background: #f0f7ff !important;
+}
+
+/* Table Body */
+.ant-table-tbody>tr>td {
+    padding: 16px 12px !important;
+    transition: all 0.3s ease !important;
+}
+
+.ant-table-tbody>tr:hover>td {
+    background: rgba(240, 247, 255, 0.5) !important;
+    transform: scale(1.001);
+}
+
+/* Zebra Striping */
+.ant-table-tbody>tr:nth-child(even) {
+    background-color: #f8fafc;
+}
+
+/* Action Buttons */
+.ant-btn {
+    color: white;
+}
+
+.details-button,
+.ant-btn {
+    background: linear-gradient(145deg, #4dabf7, #339af0);
+    /* color: #fff !important; */
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.details-button:hover,
+.ant-btn:hover {
+    /* color: #fff !important; */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(145deg, #339af0, #228be6);
+}
+
+/* Pagination Enhancement */
+.ant-pagination {
+    margin-top: 1.5rem !important;
+}
+
+.ant-pagination-item {
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
+}
+
+.ant-pagination-item:hover {
+    transform: translateY(-2px);
+}
+
+.ant-pagination-item-active {
+    background: linear-gradient(145deg, #4dabf7, #339af0) !important;
+    border: none !important;
+}
+
+.ant-pagination-item-active a {
+    color: white !important;
+}
+
+/* Loading Animation */
+.ant-table-wrapper {
+    position: relative;
+}
+
+.ant-table-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #4dabf7, transparent);
+    animation: loading 2s infinite;
+}
+
+@keyframes loading {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* Row Animation */
+.ant-table-tbody>tr {
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+
+    .ant-table-thead>tr>th,
+    .ant-table-tbody>tr>td {
+        padding: 12px 8px !important;
+        font-size: 0.9rem;
+    }
+
+    .badge {
+        padding: 6px 10px;
+        font-size: 0.7rem;
+    }
+
+    .details-button {
+        padding: 6px 12px;
+        font-size: 0.9rem;
+    }
+
+    .ant-table {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 576px) {
+
+    .ant-table-thead>tr>th,
+    .ant-table-tbody>tr>td {
+        padding: 8px 6px !important;
+        font-size: 0.8rem;
+    }
+
+    .badge {
+        padding: 4px 8px;
+        font-size: 0.65rem;
+    }
+
+    .details-button {
+        padding: 4px 10px;
+        font-size: 0.8rem;
+    }
+}
+
+/* Empty State Enhancement */
+.ant-table-empty .ant-table-placeholder {
+    background: linear-gradient(145deg, #ffffff, #f0f2f5) !important;
+    padding: 2rem !important;
+    border-radius: 12px !important;
+}
+
+.ant-table-empty .ant-empty-description {
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+/* Selection Highlight */
+.ant-table-tbody>tr.ant-table-row-selected>td {
+    background: rgba(77, 171, 247, 0.1) !important;
+}
+
+/* Hover Effects */
+.ant-table-tbody>tr:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    z-index: 1;
+}
+
+.rate-button {
+    background: linear-gradient(145deg, #ffd700, #ffa500) !important;
+    border: none !important;
+    color: #8B4513 !important; /* Dark brown for better contrast on gold/orange */
+    font-weight: 600 !important;}
+
+.rate-button:hover {
+    background: linear-gradient(145deg, #ffa500, #ff8c00) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(255, 165, 0, 0.3);
+    color: white !important;
+}
+
+.rate-button .anticon {
+    margin-right: 8px;
 }
