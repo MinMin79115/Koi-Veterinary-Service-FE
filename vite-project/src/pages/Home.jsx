@@ -129,13 +129,14 @@ const Home = () => {
     <>
       <div >
         <Carousel
+
           fade={true}
           interval={3000}
           controls={false}
           indicators={true}
           pause={false}
           touch={false}
-
+          className="carousel-fade"
         >
           <Carousel.Item>
             <img
@@ -230,7 +231,7 @@ const Home = () => {
         {/* Schedule here */}
         <div className="schedule-exam">
           <h2>Schedule a Fish Exam</h2>
-          <Link to="/booking">Schedule here.</Link>
+          <Link to="/booking#booking">Schedule here.</Link>
         </div>
         {/* Rating here */}
         {booking && (
@@ -349,27 +350,29 @@ const Home = () => {
                       />
                       <div className="feedback-user-info">
                         <h4>{feedback.user?.fullname || 'Anonymous'}</h4>
-                        <Rate
-                          // disabled 
-                          defaultValue={feedback.rating}
+                        <Rating 
+                          disabled 
+                          defaultValue={feedback.rating} 
                           character={<StarFilled />}
                           className="feedback-rating"
                         />
                       </div>
                     </div>
+                    <div className="feedback-service">
+                      {feedback.bookingId?.servicesDetail?.serviceId?.serviceName === "Online Consulting" ? (
+                        <p>{feedback.bookingId?.servicesDetail?.serviceId?.serviceName}</p>
+                      ) : (
+                          <div className='d-flex flex-column gap-6'>
+                            <p>{feedback.bookingId?.servicesDetail?.serviceId?.serviceName}
+                            <small> <br/> {feedback.bookingId?.servicesDetail?.serviceTypeId?.service_type}</small>
+                            </p>
+                          </div>
+                      )}
+                    </div>
                     <div className="feedback-content">
                       <p>"{feedback.feedback}"</p>
                     </div>
-                    <div className="feedback-service">
-                      {feedback.bookingId?.servicesDetail?.serviceId?.serviceName === "Online Consulting" ? (
-                        <p>Service: {feedback.bookingId?.servicesDetail?.serviceId?.serviceName}</p>
-                      ) : (
-                        <>
-                          <p>Service: {feedback.bookingId?.servicesDetail?.serviceId?.serviceName}</p>
-                          <small>Type: {feedback.bookingId?.servicesDetail?.serviceTypeId?.service_type}</small>
-                        </>
-                      )}
-                    </div>
+                    
                   </Card>
                 </SwiperSlide>
               ))}
