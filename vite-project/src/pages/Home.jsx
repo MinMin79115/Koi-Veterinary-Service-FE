@@ -235,6 +235,8 @@ const Home = () => {
                       onChange={(e) => setFeedbackText(e.target.value)}
                       placeholder="Please share your experience..."
                       rows={4}
+                      maxLength={200}
+                      required
                       style={{
                         resize: 'none',
                         borderRadius: '8px',

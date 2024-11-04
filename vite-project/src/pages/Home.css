@@ -254,8 +254,7 @@ body, html {
   color: #ffffff;
 }
 
-/* Carousel styles */
-
+/* Enhanced Carousel styles */
 .carousel {
   width: 100vw;
   height: 90vh;
@@ -277,7 +276,7 @@ body, html {
   left: 0;
   width: 100%;
   opacity: 0;
-  transition: all 0.8s ease-in-out;
+  transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1;
 }
 
@@ -291,22 +290,30 @@ body, html {
   height: 100%;
   object-fit: cover;
   object-position: center;
-  transform: scale(1);
-  transition: transform 6s ease-in-out;
+  transform: scale(1.05);
+  transition: transform 8s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: brightness(0.85);
 }
 
 .carousel-item.active img {
-  transform: scale(1.1);
+  transform: scale(1);
 }
 
 .carousel-caption {
-  background-color: rgba(0, 0, 0, 0.5);
-  padding: 20px;
-  border-radius: 10px;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.7),
+    rgba(0, 0, 0, 0.4),
+    transparent
+  );
+  padding: 30px;
+  border-radius: 15px;
   opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.8s ease-in-out;
-  z-index: 3;
+  transform: translateY(30px);
+  transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(5px);
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .carousel-item.active .carousel-caption {
@@ -314,13 +321,32 @@ body, html {
   transform: translateY(0);
 }
 
-.carousel-control-prev,
-.carousel-control-next {
-  display: none;
+.carousel-caption h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  transform: translateY(20px);
+  opacity: 0;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.3s;
+}
+
+.carousel-caption p {
+  font-size: 1.2rem;
+  transform: translateY(20px);
+  opacity: 0;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.5s;
+}
+
+.carousel-item.active .carousel-caption h1,
+.carousel-item.active .carousel-caption p {
+  transform: translateY(0);
+  opacity: 1;
 }
 
 .carousel-indicators {
   z-index: 4;
+  bottom: 30px;
 }
 
 .carousel-indicators button {
@@ -328,12 +354,66 @@ body, html {
   height: 12px;
   border-radius: 50%;
   background-color: rgba(255, 255, 255, 0.5);
-  border: none;
-  margin: 0 5px;
-  transition: all 0.3s ease-in-out;
+  border: 2px solid transparent;
+  margin: 0 6px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  transform: scale(0.8);
+}
+
+.carousel-indicators button::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border-radius: 50%;
+  border: 2px solid white;
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .carousel-indicators button.active {
   background-color: white;
-  transform: scale(1.2);
+  transform: scale(1);
+}
+
+.carousel-indicators button.active::after {
+  opacity: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .carousel-caption h1 {
+    font-size: 2rem;
+  }
+  
+  .carousel-caption p {
+    font-size: 1rem;
+  }
+  
+  .carousel-caption {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 576px) {
+  .carousel-caption h1 {
+    font-size: 1.5rem;
+  }
+  
+  .carousel-caption p {
+    font-size: 0.9rem;
+  }
+  
+  .carousel-caption {
+    padding: 15px;
+  }
+  
+  .carousel-indicators button {
+    width: 8px;
+    height: 8px;
+    margin: 0 4px;
+  }
 }
