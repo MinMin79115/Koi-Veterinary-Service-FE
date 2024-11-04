@@ -21,6 +21,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "save-dev": "^0.0.1-security",
+    "swiper": "^11.1.14",
     "vite-project": "file:"
   },
   "devDependencies": {

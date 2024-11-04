@@ -412,3 +412,143 @@ body, html {
     margin: 0 4px;
   }
 }
+
+/* Feedback Section Styles */
+.feedback-section {
+  padding: 4rem 2rem;
+  background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+  margin: 2rem 0;
+}
+
+.feedback-title {
+  text-align: center;
+  margin-bottom: 3rem;
+  font-size: 2.5rem;
+  font-weight: 600;
+  background: linear-gradient(145deg, #339af0, #228be6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.feedback-swiper {
+  padding: 2rem 1rem;
+}
+
+.feedback-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  height: 300px;
+  display: flex;
+  flex-direction: column;
+}
+
+.feedback-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.feedback-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.feedback-avatar {
+  background: linear-gradient(145deg, #4dabf7, #339af0);
+  margin-right: 1rem;
+}
+
+.feedback-user-info {
+  flex: 1;
+}
+
+.feedback-user-info h4 {
+  margin: 0;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.feedback-rating {
+  font-size: 16px;
+}
+
+.feedback-rating .anticon {
+  color: #ffd700;
+}
+
+.feedback-content {
+  flex: 1;
+  overflow: hidden;
+}
+
+.feedback-content p {
+  color: #4a5568;
+  font-style: italic;
+  line-height: 1.6;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.feedback-service {
+  margin-top: 1rem;
+  color: #718096;
+}
+
+/* Swiper Navigation Styles */
+.swiper-button-next,
+.swiper-button-prev {
+  color: #339af0 !important;
+  background: white;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.swiper-button-next:after,
+.swiper-button-prev:after {
+  font-size: 20px !important;
+}
+
+.swiper-pagination-bullet {
+  background: #339af0 !important;
+  opacity: 0.5;
+  transition: all 0.3s ease;
+}
+
+.swiper-pagination-bullet-active {
+  opacity: 1;
+  width: 20px;
+  border-radius: 4px;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .feedback-section {
+    padding: 2rem 1rem;
+  }
+
+  .feedback-title {
+    font-size: 2rem;
+  }
+
+  .feedback-card {
+    height: 280px;
+  }
+}
+
+@media (max-width: 576px) {
+  .feedback-title {
+    font-size: 1.75rem;
+  }
+
+  .swiper-button-next,
+  .swiper-button-prev {
+    display: none !important;
+  }
+}

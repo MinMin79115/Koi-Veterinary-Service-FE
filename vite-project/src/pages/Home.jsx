@@ -15,12 +15,20 @@ import api from '../config/axios';
 import './Home.css';
 import { Button, Input } from 'antd';
 import { useSelector } from 'react-redux';
+import { StarFilled, UserOutlined } from '@ant-design/icons';
+import { Card, Rate, Avatar } from 'antd';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay, Pagination, Navigation } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/pagination';
+import 'swiper/css/navigation';
 
 const Home = () => {
   const token = useSelector(state => state.user?.accessToken);
   const [value, setValue] = React.useState(1);
   const [valuesToSend, setValuesToSend] = useState({});
   const [faqs, setFaqs] = useState([]);
+  const [feedbacks, setFeedbacks] = useState([]);
   const [newQuestion, setNewQuestion] = useState('');
   const [openIndex, setOpenIndex] = useState(null);
   const location = useLocation();
@@ -40,9 +48,30 @@ const Home = () => {
     }
   };
 
+  const fetchFeedbacks = async () => {
+    try {
+      const response = await api.get('feedback');
+      setFeedbacks(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.error('Error fetching feedbacks:', error);
+    }
+  }
+
   useEffect(() => {
     fetchFaqs();
+    fetchFeedbacks();
   }, []);
+
+  useEffect(() => {
+    if (value && feedbackText && booking) {
+      setValuesToSend({
+        rating: value,
+        bookingId: booking.id,
+        feedback: feedbackText
+      });
+    }
+  }, [value, feedbackText, booking]);
 
   useEffect(() => {
     if (location.hash === '#rating') {
@@ -52,12 +81,6 @@ const Home = () => {
 
   const handleSubmitRating = async (e) => {
     e.preventDefault();
-    setValuesToSend({
-      rating: value,
-      bookingId: booking.id,
-      feedback: feedbackText
-    });
-
     try {
       const response = await api.post('feedback', valuesToSend, {
         headers: {
@@ -68,6 +91,8 @@ const Home = () => {
       setFeedbackText('');
       setValue(1);
       setBooking(null);
+      window.history.replaceState({}, document.title);
+      fetchFeedbacks()
       console.log(response.data);
     } catch (error) {
       console.error('Error submitting rating:', error);
@@ -90,6 +115,14 @@ const Home = () => {
 
   const toggleAccordion = (index) => {
     setOpenIndex(openIndex === index ? null : index);
+  };
+
+  const handleCancelRating = () => {
+    setBooking(null);
+    setFeedbackText('');
+    setValue(1);
+    // Clear location state
+    window.history.replaceState({}, document.title);
   };
 
   return (
@@ -246,21 +279,102 @@ const Home = () => {
                     />
                   </div>
 
-                  <Button 
-                    type='primary' 
-                    htmlType='submit'
-                    size='large'
-                    block
-                  >
-                    Submit Rating & Feedback
-                  </Button>
+                  <div className="d-flex gap-2">
+                    <Button 
+                      type='primary' 
+                      htmlType='submit'
+                      size='large'
+                      block
+                    >
+                      Submit Rating
+                    </Button>
+                    <Button 
+                      type='primary' 
+                      danger 
+                      size='large'
+                      block
+                      onClick={handleCancelRating}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
                 </form>
-                <Button style={{marginTop: 10}} type='primary' danger size='large' block onClick={() => setBooking(null)}>
-                  Cancel
-                </Button>
               </div>
             </div>
           </Box>
+        )}
+
+        {feedbacks && feedbacks.length > 0 && (
+          <div className="feedback-section">
+            <h2 className="feedback-title">What Our Customers Say</h2>
+            <Swiper
+              spaceBetween={30}
+              centeredSlides={false}
+              autoplay={{
+                delay: 3000,
+                disableOnInteraction: false,
+              }}
+              pagination={{
+                clickable: true,
+              }}
+              navigation={true}
+              modules={[Autoplay, Pagination, Navigation]}
+              className="feedback-swiper"
+              breakpoints={{
+                640: {
+                  slidesPerView: 1,
+                  spaceBetween: 20,
+                },
+                768: {
+                  slidesPerView: 2,
+                  spaceBetween: 30,
+                },
+                1024: {
+                  slidesPerView: 3,
+                  spaceBetween: 30,
+                },
+              }}
+            >
+              {feedbacks.map((feedback, index) => (
+                <SwiperSlide key={feedback.id}>
+                  <Card 
+                    className="feedback-card"
+                    bordered={false}
+                  >
+                    <div className="feedback-header">
+                      <Avatar 
+                        size={64} 
+                        icon={<UserOutlined />}
+                        className="feedback-avatar"
+                      />
+                      <div className="feedback-user-info">
+                        <h4>{feedback.user?.fullname || 'Anonymous'}</h4>
+                        <Rate 
+                          // disabled 
+                          defaultValue={feedback.rating} 
+                          character={<StarFilled />}
+                          className="feedback-rating"
+                        />
+                      </div>
+                    </div>
+                    <div className="feedback-content">
+                      <p>"{feedback.feedback}"</p>
+                    </div>
+                    <div className="feedback-service">
+                      {feedback.bookingId?.servicesDetail?.serviceId?.serviceName === "Online Consulting" ? (
+                        <p>Service: {feedback.bookingId?.servicesDetail?.serviceId?.serviceName}</p>
+                      ) : (
+                        <>
+                          <p>Service: {feedback.bookingId?.servicesDetail?.serviceId?.serviceName}</p>
+                          <small>Type: {feedback.bookingId?.servicesDetail?.serviceTypeId?.service_type}</small>
+                        </>
+                      )}
+                    </div>
+                  </Card>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </div>
         )}
         {/* FAQ here */}
         <div>
