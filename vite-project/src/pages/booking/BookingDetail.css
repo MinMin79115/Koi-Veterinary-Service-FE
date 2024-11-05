@@ -746,3 +746,28 @@
         gap: 1rem;
     }
 }
+
+/* Add styles for expired warning */
+.expired-warning {
+    font-size: 0.8rem;
+    animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* Update button styles for disabled state */
+.details-button:disabled {
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.details-button:disabled:hover {
+    transform: none;
+    box-shadow: none;
+}

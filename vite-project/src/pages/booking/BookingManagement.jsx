@@ -42,7 +42,7 @@ const BookingPage = () => {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            console.log(response.data);
+
             const values = response.data.map(booking => ({
                 id: booking.bookingId,
                 customerName: booking.user.fullname,
@@ -53,24 +53,10 @@ const BookingPage = () => {
                 status: booking.status,
                 price: booking.servicesDetail?.serviceTypeId?.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
                 createdAt: booking.bookingTime,
-                isPaid: bills.some(bill => bill.bookingId === booking.bookingId)
+                isPaid: bills.some(bill => bill.id === booking.bookingId)
             }));
 
             setBookings(values); // Set bookings to an array of booking objects
-
-            // Check for expired bookings and show toast notification
-            values.forEach(booking => {
-                if (isBookingExpired(booking)) {
-                    toast.warning(`Booking #${booking.id} is expired! (Over 5 minutes not paid)`, {
-                        position: "top-right",
-                        autoClose: false,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                    });
-                }
-            });
         } catch (error) {
             console.log(error);
         }
@@ -80,6 +66,23 @@ const BookingPage = () => {
         fetchBooking();
         fetchBill();
     }, []);
+
+    useEffect(() => {
+        // Check for expired bookings and show toast notification
+        let checkBooking = false;
+        bookings.forEach(booking => {
+            if (isBookingExpired(booking)) {
+                checkBooking = true;
+            }
+        });
+        if(checkBooking){
+            toast.warning(`Have some booking is expired! (Over 5 minutes not paid)`, {
+                position: "top-center",
+                autoClose: true,
+            })
+            return;
+        }
+    }, [bookings]);
 
     // Add this function to check if a booking is expired (over 30 minutes old)
     const isBookingExpired = (booking) => {

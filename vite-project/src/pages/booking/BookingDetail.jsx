@@ -72,6 +72,17 @@ const BookingDetail = () => {
     }
   }
 
+  // Add this function to check if a booking is expired (over 5 minutes old)
+  const isBookingExpired = (booking) => {
+    if (booking.status !== 'PENDING' || booking.isPaid) return false;
+    
+    const bookingDate = new Date(booking.createdAt);
+    const currentDate = new Date();
+    const diffInMinutes = Math.floor((currentDate - bookingDate) / (1000 * 60));
+    
+    return diffInMinutes > 5;
+  };
+
   const fetchBooking = async () => {
     try {
       const feedbackResponse = await api.get('feedback', {
@@ -98,6 +109,7 @@ const BookingDetail = () => {
           status: booking.status,
           price: booking.servicesDetail?.serviceTypeId?.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
           note: booking.note,
+          createdAt: booking.bookingTime,
           isPaid: bills.some(bill => bill.id === booking.bookingId),
           hasRating: feedbacks.some(feedback => feedback.bookingId.bookingId === booking.bookingId) ? "true" : "false"
         }));
@@ -218,10 +230,24 @@ const BookingDetail = () => {
       width: '10%',
       align: 'center',
       className: 'column-border',
-      render: (status) => (
-        <span className={`badge ${status === 'PENDING' ? 'bg-warning' : status === 'COMPLETED' ? 'bg-info' : status === 'CANCELLED' ? 'bg-danger' : 'bg-success  '} d-flex justify-content-center py-2 fst-italic text-white`}>
-          {status}
-        </span>
+      render: (status, record) => (
+        <div>
+          <span className={`badge ${
+            status === 'PENDING' ? 'bg-warning' : 
+            status === 'CONFIRMED' ? 'bg-success' : 
+            status === 'COMPLETED' ? 'bg-info' : 
+            'bg-danger'
+          } d-flex justify-content-center py-2 fst-italic text-white`}>
+            {status}
+          </span>
+          {isBookingExpired(record) && (
+            <div className="expired-warning mt-1">
+              <span className="text-danger fw-bold">
+                Expired
+              </span>
+            </div>
+          )}
+        </div>
       ),
     },
     {
@@ -243,6 +269,7 @@ const BookingDetail = () => {
         <><Button 
           onClick={() => showActionModal(record)}
           className="details-button"
+          disabled={isBookingExpired(record)}
         >
           View Details
         </Button>
@@ -608,10 +635,90 @@ const BookingDetail = () => {
             <div className="actions-section">
               <h3>Available Actions</h3>
               <div className="action-buttons">
-                {user?.role === 'CUSTOMER' ? (
-                  <>
-                    {selectedBooking.status === "COMPLETED" ? (
-                      selectedBooking.note ? (
+                {isBookingExpired(selectedBooking) ? (
+                  <div className="text-danger text-center">
+                    <p>This booking has expired. No actions available.</p>
+                    <p>Please create a new booking.</p>
+                  </div>
+                ) : (
+                  user?.role === 'CUSTOMER' ? (
+                    <>
+                      {selectedBooking.status === "COMPLETED" ? (
+                        selectedBooking.note ? (
+                          <Button 
+                            onClick={() => {
+                              closeActionModal();
+                              openNoteModal(selectedBooking);
+                            }}
+                            type="primary"
+                            className="m-1"
+                          >
+                            View Note
+                          </Button>
+                        ) : (
+                          selectedBooking.serviceType !== "At_Center" ? (
+                            <Button disabled className="m-1">No Note Available</Button>
+                          ) : (
+                            <p>Note is not available for this service type.</p>
+                          )
+                        )
+                        
+                      ) : selectedBooking.status === "PENDING" && (
+                        <>
+                          {!selectedBooking.isPaid ? (
+                            <Button
+                              type="primary"
+                              icon={<PayCircleOutlined />}
+                              onClick={() => handlePay(selectedBooking)}
+                              className="m-1"
+                            >
+                              Pay for service
+                            </Button>
+                          ) : (
+                            <div className='d-flex flex-column align-items-center'>
+                              <p className='text-success'>Payment Completed <CheckCircleOutlined /></p>
+                              <i>Waiting for confirmation</i>
+                            </div>
+                          )}
+                          <Popconfirm
+                            title="Delete Booking"
+                            description="Are you sure you want to delete this booking?"
+                            onConfirm={() => {
+                              handleDeleteBooking(selectedBooking);
+                              closeActionModal();
+                            }}
+                            okText="Yes"
+                            cancelText="No"
+                          >
+                            <Button 
+                              type="primary" 
+                              danger 
+                              icon={<DeleteOutlined />} 
+                              className="m-1"
+                              hidden={selectedBooking.isPaid}
+                            >
+                              Delete
+                            </Button>
+                          </Popconfirm>
+                        </>
+                      )}
+                    </>
+                  ) : user?.role === 'VETERINARIAN' && (
+                    <>
+                      {selectedBooking.status === "CONFIRMED" && (
+                        <Button
+                          type="primary"
+                          icon={<FileDoneOutlined />}
+                          onClick={() => {
+                            handleComplete(selectedBooking);
+                            closeActionModal();
+                          }}
+                          className="m-1"
+                        >
+                          Complete
+                        </Button>
+                      )}
+                      {selectedBooking.status === "COMPLETED" && selectedBooking.serviceType !== "At_Center" && (
                         <Button 
                           onClick={() => {
                             closeActionModal();
@@ -620,84 +727,11 @@ const BookingDetail = () => {
                           type="primary"
                           className="m-1"
                         >
-                          View Note
+                          Manage Note
                         </Button>
-                      ) : (
-                        selectedBooking.serviceType !== "At_Center" ? (
-                          <Button disabled className="m-1">No Note Available</Button>
-                        ) : (
-                          <p>Note is not available for this service type.</p>
-                        )
-                      )
-                      
-                    ) : selectedBooking.status === "PENDING" && (
-                      <>
-                        {!selectedBooking.isPaid ? (
-                          <Button
-                            type="primary"
-                            icon={<PayCircleOutlined />}
-                            onClick={() => handlePay(selectedBooking)}
-                            className="m-1"
-                          >
-                            Pay for service
-                          </Button>
-                        ) : (
-                          <div className='d-flex flex-column align-items-center'>
-                            <p className='text-success'>Payment Completed <CheckCircleOutlined /></p>
-                            <i>Waiting for confirmation</i>
-                          </div>
-                        )}
-                        <Popconfirm
-                          title="Delete Booking"
-                          description="Are you sure you want to delete this booking?"
-                          onConfirm={() => {
-                            handleDeleteBooking(selectedBooking);
-                            closeActionModal();
-                          }}
-                          okText="Yes"
-                          cancelText="No"
-                        >
-                          <Button 
-                            type="primary" 
-                            danger 
-                            icon={<DeleteOutlined />} 
-                            className="m-1"
-                            hidden={selectedBooking.isPaid}
-                          >
-                            Delete
-                          </Button>
-                        </Popconfirm>
-                      </>
-                    )}
-                  </>
-                ) : user?.role === 'VETERINARIAN' && (
-                  <>
-                    {selectedBooking.status === "CONFIRMED" && (
-                      <Button
-                        type="primary"
-                        icon={<FileDoneOutlined />}
-                        onClick={() => {
-                          handleComplete(selectedBooking);
-                          closeActionModal();
-                        }}
-                        className="m-1"
-                      >
-                        Complete
-                      </Button>
-                    )}
-                    {selectedBooking.status === "COMPLETED" && selectedBooking.serviceType !== "At_Center" && (
-                      <Button 
-                        onClick={() => {
-                          closeActionModal();
-                          openNoteModal(selectedBooking);
-                        }}
-                        type="primary"
-                        className="m-1"
-                      >
-                        Manage Note
-                      </Button>
-                    )}
-                  </>
+                      )}
+                    </>
+                  )
                 )}
               </div>
             </div>
