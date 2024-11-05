@@ -126,6 +126,7 @@ const BookingDetail = () => {
         }));
 
         setBookings(values);
+        console.log('bookings:', bookings);
       }
     } catch (error) {
       console.log(error);

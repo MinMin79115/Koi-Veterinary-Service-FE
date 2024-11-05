@@ -123,6 +123,11 @@
     border-radius: 6px;
     font-weight: 500;
     letter-spacing: 0.5px;
+    position: relative;
+}
+
+.badge.bg-warning {
+    color: #fff !important;
 }
 
 /* Button styles */
@@ -174,4 +179,16 @@
 .status-select.ant-select-focused .ant-select-selector {
     border-color: #4dabf7 !important;
     box-shadow: 0 0 0 2px rgba(77, 171, 247, 0.2) !important;
+}
+
+/* Add styles for expired warning */
+.expired-warning {
+    font-size: 0.8rem;
+    animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
 }

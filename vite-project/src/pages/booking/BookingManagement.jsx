@@ -51,10 +51,26 @@ const BookingPage = () => {
                 service: booking.servicesDetail?.serviceId?.serviceName,
                 serviceType: booking.servicesDetail?.serviceTypeId?.service_type,
                 status: booking.status,
-                price: booking.servicesDetail?.serviceTypeId?.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
+                price: booking.servicesDetail?.serviceTypeId?.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
+                createdAt: booking.bookingTime,
+                isPaid: bills.some(bill => bill.bookingId === booking.bookingId)
             }));
 
             setBookings(values); // Set bookings to an array of booking objects
+
+            // Check for expired bookings and show toast notification
+            values.forEach(booking => {
+                if (isBookingExpired(booking)) {
+                    toast.warning(`Booking #${booking.id} is expired! (Over 30 minutes)`, {
+                        position: "top-right",
+                        autoClose: false,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                    });
+                }
+            });
         } catch (error) {
             console.log(error);
         }
@@ -64,6 +80,17 @@ const BookingPage = () => {
         fetchBooking();
         fetchBill();
     }, []);
+
+    // Add this function to check if a booking is expired (over 30 minutes old)
+    const isBookingExpired = (booking) => {
+        if (booking.status !== 'PENDING' || booking.isPaid) return false;
+        
+        const bookingDate = new Date(booking.createdAt);
+        const currentDate = new Date();
+        const diffInMinutes = Math.floor((currentDate - bookingDate) / (1000 * 60));
+        
+        return diffInMinutes > 10;
+    };
 
     const columns = [
         {
@@ -114,10 +141,24 @@ const BookingPage = () => {
             width: '10%',
             align: 'center',
             className: 'column-border',
-            render: (status) => (
-                <span className={`badge ${status === 'PENDING' ? 'bg-warning' : status === 'CONFIRMED' ? 'bg-success' : status === 'COMPLETED' ? 'bg-info' : 'bg-danger'} d-flex justify-content-center py-2 fst-italic`}>
-                    {status}
-                </span>
+            render: (status, record) => (
+                <div>
+                    <span className={`badge ${
+                        status === 'PENDING' ? 'bg-warning' : 
+                        status === 'CONFIRMED' ? 'bg-success' : 
+                        status === 'COMPLETED' ? 'bg-info' : 
+                        'bg-danger'
+                    } d-flex justify-content-center py-2 fst-italic`}>
+                        {status}
+                    </span>
+                    {isBookingExpired(record) && (
+                        <div className="expired-warning mt-1">
+                            <span className="text-danger fw-bold">
+                                Expired
+                            </span>
+                        </div>
+                    )}
+                </div>
             ),
         },
         {

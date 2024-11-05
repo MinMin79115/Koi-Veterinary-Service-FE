@@ -392,9 +392,11 @@ const BookingPage  = () => {
                         >
                           <option value="">Select a Doctor</option>
                           {doctors.map((item) => (
+                            item.state !== 'WORKING' && (
                             <option key={item.veterinarianId} value={`${item.veterinarianId} | ${item.user.fullname}`}>
                               Doctor: {item.user.fullname}
                             </option>
+                            )
                           ))}
                         </select>
                         </Form.Item>

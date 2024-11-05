@@ -349,32 +349,33 @@ const Home = () => {
                         className="feedback-avatar"
                       />
                       <div className="feedback-user-info">
-                        <h4>{feedback.user?.fullname || 'Anonymous'}</h4>
-                        <Rating 
-                          disabled 
-                          defaultValue={feedback.rating} 
+                        <h4 className='text-white'>Anonymous</h4>
+                        <Rating
+                          disabled
+                          defaultValue={feedback.rating}
                           character={<StarFilled />}
+                          style={{ color: 'rgb(254, 153, 0)' }}
                           className="feedback-rating"
                         />
                       </div>
                     </div>
-                    <div className="feedback-service">
+                    <div className="feedback-service text-white">
                       {feedback.bookingId?.servicesDetail?.serviceId?.serviceName === "Online Consulting" ? (
                         <p>{feedback.bookingId?.servicesDetail?.serviceId?.serviceName}
-                          <br/> <small>Online</small>
+                          <br /> <small>Online</small>
                         </p>
                       ) : (
-                          <div className='d-flex flex-column gap-6'>
-                            <p>{feedback.bookingId?.servicesDetail?.serviceId?.serviceName}
-                            <small> <br/> {feedback.bookingId?.servicesDetail?.serviceTypeId?.service_type}</small>
-                            </p>
-                          </div>
+                        <div className='d-flex flex-column gap-6'>
+                          <p>{feedback.bookingId?.servicesDetail?.serviceId?.serviceName}
+                            <small> <br /> {feedback.bookingId?.servicesDetail?.serviceTypeId?.service_type}</small>
+                          </p>
+                        </div>
                       )}
                     </div>
                     <div className="feedback-content">
-                      <p>"{feedback.feedback}"</p>
+                      <p className='text-white'>"{feedback.feedback}"</p>
                     </div>
-                    
+
                   </Card>
                 </SwiperSlide>
               ))}
@@ -386,10 +387,10 @@ const Home = () => {
           <div className="container mt-5">
             <div className="row">
               <div className="col-lg-12">
-                <div className="faq-section">
+                <div className="faq-section d-flex flex-column align-items-center">
                   <h2 className="mb-4">Frequently Asked Questions</h2>
                   {faqs && faqs.length > 0 ? (
-                    <div className="accordion" id="faqAccordion">
+                    <div className="accordion w-100" id="faqAccordion">
                       {faqs.map((faq, index) => (
                         <div className="accordion-item" key={faq.id}>
                           <h2 className="accordion-header" id={`heading${index}`}>
@@ -414,27 +415,25 @@ const Home = () => {
                   ) : (
                     <p className="text-muted">No FAQs available</p>
                   )}
-                </div>
-              </div>
-
-              <div className="col-12 mt-5">
-                <div className="card add-faq-section">
-                  <div className="card-body">
-                    <h3 className="card-title">Add your FAQ</h3>
-                    <form onSubmit={handleAddFAQ}>
-                      <div className="mb-3">
-                        <label htmlFor="question" className="form-label">Question:</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          id="question"
-                          value={newQuestion}
-                          onChange={(e) => setNewQuestion(e.target.value)}
-                          required
-                        />
+                  <div className="d-flex justify-content-center col-8 mt-5">
+                    <div className="card add-faq-section w-100">
+                      <div className="card-body">
+                        <form onSubmit={handleAddFAQ}>
+                          <div className="mb-3">
+                            <label htmlFor="question" className="form-label text-white">Do you have any questions?</label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              id="question"
+                              value={newQuestion}
+                              onChange={(e) => setNewQuestion(e.target.value)}
+                              required
+                            />
+                          </div>
+                          <button type="submit" className="button">Add FAQ</button>
+                        </form>
                       </div>
-                      <button type="submit" className="button">Add FAQ</button>
-                    </form>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -446,4 +445,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+      export default Home;

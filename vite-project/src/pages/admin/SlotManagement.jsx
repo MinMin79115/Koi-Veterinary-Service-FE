@@ -187,7 +187,7 @@ const SlotManagement = () => {
             width: "15%",
         },
         {
-            title: "Time Slot ID",
+            title: "Slot Number",
             dataIndex: ['timeSlotId'],
             key: "slotTimeId",
             width: "15%",
@@ -276,7 +276,7 @@ const SlotManagement = () => {
                         }))} />
                     </Form.Item>
                     <Form.Item
-                        label="Time Slot ID:"
+                        label="Slot Number:"
                         name="slotTimeId"
                         rules={[{
                             required: true, validator: validateSlotTimeId
