@@ -360,7 +360,9 @@ const Home = () => {
                     </div>
                     <div className="feedback-service">
                       {feedback.bookingId?.servicesDetail?.serviceId?.serviceName === "Online Consulting" ? (
-                        <p>{feedback.bookingId?.servicesDetail?.serviceId?.serviceName}</p>
+                        <p>{feedback.bookingId?.servicesDetail?.serviceId?.serviceName}
+                          <br/> <small>Online</small>
+                        </p>
                       ) : (
                           <div className='d-flex flex-column gap-6'>
                             <p>{feedback.bookingId?.servicesDetail?.serviceId?.serviceName}

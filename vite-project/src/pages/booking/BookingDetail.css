@@ -552,3 +552,197 @@
 .rate-button .anticon {
     margin-right: 8px;
 }
+
+/* Add these styles to improve the professional look */
+.booking-header {
+  margin-bottom: 2rem;
+}
+
+.page-title {
+  color: #1a1a1a;
+  margin-bottom: 2rem;
+  font-size: 2.2rem;
+  position: relative;
+  padding-bottom: 1rem;
+}
+
+.page-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 3px;
+  background: linear-gradient(90deg, #339af0, #4dabf7);
+  border-radius: 2px;
+}
+
+.booking-controls {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.search-section {
+  flex: 1;
+  max-width: 300px;
+}
+
+.search-input {
+  border-radius: 6px;
+}
+
+.search-input:hover, .search-input:focus {
+  border-color: #4dabf7;
+}
+
+.filter-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.sort-select {
+  min-width: 150px;
+}
+
+.cancel-toggle-btn {
+  border-radius: 6px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.cancel-toggle-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.booking-table-container {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.booking-table {
+  margin-top: 2.5rem;
+}
+
+/* Style the table */
+.ant-table {
+  border-radius: 8px;
+}
+
+.ant-table-thead > tr > th {
+  background: #f8f9fa;
+  color: #495057;
+  font-weight: 600;
+}
+
+.ant-table-tbody > tr:hover > td {
+  background: #f8f9fa;
+}
+
+/* Style the action buttons */
+.details-button {
+  background: #4dabf7;
+  border-color: #4dabf7;
+  color: white;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.details-button:hover {
+  background: #339af0;
+  border-color: #339af0;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(77, 171, 247, 0.2);
+}
+
+.rate-button {
+  background: #ffd43b;
+  border-color: #ffd43b;
+  color: #1a1a1a;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.rate-button:hover {
+  background: #fcc419;
+  border-color: #fcc419;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(255, 212, 59, 0.2);
+}
+
+/* Style the status badges */
+.badge {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* Modal styles */
+.action-modal .ant-modal-content {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.action-modal .ant-modal-header {
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  padding: 1rem 1.5rem;
+}
+
+.action-modal .ant-modal-body {
+  padding: 1.5rem;
+}
+
+/* Add these styles for the status filter */
+.search-section {
+    flex: 1;
+    max-width: 500px;
+}
+
+.status-select {
+    min-width: 120px !important;
+}
+
+.status-select .ant-select-selector {
+    border-radius: 6px !important;
+}
+
+.status-select:hover .ant-select-selector {
+    border-color: #4dabf7 !important;
+}
+
+.status-select.ant-select-focused .ant-select-selector {
+    border-color: #4dabf7 !important;
+    box-shadow: 0 0 0 2px rgba(77, 171, 247, 0.2) !important;
+}
+
+/* Update responsive styles */
+@media (max-width: 768px) {
+    .search-section {
+        flex-direction: column;
+        max-width: 100%;
+    }
+
+    .status-select {
+        width: 100% !important;
+    }
+
+    .filter-section {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .booking-controls {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}

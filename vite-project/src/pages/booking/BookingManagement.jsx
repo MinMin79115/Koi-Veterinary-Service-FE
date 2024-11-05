@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Popconfirm } from 'antd';
-import { CheckCircleOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Table, Button, Popconfirm, Input, Select, Space } from 'antd';
+import { CheckCircleOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './BookingManagement.css';
 import api from '../../config/axios'
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
+
+const { Option } = Select;
 
 const BookingPage = () => {
     const user = useSelector(state => state.user);
@@ -13,7 +15,9 @@ const BookingPage = () => {
     const [bookings, setBookings] = useState([]);
     const [bills, setBills] = useState([]);
     const [showCancelled, setShowCancelled] = useState(false);
-
+    const [searchTerm, setSearchTerm] = useState('');
+    const [sortOrder, setSortOrder] = useState('latest');
+    const [statusFilter, setStatusFilter] = useState('ALL');
 
     const fetchBill = async () => {
         try {
@@ -60,8 +64,6 @@ const BookingPage = () => {
         fetchBooking();
         fetchBill();
     }, []);
-
-
 
     const columns = [
         {
@@ -160,7 +162,6 @@ const BookingPage = () => {
             )
         }
     ];
-
 
     const handleConfirmBooking = async (record) => {
         const URLMeet = "https://meet.google.com/fgy-kvct-gtf"
@@ -266,31 +267,102 @@ const BookingPage = () => {
         }
     };
 
-    const filteredBookings = bookings
-        .filter(booking => showCancelled ? booking.status === "CANCELLED" : booking.status !== "CANCELLED")
-        .slice(showCancelled ? 10 : 0)
-        .sort((a, b) => b.id - a.id)
+    const getFilteredAndSortedBookings = () => {
+        let filtered = [...bookings];
+        
+        // Filter by service name
+        if (searchTerm) {
+            filtered = filtered.filter(booking => 
+                booking.service?.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        // Filter by status
+        if (statusFilter !== 'ALL') {
+            filtered = filtered.filter(booking => booking.status === statusFilter);
+        } else {
+            // Filter cancelled bookings
+            filtered = filtered.filter(booking => 
+                showCancelled ? booking.status === "CANCELLED" : booking.status !== "CANCELLED"
+            );
+        }
+
+        // Sort by booking ID
+        filtered.sort((a, b) => {
+            if (sortOrder === 'latest') {
+                return b.id - a.id;
+            } else {
+                return a.id - b.id;
+            }
+        });
+
+        return filtered;
+    };
+
     return (
         <div className="container-fluid mt-5">
-            <h2 className="mb-4 text-center mt-5">Booking Management</h2>
-            <div className="container bg-white rounded-3 p-3">
-                <div className="d-flex justify-content-end mb-3 py-2">
-                                <Button
-                                    type={showCancelled ? "primary" : "default"}
-                                    onClick={() => setShowCancelled(!showCancelled)}
-                                    className="mb-3"
-                                >
-                                    {showCancelled ? "Show Active Bookings" : "Show Cancelled Bookings"}
-                                </Button>
-                            </div>
-                                <Table
-                                    dataSource={filteredBookings}
-                                    columns={columns}
-                                    pagination={{ pageSize: 6 }}
-                                    className="table "
-                                />
+            <h2 className="page-title text-center mt-5">Booking Management</h2>
+                <div className="booking-controls mb-4">
+                    <Space size="middle" className="w-100 justify-content-between align-items-center">
+                        <div className="search-section d-flex gap-3">
+                            <Input
+                                placeholder="Search by service name..."
+                                prefix={<SearchOutlined />}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="search-input"
+                                allowClear
+                            />
+                            <Select
+                                defaultValue="ALL"
+                                onChange={(value) => setStatusFilter(value)}
+                                className="status-select"
+                                style={{ minWidth: 120 }}
+                                disabled={showCancelled}
+                            >
+                                <Option value="ALL">All Status</Option>
+                                <Option value="PENDING">Pending</Option>
+                                <Option value="CONFIRMED">Confirmed</Option>
+                                <Option value="COMPLETED">Completed</Option>
+                            </Select>
                         </div>
-                    </div>
+                        <div className="filter-section">
+                            <Select
+                                defaultValue="latest"
+                                onChange={(value) => setSortOrder(value)}
+                                className="sort-select me-3"
+                            >
+                                <Option value="latest">Latest First</Option>
+                                <Option value="oldest">Oldest First</Option>
+                            </Select>
+                            <Button
+                                type={showCancelled ? "primary" : "default"}
+                                onClick={() => {
+                                    setShowCancelled(!showCancelled);
+                                    setStatusFilter('ALL');
+                                }}
+                                className="cancel-toggle-btn"
+                            >
+                                {showCancelled ? "Show Active Bookings" : "Show Cancelled Bookings"}
+                            </Button>
+                        </div>
+                    </Space>
+                </div>
+
+                <div className="booking-table-container">
+                    <Table
+                        dataSource={getFilteredAndSortedBookings()}
+                    columns={columns}
+                    pagination={{ 
+                        pageSize: 4,
+                        showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} bookings`,
+                        showQuickJumper: true,
+                        showSizeChanger: false
+                    }}
+                    className="booking-table"
+                    loading={bookings.length === 0}
+                />
+            </div>
+        </div>
     );
 };
 

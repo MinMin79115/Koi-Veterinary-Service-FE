@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Popconfirm, Modal, Input } from 'antd';
-import { DeleteOutlined, FileDoneOutlined, PayCircleOutlined, ClockCircleOutlined, CheckCircleOutlined, StarOutlined } from '@ant-design/icons';
+import { Table, Button, Popconfirm, Modal, Input, Select, Space } from 'antd';
+import { DeleteOutlined, FileDoneOutlined, PayCircleOutlined, ClockCircleOutlined, CheckCircleOutlined, StarOutlined, SearchOutlined } from '@ant-design/icons';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './BookingDetail.css';
 import api from '../../config/axios'
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
+
+const { Option } = Select;
 
 const BookingDetail = () => {
   const token = useSelector(state => state.user.accessToken);
@@ -20,6 +22,9 @@ const BookingDetail = () => {
   const [actionModal, setActionModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortOrder, setSortOrder] = useState('latest');
+  const [statusFilter, setStatusFilter] = useState('ALL');
 
 
   //Open the note modal
@@ -380,254 +385,325 @@ const BookingDetail = () => {
     setSelectedBooking(null);
   };
 
+  const getFilteredAndSortedBookings = () => {
+    let filtered = [...bookings];
+    
+    // Filter by service name
+    if (searchTerm) {
+      filtered = filtered.filter(booking => 
+        booking.service?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Filter by status
+    if (statusFilter !== 'ALL') {
+      filtered = filtered.filter(booking => booking.status === statusFilter);
+    } else {
+      // Filter cancelled bookings
+      filtered = filtered.filter(booking => 
+        showCancelled ? booking.status === "CANCELLED" : booking.status !== "CANCELLED"
+      );
+    }
+
+    // Sort by booking ID
+    filtered.sort((a, b) => {
+      if (sortOrder === 'latest') {
+        return b.id - a.id;
+      } else {
+        return a.id - b.id;
+      }
+    });
+
+    return filtered;
+  };
+
   return (
-    <div className="container-fluid py-2">
-      <h2 className="mb-4 text-center fw-bold mt-5">Booking Detail</h2>
-        <div className="container">
-          <div className="bg-white rounded-3">
-            <div className="p-3">
-              <div className="d-flex justify-content-end mb-3">
-                <Button
-                  type= {showCancelled ? "" : "dashed"}
-                  onClick={() => setShowCancelled(!showCancelled)}
-                  className="mb-3"
-                  style={{
-                    border: 'none',
-                    padding: '20px 10px',
-                    background: showCancelled ? 'linear-gradient(145deg, #4dabf7, #339af0)' : 'black',
-                    color: 'white'
-                  }}
-                >
-                  {showCancelled ? "Show Active Bookings" : "Show Cancelled Bookings"}
-                </Button>
-              </div>
-                <Table
-                  dataSource={filteredBookings}
-                  columns={columns}
-                  pagination={{ pageSize: 6 }}
-                  className="table"
-                />
-              <Modal
-                title="Note"
-                open={noteModal}
-                onCancel={closeNoteModal}
-                onOk={() => handleNote(selectedRecord)}
-                okButtonProps={{ style: { display: user.role === 'CUSTOMER' ? 'none' : 'inline-block' } }} // Hide OK button for CUSTOMER
+    <div className="container-fluid py-4">
+      <div className="booking-header">
+        <h2 className="page-title text-center fw-bold mt-5">Booking History</h2>
+        <div className="booking-controls">
+          <Space size="middle" className="w-100 justify-content-between align-items-center mb-1">
+            <div className="search-section d-flex gap-3">
+              <Input
+                placeholder="Search by service name..."
+                prefix={<SearchOutlined />}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="search-input"
+                allowClear
+              />
+              <Select
+                defaultValue="ALL"
+                onChange={(value) => setStatusFilter(value)}
+                className="status-select"
+                style={{ minWidth: 120 }}
+                disabled={showCancelled}
               >
-                {user.role === 'VETERINARIAN' ? (
-                  <Input.TextArea size='large' rows={6} value={selectedRecord?.note} onChange={(e) => setSelectedRecord({ ...selectedRecord, note: e.target.value })} />
-                ) : (
-                  <>
-                    <span className='fw-bold'>Your prescription:</span>
-                    <p>{selectedRecord?.note || 'No note available'}</p>
-                  </>
-                )}
-              </Modal>
-              <Modal
-                open={actionModal}
-                onCancel={closeActionModal}
-                footer={null}
-                centered
-                width="90%"
-                style={{ 
-                  maxWidth: '700px',
-                  minWidth: '300px'
-                }}
-                className="action-modal"
-              >
-                {selectedBooking && (
-                  <div className="booking-details">
-                    <div className="details-section">
-                      <h3>Booking Information</h3>
-                      <div className="info-grid">
-                        <div className="info-item">
-                          <label>Booking ID:</label>
-                          <span>{selectedBooking.id}</span>
-                        </div>
-                        {(user?.role === 'CUSTOMER' || user?.role === 'VETERINARIAN') && (
-                          <div className="info-item">
-                            <label>Customer:</label>
-                            <span>{selectedBooking.customerName}</span>
-                          </div>
-                        )}
-                        {user?.role === 'CUSTOMER' && (
-                          <div className="info-item">
-                            <label>Veterinarian:</label>
-                            <span>{selectedBooking?.veterinarian || 'No veterinarian available'}</span>
-                          </div>
-                        )}
-                        {user?.role === 'VETERINARIAN' && (
-                          <div className="info-item">
-                            <label>Address:</label>
-                            <span>{selectedBooking.address}</span>
-                          </div>
-                        )}
-                        
-                        <div className="info-item">
-                          <label>Service:</label>
-                          <span>{selectedBooking.service}</span>
-                        </div>
-                        <div className="info-item">
-                          <label>Type:</label>
-                          <span>{selectedBooking.serviceType}</span>
-                        </div>
-                        {selectedBooking.serviceType === "At_Home" && selectedBooking.status !== "CANCELLED" && (
-                          <div className="info-item">
-                            <label>Price:</label>
-                            <span>{selectedBooking.price} <br /> <span className='text-success'>+10% each km (if above 10km)</span></span>
-                          </div>
-                        )}
-                        {selectedBooking.serviceType !== "At_Home" && (
-                          <div className="info-item">
-                            <label>Price:</label>
-                            <span>{selectedBooking.price}</span>
-                          </div>
-                        )}
-                        <div className="info-item">
-                          <label>Email:</label>
-                          <span>{selectedBooking.email}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="status-progress">
-                      <div className="progress-container">
-                        <div className="progress-line">
-                          <div 
-                            className={`progress-fill ${
-                              selectedBooking.status === 'CANCELLED' ? 'cancelled' :
-                              selectedBooking.status === 'COMPLETED' ? 'completed' :
-                              selectedBooking.status === 'CONFIRMED' ? 'confirmed' : 'pending'
-                            }`}
-                            style={{
-                              width: selectedBooking.status === 'COMPLETED' ? '100%' :
-                                    selectedBooking.status === 'CONFIRMED' ? '66%' :
-                                    selectedBooking.status === 'PENDING' ? '33%' : '100%'
-                            }}
-                          />
-                        </div>
-                        {user?.role === 'CUSTOMER' && (
-                          <>
-                          <div className="progress-steps">
-                            <div className={`progress-step ${selectedBooking.status === 'PENDING' || selectedBooking.status === 'CONFIRMED' || selectedBooking.status === 'COMPLETED' ? 'active' : ''}`}>
-                              <div className="step-dot"></div>
-                              <span>Pending</span>
-                            </div>
-                            <div className={`progress-step ${selectedBooking.status === 'CONFIRMED' || selectedBooking.status === 'COMPLETED' ? 'active' : ''}`}>
-                              <div className="step-dot"></div>
-                              <span>Confirmed</span>
-                            </div>
-                            <div className={`progress-step ${selectedBooking.status === 'COMPLETED' ? 'active' : ''}`}>
-                              <div className="step-dot"></div>
-                              <span>Completed</span>
-                            </div>
-                          </div>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                    <div className="actions-section">
-                      <h3>Available Actions</h3>
-                      <div className="action-buttons">
-                        {user?.role === 'CUSTOMER' ? (
-                          <>
-                            {selectedBooking.status === "COMPLETED" ? (
-                              selectedBooking.note ? (
-                                <Button 
-                                  onClick={() => {
-                                    closeActionModal();
-                                    openNoteModal(selectedBooking);
-                                  }}
-                                  type="primary"
-                                  className="m-1"
-                                >
-                                  View Note
-                                </Button>
-                              ) : (
-                                selectedBooking.serviceType !== "At_Center" ? (
-                                  <Button disabled className="m-1">No Note Available</Button>
-                                ) : (
-                                  <p>Note is not available for this service type.</p>
-                                )
-                              )
-                              
-                            ) : selectedBooking.status === "PENDING" && (
-                              <>
-                                {!selectedBooking.isPaid ? (
-                                  <Button
-                                    type="primary"
-                                    icon={<PayCircleOutlined />}
-                                    onClick={() => handlePay(selectedBooking)}
-                                    className="m-1"
-                                  >
-                                    Pay for service
-                                  </Button>
-                                ) : (
-                                  <div className='d-flex flex-column align-items-center'>
-                                    <p className='text-success'>Payment Completed <CheckCircleOutlined /></p>
-                                    <i>Waiting for confirmation</i>
-                                  </div>
-                                )}
-                                <Popconfirm
-                                  title="Delete Booking"
-                                  description="Are you sure you want to delete this booking?"
-                                  onConfirm={() => {
-                                    handleDeleteBooking(selectedBooking);
-                                    closeActionModal();
-                                  }}
-                                  okText="Yes"
-                                  cancelText="No"
-                                >
-                                  <Button 
-                                    type="primary" 
-                                    danger 
-                                    icon={<DeleteOutlined />} 
-                                    className="m-1"
-                                    hidden={selectedBooking.isPaid}
-                                  >
-                                    Delete
-                                  </Button>
-                                </Popconfirm>
-                              </>
-                            )}
-                          </>
-                        ) : user?.role === 'VETERINARIAN' && (
-                          <>
-                            {selectedBooking.status === "CONFIRMED" && (
-                              <Button
-                                type="primary"
-                                icon={<FileDoneOutlined />}
-                                onClick={() => {
-                                  handleComplete(selectedBooking);
-                                  closeActionModal();
-                                }}
-                                className="m-1"
-                              >
-                                Complete
-                              </Button>
-                            )}
-                            {selectedBooking.status === "COMPLETED" && selectedBooking.serviceType !== "At_Center" && (
-                              <Button 
-                                onClick={() => {
-                                  closeActionModal();
-                                  openNoteModal(selectedBooking);
-                                }}
-                                type="primary"
-                                className="m-1"
-                              >
-                                Manage Note
-                              </Button>
-                            )}
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </Modal>
+                <Option value="ALL">All Status</Option>
+                <Option value="PENDING">Pending</Option>
+                <Option value="CONFIRMED">Confirmed</Option>
+                <Option value="COMPLETED">Completed</Option>
+              </Select>
             </div>
-          </div>
+            <div className="filter-section">
+              <Select
+                defaultValue="latest"
+                onChange={(value) => setSortOrder(value)}
+                className="sort-select"
+              >
+                <Option value="latest">Latest First</Option>
+                <Option value="oldest">Oldest First</Option>
+              </Select>
+              <Button
+                type={showCancelled ? "" : "dashed"}
+                onClick={() => {
+                  setShowCancelled(!showCancelled);
+                  setStatusFilter('ALL');
+                }}
+                className="cancel-toggle-btn ms-3"
+                style={{
+                  background: showCancelled ? 'linear-gradient(145deg, #4dabf7, #339af0)' : 'black',
+                  color: 'white'
+                }}
+              >
+                {showCancelled ? "Show Active Bookings" : "Show Cancelled Bookings"}
+              </Button>
+            </div>
+          </Space>
         </div>
       </div>
+
+      <div className="booking-table-container">
+        <Table
+          dataSource={getFilteredAndSortedBookings()}
+          columns={columns}
+          pagination={{ 
+            pageSize: 4,
+            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} bookings`,
+            showQuickJumper: true
+          }}
+          className="booking-table"
+          loading={bookings.length === 0}
+        />
+      </div>
+      
+      <Modal
+        title="Note"
+        open={noteModal}
+        onCancel={closeNoteModal}
+        onOk={() => handleNote(selectedRecord)}
+        okButtonProps={{ style: { display: user.role === 'CUSTOMER' ? 'none' : 'inline-block' } }} // Hide OK button for CUSTOMER
+      >
+        {user.role === 'VETERINARIAN' ? (
+          <Input.TextArea size='large' rows={6} value={selectedRecord?.note} onChange={(e) => setSelectedRecord({ ...selectedRecord, note: e.target.value })} />
+        ) : (
+          <>
+            <span className='fw-bold'>Your prescription:</span>
+            <p>{selectedRecord?.note || 'No note available'}</p>
+          </>
+        )}
+      </Modal>
+      <Modal
+        open={actionModal}
+        onCancel={closeActionModal}
+        footer={null}
+        centered
+        width="90%"
+        style={{ 
+          maxWidth: '700px',
+          minWidth: '300px'
+        }}
+        className="action-modal"
+      >
+        {selectedBooking && (
+          <div className="booking-details">
+            <div className="details-section">
+              <h3>Booking Information</h3>
+              <div className="info-grid">
+                <div className="info-item">
+                  <label>Booking ID:</label>
+                  <span>{selectedBooking.id}</span>
+                </div>
+                {(user?.role === 'CUSTOMER' || user?.role === 'VETERINARIAN') && (
+                  <div className="info-item">
+                    <label>Customer:</label>
+                    <span>{selectedBooking.customerName}</span>
+                  </div>
+                )}
+                {user?.role === 'CUSTOMER' && (
+                  <div className="info-item">
+                    <label>Veterinarian:</label>
+                    <span>{selectedBooking?.veterinarian || 'No veterinarian available'}</span>
+                  </div>
+                )}
+                {user?.role === 'VETERINARIAN' && (
+                  <div className="info-item">
+                    <label>Address:</label>
+                    <span>{selectedBooking.address}</span>
+                  </div>
+                )}
+                
+                <div className="info-item">
+                  <label>Service:</label>
+                  <span>{selectedBooking.service}</span>
+                </div>
+                <div className="info-item">
+                  <label>Type:</label>
+                  <span>{selectedBooking.serviceType}</span>
+                </div>
+                {selectedBooking.serviceType === "At_Home" && selectedBooking.status !== "CANCELLED" && (
+                  <div className="info-item">
+                    <label>Price:</label>
+                    <span>{selectedBooking.price} <br /> <span className='text-success'>+10% each km (if above 10km)</span></span>
+                  </div>
+                )}
+                {selectedBooking.serviceType !== "At_Home" && (
+                  <div className="info-item">
+                    <label>Price:</label>
+                    <span>{selectedBooking.price}</span>
+                  </div>
+                )}
+                <div className="info-item">
+                  <label>Email:</label>
+                  <span>{selectedBooking.email}</span>
+                </div>
+              </div>
+            </div>
+            <div className="status-progress">
+              <div className="progress-container">
+                <div className="progress-line">
+                  <div 
+                    className={`progress-fill ${
+                      selectedBooking.status === 'CANCELLED' ? 'cancelled' :
+                      selectedBooking.status === 'COMPLETED' ? 'completed' :
+                      selectedBooking.status === 'CONFIRMED' ? 'confirmed' : 'pending'
+                    }`}
+                    style={{
+                      width: selectedBooking.status === 'COMPLETED' ? '100%' :
+                            selectedBooking.status === 'CONFIRMED' ? '66%' :
+                            selectedBooking.status === 'PENDING' ? '33%' : '100%'
+                    }}
+                  />
+                </div>
+                {user?.role === 'CUSTOMER' && (
+                  <>
+                  <div className="progress-steps">
+                    <div className={`progress-step ${selectedBooking.status === 'PENDING' || selectedBooking.status === 'CONFIRMED' || selectedBooking.status === 'COMPLETED' ? 'active' : ''}`}>
+                      <div className="step-dot"></div>
+                      <span>Pending</span>
+                    </div>
+                    <div className={`progress-step ${selectedBooking.status === 'CONFIRMED' || selectedBooking.status === 'COMPLETED' ? 'active' : ''}`}>
+                      <div className="step-dot"></div>
+                      <span>Confirmed</span>
+                    </div>
+                    <div className={`progress-step ${selectedBooking.status === 'COMPLETED' ? 'active' : ''}`}>
+                      <div className="step-dot"></div>
+                      <span>Completed</span>
+                    </div>
+                  </div>
+                  </>
+                )}
+              </div>
+            </div>
+            <div className="actions-section">
+              <h3>Available Actions</h3>
+              <div className="action-buttons">
+                {user?.role === 'CUSTOMER' ? (
+                  <>
+                    {selectedBooking.status === "COMPLETED" ? (
+                      selectedBooking.note ? (
+                        <Button 
+                          onClick={() => {
+                            closeActionModal();
+                            openNoteModal(selectedBooking);
+                          }}
+                          type="primary"
+                          className="m-1"
+                        >
+                          View Note
+                        </Button>
+                      ) : (
+                        selectedBooking.serviceType !== "At_Center" ? (
+                          <Button disabled className="m-1">No Note Available</Button>
+                        ) : (
+                          <p>Note is not available for this service type.</p>
+                        )
+                      )
+                      
+                    ) : selectedBooking.status === "PENDING" && (
+                      <>
+                        {!selectedBooking.isPaid ? (
+                          <Button
+                            type="primary"
+                            icon={<PayCircleOutlined />}
+                            onClick={() => handlePay(selectedBooking)}
+                            className="m-1"
+                          >
+                            Pay for service
+                          </Button>
+                        ) : (
+                          <div className='d-flex flex-column align-items-center'>
+                            <p className='text-success'>Payment Completed <CheckCircleOutlined /></p>
+                            <i>Waiting for confirmation</i>
+                          </div>
+                        )}
+                        <Popconfirm
+                          title="Delete Booking"
+                          description="Are you sure you want to delete this booking?"
+                          onConfirm={() => {
+                            handleDeleteBooking(selectedBooking);
+                            closeActionModal();
+                          }}
+                          okText="Yes"
+                          cancelText="No"
+                        >
+                          <Button 
+                            type="primary" 
+                            danger 
+                            icon={<DeleteOutlined />} 
+                            className="m-1"
+                            hidden={selectedBooking.isPaid}
+                          >
+                            Delete
+                          </Button>
+                        </Popconfirm>
+                      </>
+                    )}
+                  </>
+                ) : user?.role === 'VETERINARIAN' && (
+                  <>
+                    {selectedBooking.status === "CONFIRMED" && (
+                      <Button
+                        type="primary"
+                        icon={<FileDoneOutlined />}
+                        onClick={() => {
+                          handleComplete(selectedBooking);
+                          closeActionModal();
+                        }}
+                        className="m-1"
+                      >
+                        Complete
+                      </Button>
+                    )}
+                    {selectedBooking.status === "COMPLETED" && selectedBooking.serviceType !== "At_Center" && (
+                      <Button 
+                        onClick={() => {
+                          closeActionModal();
+                          openNoteModal(selectedBooking);
+                        }}
+                        type="primary"
+                        className="m-1"
+                      >
+                        Manage Note
+                      </Button>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </Modal>
+    </div>
   );
 };
 
