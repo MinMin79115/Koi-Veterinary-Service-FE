@@ -61,7 +61,7 @@ const BookingPage = () => {
             // Check for expired bookings and show toast notification
             values.forEach(booking => {
                 if (isBookingExpired(booking)) {
-                    toast.warning(`Booking #${booking.id} is expired! (Over 30 minutes)`, {
+                    toast.warning(`Booking #${booking.id} is expired! (Over 5 minutes not paid)`, {
                         position: "top-right",
                         autoClose: false,
                         hideProgressBar: false,
@@ -89,7 +89,7 @@ const BookingPage = () => {
         const currentDate = new Date();
         const diffInMinutes = Math.floor((currentDate - bookingDate) / (1000 * 60));
         
-        return diffInMinutes > 10;
+        return diffInMinutes > 5;
     };
 
     const columns = [
