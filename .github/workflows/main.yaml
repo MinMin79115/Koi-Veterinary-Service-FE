@@ -7,6 +7,7 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
+      BASE_URL: ${{secrets.BASE_URL}}
     steps:
       - name: Checkout Develop
         uses: actions/checkout@v3

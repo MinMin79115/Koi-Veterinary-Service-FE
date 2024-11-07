@@ -5,6 +5,8 @@ FROM node:lts AS build
 WORKDIR /build
 COPY package.json /build/package.json
 COPY package-lock.json /build/package-lock.json
+ARG BASE_URL
+ENV VITE_BASE_URL=${BASE_URL}
 RUN npm i
 COPY . /build
 RUN npm run build

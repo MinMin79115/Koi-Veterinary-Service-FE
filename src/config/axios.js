@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const api = axios.create({
     // baseURL: 'http://14.225.206.168:8080/api/',
-    baseURL: 'http://localhost:8080/api/v1/',
+    baseURL: process.env.VITE_BASE_URL ?? 'http://localhost:8080/api/v1/',
 });
 
 api.interceptors.request.use(config => {
