@@ -1,0 +1,39 @@
+on:
+  push:
+    branches: ["main", "deploy/add_script_deploy"]
+jobs:
+  koi-client-build:
+    name: Build source code to Docker image
+    runs-on: ubuntu-22.04
+    env:
+      DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
+    steps:
+      - name: Checkout Develop
+        uses: actions/checkout@v3
+      - name: DockerHub Login
+        uses: docker/login-action@v3.1.0
+        with:
+          username: ${{secrets.DOCKER_USERNAME}}
+          password: ${{secrets.DOCKER_TOKEN}}
+      - name: Build Image And Push
+        run: docker compose build koi-client && docker compose push koi-client
+
+  koi-client-deploy:
+    name: Deploy KOI Client
+    runs-on: mint-server
+    needs: koi-client-build
+    env:
+      DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
+    steps:
+      - name: Checkout Develop
+        uses: actions/checkout@v3
+      - name: DockerHub Login
+        uses: docker/login-action@v3.1.0
+        with:
+          username: ${{secrets.DOCKER_USERNAME}}
+          password: ${{secrets.DOCKER_TOKEN}}
+      - name: Stop Client
+        run: docker compose -f docker-compose.prod.yaml -p koi-application down koi-client --rmi all -v
+        continue-on-error: true
+      - name: Deploy Client
+        run: docker compose -f docker-compose.prod.yaml -p koi-application up -d
