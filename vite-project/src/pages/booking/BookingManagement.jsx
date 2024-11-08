@@ -18,6 +18,32 @@ const BookingPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [sortOrder, setSortOrder] = useState('latest');
     const [statusFilter, setStatusFilter] = useState('ALL');
+    const [options, setOptions] = useState([]);
+    const labelRender = (props) => {
+        const { label, value } = props;
+        if (label) {
+            return value;
+        }
+        return <span>Select Veterinarian</span>;
+    };
+
+    const fetchDoctor = async () => {
+        try {
+            const response = await api.get('veterinarian', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const values = response.data.filter(doc => doc.state === 'ONLINE').map(doc => ({
+                label: doc.user.fullname,
+                value: doc.veterinarianId
+            }));
+            setOptions(values);
+            console.log(values)
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     const fetchBill = async () => {
         try {
@@ -65,7 +91,9 @@ const BookingPage = () => {
     useEffect(() => {
         fetchBooking();
         fetchBill();
+        fetchDoctor();
     }, []);
+
 
     useEffect(() => {
         // Check for expired bookings and show toast notification
@@ -75,7 +103,7 @@ const BookingPage = () => {
                 checkBooking = true;
             }
         });
-        if(checkBooking){
+        if (checkBooking) {
             toast.warning(`Have some booking is expired! (Over 5 minutes not paid)`, {
                 position: "top-center",
                 autoClose: true,
@@ -84,15 +112,15 @@ const BookingPage = () => {
         }
     }, [bookings]);
 
-    // Add this function to check if a booking is expired (over 30 minutes old)
+    // Add this function to check if a booking is expired (over 10 minutes old)
     const isBookingExpired = (booking) => {
         if (booking.status !== 'PENDING' || booking.isPaid) return false;
-        
+
         const bookingDate = new Date(booking.createdAt);
         const currentDate = new Date();
         const diffInMinutes = Math.floor((currentDate - bookingDate) / (1000 * 60));
-        
-        return diffInMinutes > 5;
+
+        return diffInMinutes > 12;
     };
 
     const columns = [
@@ -127,7 +155,21 @@ const BookingPage = () => {
             key: 'veterinarian',
             width: '20%',
             align: 'center',
-            className: 'column-border'
+            className: 'column-border',
+            render: (_, record) => (
+                record?.veterinarian ? record?.veterinarian : (
+                    <Select
+                        labelRender={labelRender}
+                        defaultValue="-1"
+                        style={{
+                            width: '100%',
+                        }}
+                        options={options}
+                        onChange={(value) => handleChangeVeterinarian(value, record)}
+                        allowClear
+                    />
+                )
+            )
         },
         {
             title: 'Service',
@@ -146,12 +188,11 @@ const BookingPage = () => {
             className: 'column-border',
             render: (status, record) => (
                 <div>
-                    <span className={`badge ${
-                        status === 'PENDING' ? 'bg-warning' : 
-                        status === 'CONFIRMED' ? 'bg-success' : 
-                        status === 'COMPLETED' ? 'bg-info' : 
-                        'bg-danger'
-                    } d-flex justify-content-center py-2 fst-italic`}>
+                    <span className={`badge ${status === 'PENDING' ? 'bg-warning' :
+                            status === 'CONFIRMED' ? 'bg-success' :
+                                status === 'COMPLETED' ? 'bg-info' :
+                                    'bg-danger'
+                        } d-flex justify-content-center py-2 fst-italic`}>
                         {status}
                     </span>
                     {isBookingExpired(record) && (
@@ -192,20 +233,39 @@ const BookingPage = () => {
                             okText="Yes"
                             cancelText="No"
                         >
-                            <Button 
-                                type="primary" 
-                                danger 
-                                icon={<DeleteOutlined />} 
+                            <Button
+                                type="primary"
+                                danger
+                                icon={<DeleteOutlined />}
                                 className="m-1"
                             >
                                 Delete
-                                </Button>
+                            </Button>
                         </Popconfirm>
                     )}
                 </div>
             )
         }
     ];
+
+    const handleChangeVeterinarian = async (value, record) => {
+        if (!value) return;
+        const valuesToSend = {
+            veterinarianId: value
+        }
+        try {
+            const response = await api.put(`bookings/${record.id}`, valuesToSend, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            fetchBooking();
+            console.log(response.data)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
 
     const handleConfirmBooking = async (record) => {
         const URLMeet = "https://meet.google.com/fgy-kvct-gtf"
@@ -276,7 +336,7 @@ const BookingPage = () => {
     };
 
     const handleDeleteBooking = async (record) => {
-       
+
         const emailContent = `
             <html>
               <body>
@@ -313,10 +373,10 @@ const BookingPage = () => {
 
     const getFilteredAndSortedBookings = () => {
         let filtered = [...bookings];
-        
+
         // Filter by service name
         if (searchTerm) {
-            filtered = filtered.filter(booking => 
+            filtered = filtered.filter(booking =>
                 booking.service?.toLowerCase().includes(searchTerm.toLowerCase())
             );
         }
@@ -326,7 +386,7 @@ const BookingPage = () => {
             filtered = filtered.filter(booking => booking.status === statusFilter);
         } else {
             // Filter cancelled bookings
-            filtered = filtered.filter(booking => 
+            filtered = filtered.filter(booking =>
                 showCancelled ? booking.status === "CANCELLED" : booking.status !== "CANCELLED"
             );
         }
@@ -346,61 +406,61 @@ const BookingPage = () => {
     return (
         <div className="container-fluid mt-5">
             <h2 className="page-title text-center mt-5">Booking Management</h2>
-                <div className="booking-controls mb-4">
-                    <Space size="middle" className="w-100 justify-content-between align-items-center">
-                        <div className="search-section d-flex gap-3">
-                            <Input
-                                placeholder="Search by service name..."
-                                prefix={<SearchOutlined />}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="search-input"
-                                allowClear
-                            />
-                            <Select
-                                defaultValue="ALL"
-                                onChange={(value) => setStatusFilter(value)}
-                                className="status-select"
-                                style={{ minWidth: 120 }}
-                                disabled={showCancelled}
-                            >
-                                <Option value="ALL">All Status</Option>
-                                <Option value="PENDING">Pending</Option>
-                                <Option value="CONFIRMED">Confirmed</Option>
-                                <Option value="COMPLETED">Completed</Option>
-                            </Select>
-                        </div>
-                        <div className="filter-section">
-                            <Select
-                                defaultValue="latest"
-                                onChange={(value) => setSortOrder(value)}
-                                className="sort-select me-3"
-                            >
-                                <Option value="latest">Latest First</Option>
-                                <Option value="oldest">Oldest First</Option>
-                            </Select>
-                            <Button
-                                type={showCancelled ? "primary" : "default"}
-                                onClick={() => {
-                                    setShowCancelled(!showCancelled);
-                                    setStatusFilter('ALL');
-                                }}
-                                className="cancel-toggle-btn"
-                                style={{
-                                    background: showCancelled ? 'linear-gradient(145deg, #4dabf7, #339af0)' : 'black',
-                                    color: 'white'
-                                }}
-                            >
-                                {showCancelled ? "Show Active Bookings" : "Show Cancelled Bookings"}
-                            </Button>
-                        </div>
-                    </Space>
-                </div>
+            <div className="booking-controls mb-4">
+                <Space size="middle" className="w-100 justify-content-between align-items-center">
+                    <div className="search-section d-flex gap-3">
+                        <Input
+                            placeholder="Search by service name..."
+                            prefix={<SearchOutlined />}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="search-input"
+                            allowClear
+                        />
+                        <Select
+                            defaultValue="ALL"
+                            onChange={(value) => setStatusFilter(value)}
+                            className="status-select"
+                            style={{ minWidth: 120 }}
+                            disabled={showCancelled}
+                        >
+                            <Option value="ALL">All Status</Option>
+                            <Option value="PENDING">Pending</Option>
+                            <Option value="CONFIRMED">Confirmed</Option>
+                            <Option value="COMPLETED">Completed</Option>
+                        </Select>
+                    </div>
+                    <div className="filter-section">
+                        <Select
+                            defaultValue="latest"
+                            onChange={(value) => setSortOrder(value)}
+                            className="sort-select me-3"
+                        >
+                            <Option value="latest">Latest First</Option>
+                            <Option value="oldest">Oldest First</Option>
+                        </Select>
+                        <Button
+                            type={showCancelled ? "primary" : "default"}
+                            onClick={() => {
+                                setShowCancelled(!showCancelled);
+                                setStatusFilter('ALL');
+                            }}
+                            className="cancel-toggle-btn"
+                            style={{
+                                background: showCancelled ? 'linear-gradient(145deg, #4dabf7, #339af0)' : 'black',
+                                color: 'white'
+                            }}
+                        >
+                            {showCancelled ? "Show Active Bookings" : "Show Cancelled Bookings"}
+                        </Button>
+                    </div>
+                </Space>
+            </div>
 
-                <div className="booking-table-container">
-                    <Table
-                        dataSource={getFilteredAndSortedBookings()}
+            <div className="booking-table-container">
+                <Table
+                    dataSource={getFilteredAndSortedBookings()}
                     columns={columns}
-                    pagination={{ 
+                    pagination={{
                         pageSize: 4,
                         showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} bookings`,
                         showQuickJumper: true,

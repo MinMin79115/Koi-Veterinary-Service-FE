@@ -72,7 +72,7 @@ const BookingDetail = () => {
     }
   }
 
-  // Add this function to check if a booking is expired (over 5 minutes old)
+  // Add this function to check if a booking is expired (over 10 minutes old)
   const isBookingExpired = (booking) => {
     if (booking.status !== 'PENDING' || booking.isPaid) return false;
     
@@ -80,7 +80,7 @@ const BookingDetail = () => {
     const currentDate = new Date();
     const diffInMinutes = Math.floor((currentDate - bookingDate) / (1000 * 60));
     
-    return diffInMinutes > 5;
+    return diffInMinutes > 10;
   };
 
   const fetchBooking = async () => {

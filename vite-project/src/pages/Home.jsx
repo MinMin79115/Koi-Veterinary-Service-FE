@@ -230,8 +230,8 @@ const Home = () => {
         </div>
         {/* Schedule here */}
         <div className="schedule-exam">
-          <h2>Schedule a Fish Exam</h2>
-          <Link to="/booking#booking">Schedule here.</Link>
+        <h3>Need help with your Koi?</h3>
+        <Link to="/booking#booking" className="cta-button">Schedule a Consultation</Link>
         </div>
         {/* Rating here */}
         {booking && (
