@@ -126,29 +126,43 @@ function CustomerPage() {
   return (
     <div className={`bg-white shadow my-2`} id="page-content">
       {user.role === "CUSTOMER" || user.role === "VETERINARIAN" ? (
-        <div className="row mb-4">
-          <div className="col-12 d-flex justify-content-end align-items-center my-4">
-            <SendOutlined className="me-2" />
-            <Link className="btn btn-outline-info btn-sm me-2" to="/booking-detail">
+        <div className={styles['nav-links-container']}>
+          <div className="d-flex justify-content-end">
+            <Link 
+              className={`${styles['nav-button']} ${styles.primary}`} 
+              to="/booking-detail"
+            >
+              <SendOutlined className={styles['nav-icon']} />
               View Booking History
             </Link>
           </div>
         </div>
       ) : (
-        <>
-        <div className="row mb-4">
-          <div className="col-12 d-flex justify-content-end align-items-center my-4">
-            <SendOutlined className="me-1" />
-            <Link className="btn btn-outline-info btn-sm me-3" to="/booking-management">
+        <div className={styles['nav-links-container']}>
+          <div className="d-flex justify-content-end flex-wrap gap-3">
+            <Link 
+              className={`${styles['nav-button']} ${styles.warning}`} 
+              to="/booking-management"
+            >
+              <SendOutlined className={styles['nav-icon']} />
               Manage Bookings
             </Link>
-            <SendOutlined className="me-1 mx-1" />
-            <Link className="btn btn-outline-info btn-sm me-3" to="/faq-management">
+            <Link 
+              className={`${styles['nav-button']} ${styles.primary}`} 
+              to="/feedback-management"
+            >
+              <SendOutlined className={styles['nav-icon']} />
+              Manage Feedbacks
+            </Link>
+            <Link 
+              className={`${styles['nav-button']} ${styles.primary}`} 
+              to="/faq-management"
+            >
+              <SendOutlined className={styles['nav-icon']} />
               Manage FAQs
             </Link>
           </div>
         </div>
-      </>
       )}
       <div className={`${styles.padding} m-5`}>
         <div className={`row container d-flex justify-content-center `}>

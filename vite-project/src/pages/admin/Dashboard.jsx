@@ -17,6 +17,7 @@ import './AdminPage.css'; // We'll create this for any additional custom styles
 import api from '../../config/axios';
 import { Table, Tag } from 'antd';
 import { useSelector } from 'react-redux';
+import { StarFilled } from '@ant-design/icons';
 
 // Register the required components
 ChartJS.register(
@@ -35,6 +36,7 @@ const Dashboard = () => {
   const token = useSelector((state) => state.accessToken);
   const [dataSource, setDataSource] = useState([]);
   const [customerList, setCustomerList] = useState([]);
+  const [feedbacks, setFeedbacks] = useState([]);
   const [bills, setBills] = useState([]);
   const sortBooking = dataSource.sort((a, b) => b.bookingId - a.bookingId);
   const sortCustomer = customerList.sort((a, b) => b.customerId - a.customerId);
@@ -77,6 +79,7 @@ const Dashboard = () => {
     ],
   });
 
+
   const columns = [
     { title: 'Booking ID', dataIndex: 'bookingId' },
     { title: 'Customer', dataIndex: 'customerName' },
@@ -99,6 +102,46 @@ const Dashboard = () => {
     { title: 'BookingId', dataIndex: 'BookingId'  },
     {title: 'Customer', dataIndex: 'Customer'},
     { title: 'Date', dataIndex: 'Date' },
+  ];
+
+  const feedbackColumns = [
+    { 
+      title: 'Booking ID', 
+      dataIndex: 'bookingId',
+      width: '10%',
+      align: 'center' 
+    },
+    { 
+      title: 'Customer', 
+      dataIndex: 'customerName',
+      width: '20%',
+      align: 'center' 
+    },
+    { 
+      title: 'Service', 
+      dataIndex: 'serviceName',
+      width: '20%',
+      align: 'center' 
+    },
+    {
+      title: 'Rating',
+      dataIndex: 'rating',
+      width: '15%',
+      align: 'center',
+      render: (rating) => (
+        <div style={{ color: '#ffd700' }}>
+          {[...Array(rating)].map((_, index) => (
+            <StarFilled key={index} />
+          ))}
+        </div>
+      )
+    },
+    { 
+      title: 'Comment', 
+      dataIndex: 'comment',
+      width: '25%',
+      align: 'center' 
+    },
   ];
 
   const fetchBills = async () => {
@@ -267,9 +310,32 @@ const Dashboard = () => {
     }
   };
 
+  const fetchFeedbacks = async () => {
+    try {
+      const response = await api.get('feedback', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      console.log(response.data)
+      const formattedFeedbacks = response.data.map(feedback => ({
+        bookingId: feedback.bookingId?.bookingId,
+        customerName: feedback.bookingId?.user?.fullname,
+        serviceName: feedback.bookingId?.servicesDetail?.serviceId?.serviceName,
+        rating: feedback.rating,
+        comment: feedback.feedback,
+      }));
+
+      setFeedbacks(formattedFeedbacks);
+    } catch (error) {
+      console.error('Error fetching feedbacks:', error);
+    }
+  };
+
   useEffect(() => {
     fetchBookingStats();
     fetchBills();
+    fetchFeedbacks();
   }, []);
 
   const chartOptions = {
@@ -377,6 +443,15 @@ const Dashboard = () => {
       <div className="table-container">
         <h1 className="table-title">History Payment</h1>
         <Table pagination={{ pageSize: 6 }} dataSource={sortBills} columns={columnsBill} />
+      </div>
+      <div className="table-container">
+        <h1 className="table-title">Customer Feedbacks</h1>
+        <Table 
+          dataSource={feedbacks} 
+          columns={feedbackColumns}
+          pagination={{ pageSize: 6 }}
+          scroll={{ x: true }}
+        />
       </div>
     </>
   );

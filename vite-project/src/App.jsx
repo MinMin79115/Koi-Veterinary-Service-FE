@@ -26,6 +26,7 @@ import PaySuccess from './pages/payment/paySuccess';
 import PaymentDetail from './pages/payment/paymentDetail';
 import ForgotPassword from './pages/forgotPassword'
 import ResetPassword from './pages/resetPassword'
+import FeedbackManagement from './pages/customer-staff/FeedbackManagement';
 const App = () => {
 
   const ProtectedRoute = ({ children }) => {
@@ -87,6 +88,7 @@ const App = () => {
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/booking-management" element={<ProtectedRouteStaff><BookingManagement/></ProtectedRouteStaff>}/>
                   <Route path="/faq-management" element={<ProtectedRouteStaff><FAQManagement/></ProtectedRouteStaff>}/>
+                  <Route path="/feedback-management" element={<ProtectedRouteStaff><FeedbackManagement/></ProtectedRouteStaff>}/>
                   <Route path="/customer-profile" element={<ProtectedRouteCustomer><CustomerPage /></ProtectedRouteCustomer>} />
                   <Route path="/booking" element={<Booking />} />
                   <Route path="/booking-detail" element={<BookingDetail />} />
@@ -109,6 +111,7 @@ const App = () => {
           <Route path="/booking-detail" element={<BookingDetail />} />
           <Route path="/booking-management" element={<BookingManagement />} />
           <Route path="/faq-management" element={<FAQManagement />} />
+          <Route path="/feedback-management" element={<FeedbackManagement />} />
           <Route path="/about" element={<AboutUs />} />
         </Route>
 
