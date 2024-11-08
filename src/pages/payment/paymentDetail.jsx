@@ -66,7 +66,7 @@ function PaymentDetail() {
         <div className="row justify-content-center">
         <div className="col-lg-8 col-md-10 payment-detail-card">
           <div className="card shadow-lg border-0 rounded-lg">
-            <div className="card-header bg-light text-white text-center py-4">
+            <div className="card-header-payment bg-light text-white text-center py-4">
               <div className="text-center mb-4">
                 <FaCheckCircle className="text-success" size={50} />
               </div>
