@@ -482,7 +482,7 @@ const BookingDetail = () => {
                 <Option value="oldest">Oldest First</Option>
               </Select>
               <Button
-                type={showCancelled ? "" : "dashed"}
+                type={showCancelled ? "primary" : "default"}
                 onClick={() => {
                   setShowCancelled(!showCancelled);
                   setStatusFilter('ALL');

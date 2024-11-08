@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import "react-toastify/dist/ReactToastify.css";
 import { Link, useNavigate } from 'react-router-dom';
 import './Auth.css';
+// import './Login.css';
 import { googleProvider } from '../config/firebase';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import api from '../config/axios';

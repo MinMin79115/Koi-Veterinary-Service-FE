@@ -385,6 +385,10 @@ const BookingPage = () => {
                                     setStatusFilter('ALL');
                                 }}
                                 className="cancel-toggle-btn"
+                                style={{
+                                    background: showCancelled ? 'linear-gradient(145deg, #4dabf7, #339af0)' : 'black',
+                                    color: 'white'
+                                }}
                             >
                                 {showCancelled ? "Show Active Bookings" : "Show Cancelled Bookings"}
                             </Button>

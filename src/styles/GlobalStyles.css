@@ -75,3 +75,47 @@ a:hover {
   background-color: #ffb380;
   transform: translateY(-2px);
 }
+
+/* Add these responsive breakpoints */
+:root {
+  --mobile-width: 480px;
+  --tablet-width: 768px;
+  --desktop-width: 1024px;
+}
+
+/* Base responsive styles */
+@media (max-width: 768px) {
+  .page-container {
+    padding: 1rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  h2 {
+    font-size: 1.75rem;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-container {
+    padding: 0.75rem;
+  }
+
+  h1 {
+    font-size: 1.75rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+  }
+}

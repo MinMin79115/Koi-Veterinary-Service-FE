@@ -383,58 +383,58 @@ const Home = () => {
           </div>
         )}
         {/* FAQ here */}
-        <div>
-          <div className="container mt-5">
-            <div className="row">
-              <div className="col-lg-12">
-                <div className="faq-section d-flex flex-column align-items-center">
-                  <h2 className="mb-4">Frequently Asked Questions</h2>
-                  {faqs && faqs.length > 0 ? (
-                    <div className="accordion w-100" id="faqAccordion">
-                      {faqs.map((faq, index) => (
-                        <div className="accordion-item" key={faq.id}>
-                          <h2 className="accordion-header" id={`heading${index}`}>
-                            <button
-                              className={`accordion-button ${openIndex === index ? '' : 'collapsed'}`}
-                              type="button"
-                              onClick={() => toggleAccordion(index)}
-                            >
-                              {faq.Question}
-                            </button>
-                          </h2>
-                          <div
-                            className={`accordion-collapse collapse ${openIndex === index ? 'show' : ''}`}
+        <div className="container mt-5">
+          <div className="row">
+            <div className="col-lg-12">
+              <div className="faq-section">
+                <h2>Frequently Asked Questions</h2>
+                {faqs && faqs.length > 0 ? (
+                  <div className="accordion" id="faqAccordion">
+                    {faqs.map((faq, index) => (
+                      <div className="accordion-item" key={faq.id}>
+                        <h2 className="accordion-header">
+                          <button
+                            className={`accordion-button ${openIndex === index ? '' : 'collapsed'}`}
+                            type="button"
+                            onClick={() => toggleAccordion(index)}
                           >
-                            <div className="accordion-body">
-                              {faq.Answer || 'No answer yet'}
-                            </div>
+                            {faq.Question}
+                          </button>
+                        </h2>
+                        <div
+                          className={`accordion-collapse collapse ${openIndex === index ? 'show' : ''}`}
+                        >
+                          <div className="accordion-body">
+                            {faq.Answer || 'No answer yet'}
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-muted">No FAQs available</p>
-                  )}
-                  <div className="d-flex justify-content-center col-8 mt-5">
-                    <div className="card add-faq-section w-100">
-                      <div className="card-body">
-                        <form onSubmit={handleAddFAQ}>
-                          <div className="mb-3">
-                            <label htmlFor="question" className="form-label text-white">Do you have any questions?</label>
-                            <input
-                              type="text"
-                              className="form-control"
-                              id="question"
-                              value={newQuestion}
-                              onChange={(e) => setNewQuestion(e.target.value)}
-                              required
-                            />
-                          </div>
-                          <button type="submit" className="button">Add FAQ</button>
-                        </form>
                       </div>
-                    </div>
+                    ))}
                   </div>
+                ) : (
+                  <p className="text-center text-white">No FAQs available</p>
+                )}
+                
+                <div className="add-faq-section">
+                  <form onSubmit={handleAddFAQ}>
+                    <div className="mb-3">
+                      <label htmlFor="question" className="form-label">
+                        Do you have any questions?
+                      </label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="question"
+                        value={newQuestion}
+                        onChange={(e) => setNewQuestion(e.target.value)}
+                        placeholder="Type your question here..."
+                        required
+                      />
+                    </div>
+                    <button type="submit" className="button">
+                      Add Question
+                    </button>
+                  </form>
                 </div>
               </div>
             </div>

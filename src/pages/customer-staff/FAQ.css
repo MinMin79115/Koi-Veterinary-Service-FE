@@ -1,0 +1,154 @@
+.faq-management-container {
+  padding: 2rem;
+  background-color: #f8f9fa;
+}
+
+.faq-title {
+  color: #1a1a1a;
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+  position: relative;
+  padding-bottom: 1rem;
+  text-align: center;
+}
+
+.faq-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 3px;
+  background: linear-gradient(90deg, #339af0, #4dabf7);
+  border-radius: 2px;
+}
+
+.search-container {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.search-input {
+  width: 100%;
+}
+
+.faq-table {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Table styles */
+.ant-table-thead > tr > th {
+  background: #f8f9fa !important;
+  color: #495057;
+  font-weight: 600;
+}
+
+.ant-table-tbody > tr:hover > td {
+  background: #f8f9fa;
+}
+
+.ant-table-tbody > tr {
+  transition: all 0.3s ease;
+}
+
+.ant-table-tbody > tr:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Button styles */
+.ant-btn {
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.ant-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ant-btn-primary {
+  background: #4dabf7;
+  border-color: #4dabf7;
+}
+
+.ant-btn-primary:hover {
+  background: #339af0;
+  border-color: #339af0;
+}
+
+.ant-btn-dangerous {
+  background: #ff6b6b;
+  border-color: #ff6b6b;
+}
+
+.ant-btn-dangerous:hover {
+  background: #fa5252;
+  border-color: #fa5252;
+}
+
+/* Modal styles */
+.edit-modal .ant-modal-content {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.edit-modal .ant-modal-header {
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  padding: 16px 24px;
+}
+
+.edit-modal .ant-modal-body {
+  padding: 24px;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .faq-management-container {
+    padding: 1rem;
+  }
+
+  .faq-title {
+    font-size: 1.75rem;
+  }
+
+  .search-container {
+    max-width: 100%;
+  }
+
+  .ant-table {
+    font-size: 0.9rem;
+  }
+
+  .ant-btn {
+    padding: 4px 8px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .faq-management-container {
+    padding: 0.75rem;
+  }
+
+  .faq-title {
+    font-size: 1.5rem;
+  }
+
+  .ant-table {
+    font-size: 0.8rem;
+  }
+
+  .ant-btn {
+    padding: 4px 6px;
+    font-size: 0.8rem;
+  }
+
+  .ant-table-tbody > tr > td {
+    padding: 8px 4px !important;
+  }
+} 

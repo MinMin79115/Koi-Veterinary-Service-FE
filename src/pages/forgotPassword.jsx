@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import api from '../config/axios';
 import { toast } from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
-
+import './Auth.css';
 function ForgotPassword() {
   const [email, setEmail] = useState('');
   const navigate = useNavigate();
@@ -32,12 +32,13 @@ function ForgotPassword() {
   }
 
   return (
-    <><div className='m-3'>
-      <Link to="/login" className='text-decoration-none p-2 bg-primary text-white rounded'>Back to Login</Link>
-    </div>
-      <div className="container py-5 d-flex justify-content-center">
-        <div className=" p-4 shadow-sm" style={{ maxWidth: '600px', width: '100%' }}>
-          <h1 className="text-center mb-4">Forgot Password</h1>
+    <div className='forgot-password-container'>
+      <div className='m-3 d-flex justify-content-center'>
+        <Link to="/login" className='text-decoration-none p-2 bg-primary text-white rounded'>Back to Login</Link>
+      </div>
+      <div className="container py-5 d-flex justify-content-center" style={{width: '100%'}}>
+        <div className=" p-4 shadow-lg " style={{ maxWidth: '600px', width: '100%' }}>
+          <h1 className="text-center mb-4 fw-bold text-black">Forgot Password</h1>
           <form onSubmit={handleSend}>
             <div className="mb-3">
               <input
@@ -53,7 +54,7 @@ function ForgotPassword() {
           </form>
         </div>
       </div>
-    </>
+    </div>
   )
 }
 

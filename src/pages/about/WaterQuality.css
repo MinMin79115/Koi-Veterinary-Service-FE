@@ -72,3 +72,30 @@
     font-size: 1.5rem;
   }
 }
+
+@media (max-width: 480px) {
+    .water-quality h1 {
+        font-size: 1.5rem;
+    }
+
+    .tip-section h2 {
+        font-size: 1.2rem;
+    }
+
+    .cta-section h3 {
+        font-size: 1rem;
+    }
+
+    .cta-button {
+        font-size: 0.8rem;
+    }
+
+    .water-quality p {
+        font-size: 0.8rem;
+    }
+    
+    img {
+        width: 100%;
+        height: 20vh;
+    }
+}
