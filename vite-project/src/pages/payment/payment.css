@@ -44,7 +44,7 @@
     transition: all 0.3s ease;
 }
 
-.card-header{
+.card-header-payment{
     background: linear-gradient(135deg, #ff9966, #e89092) !important;
     color: white !important;
 }
