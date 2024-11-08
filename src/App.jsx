@@ -27,6 +27,7 @@ import PaymentDetail from './pages/payment/paymentDetail';
 import ForgotPassword from './pages/forgotPassword'
 import ResetPassword from './pages/resetPassword'
 import FeedbackManagement from './pages/customer-staff/FeedbackManagement';
+import TablePrice from './pages/about/TablePrice';
 const App = () => {
 
   const ProtectedRoute = ({ children }) => {
@@ -86,6 +87,7 @@ const App = () => {
                   <Route path="/water-quality" element={<WaterQuality />} />
                   <Route path="/fish-types" element={<FishTypes />} />
                   <Route path="/contact" element={<Contact />} />
+                  <Route path="/table-of-prices" element={<TablePrice />} />
                   <Route path="/booking-management" element={<ProtectedRouteStaff><BookingManagement/></ProtectedRouteStaff>}/>
                   <Route path="/faq-management" element={<ProtectedRouteStaff><FAQManagement/></ProtectedRouteStaff>}/>
                   <Route path="/feedback-management" element={<ProtectedRouteStaff><FeedbackManagement/></ProtectedRouteStaff>}/>
@@ -106,6 +108,7 @@ const App = () => {
           <Route path="/water-quality" element={<WaterQuality />} />
           <Route path="/fish-types" element={<FishTypes />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/table-of-prices" element={<TablePrice />} />
           <Route path="/customer-profile" element={<CustomerPage />} />
           <Route path="/booking" element={<Booking />} />
           <Route path="/booking-detail" element={<BookingDetail />} />

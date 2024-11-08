@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import useParam from '../../hook/useParam';
 import { useDispatch } from 'react-redux';
 import { bookingReset } from '../../redux/features/bookingSlider';
+import './payment.css'
 const PaySuccess = () => {
   const params = useParam();
   const bookingId = params.getParam('bookingId');
@@ -16,21 +17,27 @@ const PaySuccess = () => {
     dispatch(bookingReset());
   }, []);
   return (
+    <div className='payment-success-container'>
     <Result
+    className='payment-success-result'
     status="success"
     title="Payment Successfully!"
-    subTitle={`BookingNo: ${bookingId} , Amount: ${formatAmount} , Payment Method: ${method}`}
+    subTitle={ <span style={{color: 'black'}}>BookingNo: {bookingId? bookingId : 'null'} , Amount: {formatAmount} , Payment Method: {method? method : 'null'}</span>}
     extra={[
-      <Button type="primary" onClick={() => {
+      <button className='btn btn-primary' onClick={() => {
         navigate('/booking-detail');
       }}>
         Go To Booking History
-      </Button>,
-      <Button onClick={() => {
+      </button>,
+      
+      <button className='btn btn-secondary' onClick={() => {
         navigate('/');
-      }}>Go To Home</Button>,
+      }}>
+        Go To Home
+      </button>,
     ]}
-  />
-);
+    />
+    </div>
+  );
 }
 export default PaySuccess;

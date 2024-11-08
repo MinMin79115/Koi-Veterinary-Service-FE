@@ -176,13 +176,26 @@ body {
     min-height: 100vh;
   }
 
+  .auth-form-container{
+    width: 92vw;
+    margin: 0 auto;
+  }
+
+  .payment-detail-container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh; /* Full viewport height */
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.5)), url('../assets/login-register.jpg') no-repeat center center fixed; /* Background image with gradient */
+    background-size: cover; /* Cover the entire background */
+    min-height: 100vh;
+  }
   
-  .auth-form-container-register{
+  .auth-form-container-register {
     margin: 0 auto;
     padding: 1.5rem;
     width: 90%;
     max-width: 100%;
-  
   }
 
   .form-label {

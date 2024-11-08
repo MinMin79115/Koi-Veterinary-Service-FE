@@ -7,6 +7,11 @@ const Services = () => {
     <div className="services-container">
       <h1>Our Services</h1>
       <div className="services-grid">
+      <div className="service-item">
+          <h2>Table of Prices & Services</h2>
+          <p>Explore our table of prices for our services.</p>
+          <Link to="/table-of-prices" className="service-link">Discover</Link>
+        </div>
         <div className="service-item">
           <h2>Care Guide</h2>
           <p>Learn how to properly care for your KOI fish.</p>
@@ -22,11 +27,10 @@ const Services = () => {
           <p>Explore various KOI fish types and their characteristics.</p>
           <Link to="/fish-types" className="service-link">Discover</Link>
         </div>
-        <div className="service-item">
-          <h2>Book a Service</h2>
-          <p>Schedule a professional KOI care service.</p>
-          <Link to="/booking#booking" className="service-link">Book Now</Link>
-        </div>
+      </div>
+      <div className="cta-section">
+        <h3>Booking a service here?</h3>
+        <Link to="/booking#booking" className="cta-button">Schedule a Consultation</Link>
       </div>
     </div>
   );

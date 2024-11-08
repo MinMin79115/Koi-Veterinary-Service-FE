@@ -233,10 +233,9 @@ body, html {
 }
 
 .schedule-exam a:hover {
-  background-color: #ffb380;
+  background-color: #4a4a4a;
+  color: white;
   transform: translateY(-2px);
-  box-shadow: 0 6px 8px rgba(255, 153, 102, 0.3);
-  color: #333;
 }
 
 .button {
