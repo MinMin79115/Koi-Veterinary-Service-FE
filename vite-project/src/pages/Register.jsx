@@ -34,8 +34,8 @@ const Register = () => {
     // Username validation
     if (!formData.username) {
       newErrors.username = 'Username is required';
-    } else if (formData.username.length < 3) {
-      newErrors.username = 'Username must be at least 3 characters long';
+    } else if (formData.username.length < 6) {
+      newErrors.username = 'Username must be at least 6 characters long';
     }
 
     // Phone validation
@@ -45,11 +45,17 @@ const Register = () => {
       newErrors.phone = 'Phone number is invalid';
     }
 
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Email is invalid';
+    }
+
     // Fullname validation
     if (!formData.fullname) {
       newErrors.fullname = 'Full name is required';
-    } else if (formData.fullname.length < 6 || formData.fullname.length > 50) {
-      newErrors.fullname = 'Full name must be between 6 and 50 characters';
+    } else if (formData.fullname.trim().split(/\s+/).length <= 2 || formData.fullname.length > 50) {
+      newErrors.fullname = 'Full name must be at least 2 words and 50 characters';
     }
 
     // Password validation
@@ -130,7 +136,7 @@ const Register = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                required
+                isInvalid={!!errors.email}
               />
               <Form.Control.Feedback type="invalid">
                 {errors.email}

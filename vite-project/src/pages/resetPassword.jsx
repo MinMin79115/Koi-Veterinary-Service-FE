@@ -3,6 +3,7 @@ import  api  from '../config/axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import './Auth.css';
 function ResetPassword() {
     const [formData, setFormData] = useState({
         username: '',
@@ -39,9 +40,9 @@ function ResetPassword() {
     };
 
     return (
-        <div className="container mt-5">
-            <h1 className="text-center mb-4">Reset Password</h1>
-            <form onSubmit={onSubmit} style={{width: '70%'}} className="mx-auto p-3 border rounded shadow-sm">
+        <div className="container mt-5 reset-password-container">
+            <h1 className="text-center mb-4 fw-bold text-black">Reset Password</h1>
+            <form onSubmit={onSubmit} style={{width: '70%'}} className="mx-auto p-3 border rounded shadow-lg bg-linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.5))">
                 <div className="mb-3">
                     <label htmlFor="username" className="form-label">Username</label>
                     <input
