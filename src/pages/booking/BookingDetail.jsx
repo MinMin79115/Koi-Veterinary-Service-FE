@@ -38,23 +38,6 @@ const BookingDetail = () => {
     setSelectedRecord(null);
   }
 
-  const fetchFeedback = async () => {
-    try {
-      const response = await api.get(`feedbacks/booking/${selectedBooking.id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-      const values = response.data.map(feedback => ({
-        id: feedback.bookingId,
-      }));
-      setFeedback(values)
-      console.log('feedback:', feedback);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
   const fetchBill = async () => {
     try {
       const response = await api.get(`payment`, {
@@ -66,7 +49,6 @@ const BookingDetail = () => {
         id: bill.booking.bookingId,
       }));
       setBills(values);
-      console.log('bills:', bills);
     } catch (error) {
       console.log(error);
     }
@@ -91,7 +73,6 @@ const BookingDetail = () => {
         }
       });
       const feedbacks = feedbackResponse.data;
-      console.log('feedbackss:', feedbacks);
       if (user.role === 'CUSTOMER') {
         const response = await api.get(`bookings/user/${user.id}`, {
           headers: {
@@ -121,11 +102,10 @@ const BookingDetail = () => {
             'Authorization': `Bearer ${token}`
           }
         });
-        console.log(response.data);
-
         const values = response.data.map(booking => ({
           id: booking.bookingId,
           customerName: booking.user?.fullname,
+          veterinarianId: booking.veterinarian?.veterinarianId,
           email: booking.user?.email,
           address: booking.user?.address,
           service: booking.servicesDetail?.serviceId?.serviceName,
@@ -138,7 +118,6 @@ const BookingDetail = () => {
         }));
 
         setBookings(values);
-        console.log('bookings:', bookings);
       }
     } catch (error) {
       console.log(error);
@@ -164,6 +143,15 @@ const BookingDetail = () => {
       align: 'center',
       className: 'column-border',
       hidden: user?.role === 'VETERINARIAN' || user?.role === 'CUSTOMER'
+    },
+    {
+      title: 'Veterinarian ID',
+      dataIndex: 'veterinarianId',
+      key: 'veterinarianId',
+      width: '10%',
+      align: 'center',
+      className: 'column-border',
+      hidden: user?.role === 'CUSTOMER' || user?.role === 'VETERINARIAN'
     },
     {
       title: 'ID',
@@ -374,9 +362,10 @@ const BookingDetail = () => {
 
     try {
       const valuesToUpdate = {
-        status: 'COMPLETED'
+        status: 'COMPLETED',
+        veterinarianId: record.veterinarianId
       }
-      const response = await api.put(`bookings/${record.id}`, valuesToUpdate, {
+      await api.put(`bookings/${record.id}`, valuesToUpdate, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
