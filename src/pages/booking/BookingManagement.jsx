@@ -71,6 +71,7 @@ const BookingPage = () => {
 
             const values = response.data.map(booking => ({
                 id: booking.bookingId,
+                veterinarianId: booking.veterinarian?.veterinarianId,
                 customerName: booking.user.fullname,
                 veterinarian: booking.veterinarian?.user.fullname,
                 email: booking.user?.email,
@@ -131,6 +132,15 @@ const BookingPage = () => {
             width: '10%',
             align: 'center',
             className: 'column-border'
+        },
+        {
+            title: 'Veterinarian ID',
+            dataIndex: 'veterinarianId',
+            key: 'veterinarianId',
+            width: '10%',
+            align: 'center',
+            className: 'column-border',
+            hidden: user?.role === 'CUSTOMER' || user?.role === 'VETERINARIAN' || user?.role === 'STAFF'
         },
         {
             title: 'Email',
@@ -270,7 +280,8 @@ const BookingPage = () => {
     const handleConfirmBooking = async (record) => {
         const URLMeet = "https://meet.google.com/fgy-kvct-gtf"
         const valuesToSend = {
-            status: "CONFIRMED"
+            status: "CONFIRMED",
+            veterinarianId: record.veterinarianId
         }
         const emailContentOnline = `
         <html>
@@ -305,7 +316,7 @@ const BookingPage = () => {
             body: emailContentOnline
         }
         try {
-            const response = await api.put(`bookings/${record.id}`, valuesToSend, {
+            await api.put(`bookings/${record.id}`, valuesToSend, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
