@@ -280,7 +280,8 @@ const BookingDetail = () => {
 
   const handleNote = async () => {
     const valuesToUpdate = {
-      note: selectedRecord.note
+      note: selectedRecord.note,
+      veterinarianId: selectedRecord.veterinarianId
     }
     try {
       const response = await api.put(`bookings/${selectedRecord.id}`, valuesToUpdate, {
