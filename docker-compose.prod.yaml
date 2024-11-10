@@ -1,0 +1,14 @@
+services:
+  koi-client:
+    container_name: koi_client
+    image: ${DOCKER_USERNAME}/koiclient:latest
+    restart: always
+    ports:
+      - 80:80
+    networks:
+      - koiveterinary_network
+
+networks:
+  koiveterinary_network:
+    name: koiveterinary_network
+    external: true

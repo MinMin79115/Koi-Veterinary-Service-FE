@@ -1,0 +1,8 @@
+services:
+  koi-client:
+    image: ${DOCKER_USERNAME}/koiclient:latest
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BASE_URL: ${BASE_URL}
