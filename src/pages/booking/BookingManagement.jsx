@@ -19,6 +19,7 @@ const BookingPage = () => {
     const [sortOrder, setSortOrder] = useState('latest');
     const [statusFilter, setStatusFilter] = useState('ALL');
     const [options, setOptions] = useState([]);
+    const hours = sessionStorage.getItem('hours')
     const labelRender = (props) => {
         const { label, value } = props;
         if (label) {
@@ -74,6 +75,7 @@ const BookingPage = () => {
                 veterinarianId: booking.veterinarian?.veterinarianId,
                 customerName: booking.user.fullname,
                 veterinarian: booking.veterinarian?.user.fullname,
+                veterinarianEmail: booking.veterinarian?.user.email,
                 email: booking.user?.email,
                 service: booking.servicesDetail?.serviceId?.serviceName,
                 serviceType: booking.servicesDetail?.serviceTypeId?.service_type,
@@ -138,6 +140,15 @@ const BookingPage = () => {
             dataIndex: 'veterinarianId',
             key: 'veterinarianId',
             width: '10%',
+            align: 'center',
+            className: 'column-border',
+            hidden: user?.role === 'CUSTOMER' || user?.role === 'VETERINARIAN' || user?.role === 'STAFF'
+        },
+        {
+            title: 'Email Veterinarian',
+            dataIndex: 'VeterinarianEmail',
+            key: 'VeterinarianEmail',
+            width: '20%',
             align: 'center',
             className: 'column-border',
             hidden: user?.role === 'CUSTOMER' || user?.role === 'VETERINARIAN' || user?.role === 'STAFF'
@@ -288,9 +299,19 @@ const BookingPage = () => {
           <body>
             <h1 style='color: blue;'>Welcome, ${record.customerName}</h1>
             <p style='font-size: 16px;'>Your booking service has been confirmed.</p>
-            <p style='font-size: 16px;'>Your link Google Meet here: ${URLMeet}</p>
+            <p style='font-size: 16px;'>Your link Google Meet here: ${URLMeet} start at ${hours}</p>
             <p style='font-size: 16px;'>Thank you for choosing our service!</p>
             <p style='font-size: 16px;'>If you have any questions, please contact us at <b>KOI FISH CARE Centre</b></p>
+            <p style='font-size: 16px;'>Best regards, <b>KOI FISH CARE Centre</b></p>
+          </body>
+        </html>
+        `;
+        const emailContentOnlineVeterinarian = `
+        <html>
+          <body>
+            <h1 style='color: blue;'>Welcome, ${record.veterinarian}</h1>
+            <p style='font-size: 16px;'>Your booking service has been confirmed.</p>
+            <p style='font-size: 16px;'>Your link Google Meet here: ${URLMeet} start at ${hours}</p>
             <p style='font-size: 16px;'>Best regards, <b>KOI FISH CARE Centre</b></p>
           </body>
         </html>
@@ -315,6 +336,10 @@ const BookingPage = () => {
             subject: "Booking Completion",
             body: emailContentOnline
         }
+        const formatOnlineVeterinarian = {
+            subject: "Booking Completion",
+            body: emailContentOnlineVeterinarian
+        }
         try {
             await api.put(`bookings/${record.id}`, valuesToSend, {
                 headers: {
@@ -332,7 +357,14 @@ const BookingPage = () => {
                         Authorization: `Bearer ${token}`
                     }
                 })
+                const resMailVet = await api.post(`mail/send/${record.VeterinarianEmail}`, formatOnlineVeterinarian, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
                 console.log('Email sent: ', resMail)
+                console.log('Email sent: ', resMailVet)
+                
             } else {
                 const resMail = await api.post(`mail/send/${record.email}`, format, {
                     headers: {
