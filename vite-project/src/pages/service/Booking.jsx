@@ -139,14 +139,7 @@ const BookingPage  = () => {
 
   useEffect(() => {
     if (location.hash === '#booking') {
-<<<<<<< Updated upstream
       window.scrollTo(90, 200);
-=======
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
->>>>>>> Stashed changes
     }
 
   }, [location]);
@@ -184,12 +177,7 @@ const BookingPage  = () => {
             }
         });
         console.log('Booking submitted:', response.data);
-<<<<<<< Updated upstream
         dispatch(booking(response.data))
-=======
-        dispatch(booking({...response.data}))
-        sessionStorage.setItem('hours', selectedHour);
->>>>>>> Stashed changes
         toast.success('Booking submitted successfully!');
         setSelectedService('');
         setSelectedSlot('');
@@ -339,7 +327,7 @@ const BookingPage  = () => {
   };
 
   return (
-    <div className="margin">
+    <div className="my-5">
       <div className="row justify-content-center">
         <div className="col-md-8 col-lg-8">
           <div className="px-3 py-auto shadow p-3 mb-5 bg-white rounded">

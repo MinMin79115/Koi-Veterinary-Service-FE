@@ -27,6 +27,7 @@ const ServiceManagement = () => {
             setServices(response.data);
         } catch (error) {
             console.error('Error fetching services:', error.response?.data);
+            toast.error('Failed to fetch services');
         }
     }
 

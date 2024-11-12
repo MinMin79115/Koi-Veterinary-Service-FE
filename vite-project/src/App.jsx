@@ -26,12 +26,6 @@ import PaySuccess from './pages/payment/paySuccess';
 import PaymentDetail from './pages/payment/paymentDetail';
 import ForgotPassword from './pages/forgotPassword'
 import ResetPassword from './pages/resetPassword'
-<<<<<<< Updated upstream
-=======
-import FeedbackManagement from './pages/customer-staff/FeedbackManagement';
-import TablePrice from './pages/about/TablePrice';
-import TablePriceManagement from './pages/admin/TablePriceManagement';
->>>>>>> Stashed changes
 const App = () => {
 
   const ProtectedRoute = ({ children }) => {
@@ -72,7 +66,6 @@ const App = () => {
         <Route path="/staff-management" element={<ProtectedRoute><StaffManagement /></ProtectedRoute>} />
         <Route path="/service-management" element={<ProtectedRoute><ServiceManagement/></ProtectedRoute>}/>
         <Route path="/service-management" element={<ProtectedRoute><SlotManagement/></ProtectedRoute>}/>
-        <Route path="/table-price-management" element={<ProtectedRoute><TablePriceManagement/></ProtectedRoute>}/>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/success" element={<PaySuccess />} />

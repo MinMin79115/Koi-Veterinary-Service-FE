@@ -38,7 +38,6 @@ function PaymentDetail() {
         }
       });
       window.open(resPayment.data.data.paymentUrl, '_blank');
-      console.log(resPayment.data.data.paymentUrl)
     } catch (error) {
       console.log(error);
     }
