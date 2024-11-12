@@ -19,7 +19,7 @@ const BookingPage = () => {
     const [sortOrder, setSortOrder] = useState('latest');
     const [statusFilter, setStatusFilter] = useState('ALL');
     const [options, setOptions] = useState([]);
-    const hours = sessionStorage.getItem('hours')
+    const startHours = sessionStorage.getItem('hours');
     const labelRender = (props) => {
         const { label, value } = props;
         if (label) {
@@ -299,7 +299,7 @@ const BookingPage = () => {
           <body>
             <h1 style='color: blue;'>Welcome, ${record.customerName}</h1>
             <p style='font-size: 16px;'>Your booking service has been confirmed.</p>
-            <p style='font-size: 16px;'>Your link Google Meet here: ${URLMeet} start at ${hours}</p>
+            <p style='font-size: 16px;'>Your link Google Meet here: ${URLMeet} start at ${startHours}</p>
             <p style='font-size: 16px;'>Thank you for choosing our service!</p>
             <p style='font-size: 16px;'>If you have any questions, please contact us at <b>KOI FISH CARE Centre</b></p>
             <p style='font-size: 16px;'>Best regards, <b>KOI FISH CARE Centre</b></p>
@@ -311,7 +311,7 @@ const BookingPage = () => {
           <body>
             <h1 style='color: blue;'>Welcome, ${record.veterinarian}</h1>
             <p style='font-size: 16px;'>Your booking service has been confirmed.</p>
-            <p style='font-size: 16px;'>Your link Google Meet here: ${URLMeet} start at ${hours}</p>
+            <p style='font-size: 16px;'>Your link Google Meet here: ${URLMeet} start at ${startHours}</p>
             <p style='font-size: 16px;'>Best regards, <b>KOI FISH CARE Centre</b></p>
           </body>
         </html>
