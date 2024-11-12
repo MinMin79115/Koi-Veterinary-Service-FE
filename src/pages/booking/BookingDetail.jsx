@@ -25,6 +25,7 @@ const BookingDetail = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState('latest');
   const [statusFilter, setStatusFilter] = useState('ALL');
+  const meetingLink = sessionStorage.getItem('meeting-link');
 
 
   //Open the note modal
