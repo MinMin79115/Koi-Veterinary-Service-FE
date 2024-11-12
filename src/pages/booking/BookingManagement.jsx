@@ -290,6 +290,7 @@ const BookingPage = () => {
 
     const handleConfirmBooking = async (record) => {
         const URLMeet = "https://meet.google.com/fgy-kvct-gtf"
+        sessionStorage.setItem('meeting-link', URLMeet);
         const valuesToSend = {
             status: "CONFIRMED",
             veterinarianId: record.veterinarianId
