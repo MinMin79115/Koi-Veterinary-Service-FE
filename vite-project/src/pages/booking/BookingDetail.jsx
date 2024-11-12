@@ -10,7 +10,11 @@ import { toast } from 'react-toastify';
 const BookingDetail = () => {
   const token = useSelector(state => state.user.accessToken);
   const [bookings, setBookings] = useState([]);
+<<<<<<< Updated upstream
   const [payStatus, setPayStatus] = useState('')
+=======
+  const meetingLink = sessionStorage.getItem('meeting-link');
+>>>>>>> Stashed changes
   const user = useSelector((state) => state.user);
   const [noteModal, setNoteModal] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
@@ -94,6 +98,14 @@ const BookingDetail = () => {
   };
 
   useEffect(() => {
+<<<<<<< Updated upstream
+=======
+    fetchBill();
+    console.log(meetingLink)
+  }, []);
+
+  useEffect(() => {
+>>>>>>> Stashed changes
     fetchBooking();
     fetchBill();
 
@@ -338,6 +350,7 @@ const BookingDetail = () => {
   const newestBookings = bookings.slice(-10).sort((a, b) => b.id - a.id);
 
   return (
+<<<<<<< Updated upstream
     <div className="container-fluid mt-5">
       <h2 className="mb-4 text-center fw-bold">Booking Detail</h2>
       <div className="row justify-content-center">
@@ -362,6 +375,182 @@ const BookingDetail = () => {
                 {user.role === 'VETERINARIAN' ? (
                   <Input.TextArea size='large' rows={6} value={selectedRecord?.note} onChange={(e) => setSelectedRecord({ ...selectedRecord, note: e.target.value })} />
                 ) : (
+=======
+    <div className="container-fluid py-4">
+      <div className="booking-header">
+        <h2 className="page-title text-center fw-bold margin-booking">Booking History</h2>
+        <div className="booking-controls">
+          <Space size="middle" className="w-100 justify-content-between align-items-center mb-1">
+            <div className="search-section d-flex gap-3">
+              <Input
+                placeholder="Search by service name..."
+                prefix={<SearchOutlined />}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="search-input"
+                allowClear
+              />
+              <Select
+                defaultValue="ALL"
+                onChange={(value) => setStatusFilter(value)}
+                className="status-select"
+                style={{ minWidth: 120 }}
+                disabled={showCancelled}
+              >
+                <Option value="ALL">All Status</Option>
+                <Option value="PENDING">Pending</Option>
+                <Option value="CONFIRMED">Confirmed</Option>
+                <Option value="COMPLETED">Completed</Option>
+              </Select>
+            </div>
+            <div className="filter-section">
+              <Select
+                defaultValue="latest"
+                onChange={(value) => setSortOrder(value)}
+                className="sort-select"
+              >
+                <Option value="latest">Latest First</Option>
+                <Option value="oldest">Oldest First</Option>
+              </Select>
+              <Button
+                type={showCancelled ? "primary" : "default"}
+                onClick={() => {
+                  setShowCancelled(!showCancelled);
+                  setStatusFilter('ALL');
+                }}
+                className="cancel-toggle-btn ms-3"
+                style={{
+                  background: showCancelled ? 'linear-gradient(145deg, #4dabf7, #339af0)' : 'black',
+                  color: 'white'
+                }}
+              >
+                {showCancelled ? "Show Active Bookings" : "Show Cancelled Bookings"}
+              </Button>
+            </div>
+          </Space>
+        </div>
+      </div>
+
+      <div className="booking-table-container">
+        <Table
+          dataSource={getFilteredAndSortedBookings()}
+          columns={columns}
+          pagination={{ 
+            pageSize: 4,
+            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} bookings`,
+            showQuickJumper: true
+          }}
+          className="booking-table"
+          loading={bookings.length === 0}
+        />
+      </div>
+      
+      <Modal
+        title="Note"
+        open={noteModal}
+        onCancel={closeNoteModal}
+        onOk={() => handleNote(selectedRecord)}
+        okButtonProps={{ style: { display: user.role === 'CUSTOMER' ? 'none' : 'inline-block' } }} // Hide OK button for CUSTOMER
+      >
+        {user.role === 'VETERINARIAN' ? (
+          <Input.TextArea size='large' rows={6} value={selectedRecord?.note} onChange={(e) => setSelectedRecord({ ...selectedRecord, note: e.target.value })} />
+        ) : (
+          <>
+            <span className='fw-bold'>Your prescription:</span>
+            <p>{selectedRecord?.note || 'No note available'}</p>
+          </>
+        )}
+      </Modal>
+      <Modal
+        open={actionModal}
+        onCancel={closeActionModal}
+        footer={null}
+        centered
+        width="90%"
+        style={{ 
+          maxWidth: '700px',
+          minWidth: '300px'
+        }}
+        className="action-modal"
+      >
+        {selectedBooking && (
+          <div className="booking-details">
+            <div className="details-section">
+              <h3>Booking Information</h3>
+              <div className="info-grid">
+                <div className="info-item">
+                  <label>Booking ID:</label>
+                  <span>{selectedBooking.id}</span>
+                </div>
+                {(user?.role === 'CUSTOMER' || user?.role === 'VETERINARIAN') && (
+                  <div className="info-item">
+                    <label>Customer:</label>
+                    <span>{selectedBooking.customerName}</span>
+                  </div>
+                )}
+                {user?.role === 'CUSTOMER' && (
+                  <div className="info-item">
+                    <label>Veterinarian:</label>
+                    <span>{selectedBooking?.veterinarian || 'No veterinarian available'}</span>
+                  </div>
+                )}
+                {user?.role === 'VETERINARIAN' && (
+                  <div className="info-item">
+                    <label>Address:</label>
+                    <span>{selectedBooking.address}</span>
+                  </div>
+                )}
+                
+                <div className="info-item">
+                  <label>Service:</label>
+                  <span>{selectedBooking.service}</span>
+                </div>
+                <div className="info-item">
+                  <label>Type:</label>
+                  <span>{selectedBooking.serviceType}</span>
+                </div>
+                {selectedBooking.serviceType === "At_Home" && selectedBooking.status !== "CANCELLED" && (
+                  <div className="info-item">
+                    <label>Price:</label>
+                    <span>{selectedBooking.price} <br /> <span className='text-success'>+10% each km (if above 10km)</span></span>
+                  </div>
+                )}
+                {selectedBooking.serviceType !== "At_Home" && (
+                  <div className="info-item">
+                    <label>Price:</label>
+                    <span>{selectedBooking.price}</span>
+                  </div>
+                )}
+                <div className="info-item">
+                  <label>Email:</label>
+                  <span>{selectedBooking.email}</span>
+                </div>
+                {selectedBooking.serviceType === "Online" && selectedBooking.status !== "CANCELLED" && selectedBooking.status !== "PENDING" && (
+                  <div className="info-item">
+                    <label>Meeting Link:</label>
+                    <a href={meetingLink} target="_blank">{meetingLink}</a>
+                  </div>
+                )}
+              </div>
+              
+            </div>
+            <div className="status-progress">
+              <div className="progress-container">
+                <div className="progress-line">
+                  <div 
+                    className={`progress-fill ${
+                      selectedBooking.status === 'CANCELLED' ? 'cancelled' :
+                      selectedBooking.status === 'COMPLETED' ? 'completed' :
+                      selectedBooking.status === 'CONFIRMED' ? 'confirmed' : 'pending'
+                    }`}
+                    style={{
+                      width: selectedBooking.status === 'COMPLETED' ? '100%' :
+                            selectedBooking.status === 'CONFIRMED' ? '66%' :
+                            selectedBooking.status === 'PENDING' ? '33%' : '100%'
+                    }}
+                  />
+                </div>
+                {user?.role === 'CUSTOMER' && (
+>>>>>>> Stashed changes
                   <>
                     <span className='fw-bold'>Your prescription:</span>
                     <p>{selectedRecord?.note || 'No note available'}</p>

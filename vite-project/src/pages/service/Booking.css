@@ -7,6 +7,10 @@
   box-shadow: 0 8px 16px rgba(255, 153, 102, 0.1);
 }
 
+.margin {
+  margin-top: 185px !important;
+}
+
 .booking-container h2 {
   color: #ff9966;
   text-align: center;

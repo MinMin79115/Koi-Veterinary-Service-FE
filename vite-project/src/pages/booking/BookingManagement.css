@@ -11,6 +11,9 @@
     border-left: 1px solid #dad5d5;
 }
 
+.margin-booking {
+    margin-top: 120px !important;
+}
 
 .btn-custom:hover{
     opacity: 0.7;

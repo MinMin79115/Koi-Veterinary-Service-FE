@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from './CustomerPage.module.css';
 import api from '../../config/axios';
@@ -12,7 +12,13 @@ import { updateUser } from '../../redux/features/userSlider';
 import { useDispatch } from 'react-redux';
 
 function CustomerPage() {
+<<<<<<< Updated upstream
   const location = useLocation();
+=======
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
+  const token = user.accessToken;
+>>>>>>> Stashed changes
   const [customer, setCustomer] = useState([]);
   const [newPassword, setNewPassword] = useState('');
   const user = useSelector((state) => state.user);
@@ -20,6 +26,7 @@ function CustomerPage() {
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
+<<<<<<< Updated upstream
     if (location.hash === '#profile') {
       window.scrollTo(0, 180);
     }
@@ -46,6 +53,8 @@ function CustomerPage() {
   };
 
   useEffect(() => {
+=======
+>>>>>>> Stashed changes
     if (user && user.id) {
       fetchCustomer();
     }
@@ -129,6 +138,10 @@ function CustomerPage() {
             Authorization: `Bearer ${token}`
           }
         });
+<<<<<<< Updated upstream
+=======
+        if(response.status === 200) dispatch(updateUser({ updatedUser: updatedCustomer }));
+>>>>>>> Stashed changes
         console.log('Updated customer information:', response.data);
         toast.success('Profile updated successfully!');
         setNewPassword('');
@@ -227,7 +240,7 @@ function CustomerPage() {
                     </div>
                     <div className={`col-md-12`}>
                       <div className={styles.formGroup}>
-                        <p className={`mb-1 ${styles.fW600}`}>Password</p>
+                        <p className={`mb-1 ${styles.fW600}`}>New Password</p>
                         <input
                           type="password"
                           className={`${styles.formControl} ${styles.textMuted} ${styles.fW400} ${errors.password ? 'is-invalid' : ''}`}
