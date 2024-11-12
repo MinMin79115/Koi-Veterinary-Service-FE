@@ -584,6 +584,12 @@ const BookingDetail = () => {
                   <label>Email:</label>
                   <span>{selectedBooking.email}</span>
                 </div>
+                {selectedBooking.serviceType === "Online" && selectedBooking.status !== "CANCELLED" && selectedBooking.status !== "PENDING" && (
+                  <div className="info-item">
+                    <label>Meeting Link:</label>
+                    <a href={meetingLink} target="_blank">{meetingLink}</a>
+                  </div>
+                )}
               </div>
             </div>
             <div className="status-progress">
