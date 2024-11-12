@@ -156,7 +156,6 @@ const BookingPage  = () => {
         console.log('Booking submitted:', response.data);
         dispatch(booking({...response.data}))
         toast.success('Booking submitted successfully!');
-        sessionStorage.setItem('hours', selectedHour);
         setSelectedService('');
         setSelectedSlot('');
         setSelectedDoctor('');
@@ -179,6 +178,7 @@ const BookingPage  = () => {
     const [doctorId, doctorName, slotId] = doctorInfo.split(',');
     setTimeSlot(timeSlot);
     setSelectedHour(timeSlot);
+    sessionStorage.setItem('hours', timeSlot);
     setSelectedSlot(slotId);
     console.log(selectedSlot);
     setSelectedDoctor(doctorName);
