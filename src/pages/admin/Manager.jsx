@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import {
-  DesktopOutlined,
   PieChartOutlined,
   BarChartOutlined,
   UserOutlined,
   CustomerServiceOutlined,
-  CalendarOutlined 
+  CalendarOutlined,
+  MoneyCollectOutlined
 } from '@ant-design/icons';
 import { Breadcrumb, Layout, Menu, theme } from 'antd';
 import StaffManagement from './StaffManagement';
@@ -13,6 +13,7 @@ import Dashboard from './Dashboard';
 import AdminProfile from './AdminPage';
 import ServiceManagement from './ServiceManagement';
 import SlotManagement from './SlotManagement';
+import TablePriceManagement from './TablePriceManagement';
 const { Content, Sider } = Layout;
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -42,9 +43,10 @@ const Manager = () => {
     getItem('Manage Staff', 'staff', <PieChartOutlined />),
     getItem('Manage Service', 'service', <CustomerServiceOutlined />),
     getItem('Manage Slot', 'slot', <CalendarOutlined />),
+    getItem('Manage Table Price', 'tablePrice', <MoneyCollectOutlined />),
     getItem('User', 'sub1', <UserOutlined />, [
-      getItem('Profile', 'profile'),
-      getItem('Logout', 'logout'),
+    getItem('Profile', 'profile'),
+    getItem('Logout', 'logout'),
     ]),
 
   ];
@@ -63,6 +65,8 @@ const Manager = () => {
         return <ServiceManagement />;
       case 'slot':
         return <SlotManagement />;
+      case 'tablePrice':
+        return <TablePriceManagement />;
       case 'profile':
         return <AdminProfile />;
       case 'logout':
@@ -75,7 +79,18 @@ const Manager = () => {
   };
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
+      <Sider 
+        collapsible 
+        collapsed={collapsed} 
+        onCollapse={(value) => setCollapsed(value)}
+        style={{
+          overflow: 'auto',
+          height: '100%',
+          position: 'fixed',
+          left: 0,
+          zIndex: 1
+        }}
+      >
         <div className="demo-logo-vertical" />
         <Menu
           theme="dark"
@@ -85,7 +100,7 @@ const Manager = () => {
           onClick={handleMenuClick}
         />
       </Sider>
-      <Layout>
+      <Layout style={{ marginLeft: collapsed ? 80 : 200, transition: 'margin-left 0.2s' }}>
         <Content style={{ margin: '0 16px' }}>
           <Breadcrumb style={{ margin: '16px 0' }}>
             <Breadcrumb.Item>Manager</Breadcrumb.Item>
