@@ -113,6 +113,7 @@ const BookingDetail = () => {
           status: booking.status,
           price: booking.servicesDetail?.serviceTypeId?.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
           note: booking.note,
+          time: booking.serviceTime,
           isPaid: bills.some(bill => bill.id === booking.bookingId),
           hasRating: feedbacks.some(feedback => feedback.bookingId.bookingId === booking.bookingId) ? "true" : "false"
         }));
@@ -136,9 +137,18 @@ const BookingDetail = () => {
 
   const columns = [
     {
+      title: 'Time',
+      dataIndex: 'time',
+      key: 'time',
+      width: '10%',
+      align: 'center',
+      className: 'column-border',
+      hidden: user?.role === 'VETERINARIAN' || user?.role === 'CUSTOMER'
+    },
+    {
       title: 'isPaid',
       dataIndex: 'isPaid',
-      key: 'isPay',
+      key: 'isPaid',
       width: '10%',
       align: 'center',
       className: 'column-border',
@@ -599,6 +609,10 @@ const BookingDetail = () => {
                 <div className="info-item">
                   <label>Type:</label>
                   <span>{selectedBooking.serviceType}</span>
+                </div>
+                <div className="info-item">
+                  <label>Time:</label>
+                  <span>{selectedBooking.time}</span>
                 </div>
                 {selectedBooking.serviceType === "At_Home" && selectedBooking.status !== "CANCELLED" && (
                   <div className="info-item">
