@@ -51,8 +51,9 @@ const Home = () => {
   const fetchFeedbacks = async () => {
     try {
       const response = await api.get('feedback');
-      setFeedbacks(response.data);
-      console.log(response.data);
+      const sortFeedback = response.data.sort((a,b) => b.feedbackId - a.feedbackId)
+      setFeedbacks(sortFeedback);
+      console.log(sortFeedback);
     } catch (error) {
       console.error('Error fetching feedbacks:', error);
     }

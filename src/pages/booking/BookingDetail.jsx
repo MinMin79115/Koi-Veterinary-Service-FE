@@ -25,7 +25,6 @@ const BookingDetail = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState('latest');
   const [statusFilter, setStatusFilter] = useState('ALL');
-  const meetingLink = sessionStorage.getItem('meeting-link');
 
 
   //Open the note modal
@@ -58,11 +57,11 @@ const BookingDetail = () => {
   // Add this function to check if a booking is expired (over 10 minutes old)
   const isBookingExpired = (booking) => {
     if (booking.status !== 'PENDING' || booking.isPaid) return false;
-    
+
     const bookingDate = new Date(booking.createdAt);
     const currentDate = new Date();
     const diffInMinutes = Math.floor((currentDate - bookingDate) / (1000 * 60));
-    
+
     return diffInMinutes > 10;
   };
 
@@ -221,12 +220,11 @@ const BookingDetail = () => {
       className: 'column-border',
       render: (status, record) => (
         <div>
-          <span className={`badge ${
-            status === 'PENDING' ? 'bg-warning' : 
-            status === 'CONFIRMED' ? 'bg-success' : 
-            status === 'COMPLETED' ? 'bg-info' : 
-            'bg-danger'
-          } d-flex justify-content-center py-2 fst-italic text-white`}>
+          <span className={`badge ${status === 'PENDING' ? 'bg-warning' :
+              status === 'CONFIRMED' ? 'bg-success' :
+                status === 'COMPLETED' ? 'bg-info' :
+                  'bg-danger'
+            } d-flex justify-content-center py-2 fst-italic text-white`}>
             {status}
           </span>
           {isBookingExpired(record) && (
@@ -247,7 +245,7 @@ const BookingDetail = () => {
       align: 'center',
       className: 'column-border',
       render: (_, record) => (
-        record.serviceType === 'At_Home' && record.status !== 'CANCELLED' ? <span>{record.price} <br /> <span className='text-success'>+10% each km (if above 10km)</span></span> : <span>{record.price}</span>
+        record.serviceType === 'At_Home' && record.status !== 'CANCELLED' ? <span>{record.price} <br /> <span className='text-success'>+50,000 VND for moving !</span></span> : <span>{record.price}</span>
       )
     },
     {
@@ -255,28 +253,30 @@ const BookingDetail = () => {
       align: 'center',
       className: 'column-border',
       render: (_, record) => (
-        <><Button 
+        <><Button
           onClick={() => showActionModal(record)}
           className="details-button"
           disabled={isBookingExpired(record)}
         >
           View Details
         </Button>
-        {record.status === "COMPLETED" && record.hasRating === "false" && user?.role === 'CUSTOMER' && (
-          <Button
-            type="default"
-            icon={<StarOutlined />}
-            className="m-1 rate-button"
-            onClick={() => {
-              navigate('/#rating', { state: { booking: record } });
-            }}
-          >
-            Rate Us
-          </Button>
-        )}
+          {record.status === "COMPLETED" && record.hasRating === "false" && user?.role === 'CUSTOMER' && (
+            <Button
+              type="default"
+              icon={<StarOutlined />}
+              className="m-1 rate-button"
+              onClick={() => {
+                navigate('/#rating', { state: { booking: record } });
+              }}
+            >
+              Rate Us
+            </Button>
+          )}
         </>
       )
+
     }
+
   ];
 
   const handleNote = async () => {
@@ -317,8 +317,14 @@ const BookingDetail = () => {
   const handlePay = async (record) => {
     try {
       // Parse the price string to a number
-      const priceValue = parseFloat(record.price.replace(/[^\d,]/g, '').replace(',', '.'));
-      
+      let priceValue = 0;
+      if (record.serviceType === 'At_Home') {
+        const totalPrice = parseFloat(record.price.replace(/[^\d,]/g, '').replace(',', '.'))+ 50000;
+        priceValue = parseFloat(totalPrice);
+      } else {
+        priceValue = parseFloat(record.price.replace(/[^\d,]/g, '').replace(',', '.'));
+      }
+
       if (isNaN(priceValue)) {
         throw new Error('Invalid price format');
       }
@@ -331,7 +337,7 @@ const BookingDetail = () => {
         }
       });
       console.log(resPayment.data);
-      
+
       // Open the payment URL in a new window
       if (resPayment.data && resPayment.data.data && resPayment.data.data.paymentUrl) {
         window.open(resPayment.data.data.paymentUrl, '_blank');
@@ -345,7 +351,7 @@ const BookingDetail = () => {
   };
 
   const handleComplete = async (record) => {
-    
+
     const emailContent = `
     <html>
       <body>
@@ -358,7 +364,7 @@ const BookingDetail = () => {
     </html>
     `;
     const format = {
-        subject: "Booking Completion",
+      subject: "Booking Completion",
       body: emailContent
     }
 
@@ -377,13 +383,13 @@ const BookingDetail = () => {
       fetchBooking()
     } catch (error) {
       console.log(error.response.data)
-    }finally{
-        const resMail = await api.post(`mail/send/${record.email}`, format, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        })
-        console.log(resMail.data)
+    } finally {
+      const resMail = await api.post(`mail/send/${record.email}`, format, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      console.log(resMail.data)
     }
   };
 
@@ -391,13 +397,14 @@ const BookingDetail = () => {
   const filteredBookings = bookings
     .filter(booking => showCancelled ? booking.status === "CANCELLED" : booking.status !== "CANCELLED")
     .slice(showCancelled ? 15 : 0)
-    .sort((a, b) =>  b.id - a.id)
+    .sort((a, b) => b.id - a.id)
 
 
   const showActionModal = (record) => {
     setSelectedBooking(record);
-      setActionModal(true);
-    };
+    setActionModal(true);
+    console.log(record)
+  };
 
   const closeActionModal = () => {
     setActionModal(false);
@@ -406,10 +413,10 @@ const BookingDetail = () => {
 
   const getFilteredAndSortedBookings = () => {
     let filtered = [...bookings];
-    
+
     // Filter by service name
     if (searchTerm) {
-      filtered = filtered.filter(booking => 
+      filtered = filtered.filter(booking =>
         booking.service?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
@@ -419,7 +426,7 @@ const BookingDetail = () => {
       filtered = filtered.filter(booking => booking.status === statusFilter);
     } else {
       // Filter cancelled bookings
-      filtered = filtered.filter(booking => 
+      filtered = filtered.filter(booking =>
         showCancelled ? booking.status === "CANCELLED" : booking.status !== "CANCELLED"
       );
     }
@@ -495,7 +502,7 @@ const BookingDetail = () => {
         <Table
           dataSource={getFilteredAndSortedBookings()}
           columns={columns}
-          pagination={{ 
+          pagination={{
             pageSize: 4,
             showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} bookings`,
             showQuickJumper: true
@@ -504,7 +511,7 @@ const BookingDetail = () => {
           loading={bookings.length === 0}
         />
       </div>
-      
+
       <Modal
         title="Note"
         open={noteModal}
@@ -527,7 +534,7 @@ const BookingDetail = () => {
         footer={null}
         centered
         width="90%"
-        style={{ 
+        style={{
           maxWidth: '700px',
           minWidth: '300px'
         }}
@@ -560,7 +567,7 @@ const BookingDetail = () => {
                     <span>{selectedBooking.address}</span>
                   </div>
                 )}
-                
+
                 <div className="info-item">
                   <label>Service:</label>
                   <span>{selectedBooking.service}</span>
@@ -572,7 +579,7 @@ const BookingDetail = () => {
                 {selectedBooking.serviceType === "At_Home" && selectedBooking.status !== "CANCELLED" && (
                   <div className="info-item">
                     <label>Price:</label>
-                    <span>{selectedBooking.price} <br /> <span className='text-success'>+10% each km (if above 10km)</span></span>
+                    <span>{selectedBooking.price} <br /> <span className='text-success'>+50,000 VND for moving !</span></span>
                   </div>
                 )}
                 {selectedBooking.serviceType !== "At_Home" && (
@@ -588,7 +595,7 @@ const BookingDetail = () => {
                 {selectedBooking.serviceType === "Online" && selectedBooking.status !== "CANCELLED" && selectedBooking.status !== "PENDING" && (
                   <div className="info-item">
                     <label>Meeting Link:</label>
-                    <a href={meetingLink} target="_blank">{meetingLink}</a>
+                    <a href='https://meet.google.com/fgy-kvct-gtf' target="_blank">https://meet.google.com/fgy-kvct-gtf</a>
                   </div>
                 )}
               </div>
@@ -596,35 +603,34 @@ const BookingDetail = () => {
             <div className="status-progress">
               <div className="progress-container">
                 <div className="progress-line">
-                  <div 
-                    className={`progress-fill ${
-                      selectedBooking.status === 'CANCELLED' ? 'cancelled' :
-                      selectedBooking.status === 'COMPLETED' ? 'completed' :
-                      selectedBooking.status === 'CONFIRMED' ? 'confirmed' : 'pending'
-                    }`}
+                  <div
+                    className={`progress-fill ${selectedBooking.status === 'CANCELLED' ? 'cancelled' :
+                        selectedBooking.status === 'COMPLETED' ? 'completed' :
+                          selectedBooking.status === 'CONFIRMED' ? 'confirmed' : 'pending'
+                      }`}
                     style={{
                       width: selectedBooking.status === 'COMPLETED' ? '100%' :
-                            selectedBooking.status === 'CONFIRMED' ? '66%' :
-                            selectedBooking.status === 'PENDING' ? '33%' : '100%'
+                        selectedBooking.status === 'CONFIRMED' ? '66%' :
+                          selectedBooking.status === 'PENDING' ? '33%' : '100%'
                     }}
                   />
                 </div>
                 {user?.role === 'CUSTOMER' && (
                   <>
-                  <div className="progress-steps">
-                    <div className={`progress-step ${selectedBooking.status === 'PENDING' || selectedBooking.status === 'CONFIRMED' || selectedBooking.status === 'COMPLETED' ? 'active' : ''}`}>
-                      <div className="step-dot"></div>
-                      <span>Pending</span>
+                    <div className="progress-steps">
+                      <div className={`progress-step ${selectedBooking.status === 'PENDING' || selectedBooking.status === 'CONFIRMED' || selectedBooking.status === 'COMPLETED' ? 'active' : ''}`}>
+                        <div className="step-dot"></div>
+                        <span>Pending</span>
+                      </div>
+                      <div className={`progress-step ${selectedBooking.status === 'CONFIRMED' || selectedBooking.status === 'COMPLETED' ? 'active' : ''}`}>
+                        <div className="step-dot"></div>
+                        <span>Confirmed</span>
+                      </div>
+                      <div className={`progress-step ${selectedBooking.status === 'COMPLETED' ? 'active' : ''}`}>
+                        <div className="step-dot"></div>
+                        <span>Completed</span>
+                      </div>
                     </div>
-                    <div className={`progress-step ${selectedBooking.status === 'CONFIRMED' || selectedBooking.status === 'COMPLETED' ? 'active' : ''}`}>
-                      <div className="step-dot"></div>
-                      <span>Confirmed</span>
-                    </div>
-                    <div className={`progress-step ${selectedBooking.status === 'COMPLETED' ? 'active' : ''}`}>
-                      <div className="step-dot"></div>
-                      <span>Completed</span>
-                    </div>
-                  </div>
                   </>
                 )}
               </div>
@@ -642,7 +648,7 @@ const BookingDetail = () => {
                     <>
                       {selectedBooking.status === "COMPLETED" ? (
                         selectedBooking.note ? (
-                          <Button 
+                          <Button
                             onClick={() => {
                               closeActionModal();
                               openNoteModal(selectedBooking);
@@ -659,7 +665,7 @@ const BookingDetail = () => {
                             <p>Note is not available for this service type.</p>
                           )
                         )
-                        
+
                       ) : selectedBooking.status === "PENDING" && (
                         <>
                           {!selectedBooking.isPaid ? (
@@ -687,10 +693,10 @@ const BookingDetail = () => {
                             okText="Yes"
                             cancelText="No"
                           >
-                            <Button 
-                              type="primary" 
-                              danger 
-                              icon={<DeleteOutlined />} 
+                            <Button
+                              type="primary"
+                              danger
+                              icon={<DeleteOutlined />}
                               className="m-1"
                               hidden={selectedBooking.isPaid}
                             >
@@ -716,7 +722,7 @@ const BookingDetail = () => {
                         </Button>
                       )}
                       {selectedBooking.status === "COMPLETED" && selectedBooking.serviceType !== "At_Center" && (
-                        <Button 
+                        <Button
                           onClick={() => {
                             closeActionModal();
                             openNoteModal(selectedBooking);

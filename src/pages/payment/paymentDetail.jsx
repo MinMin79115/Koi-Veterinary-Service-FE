@@ -25,7 +25,7 @@ function PaymentDetail() {
     const bookingId = booking?.bookingId;
     const serviceName = booking?.servicesDetail?.serviceId?.serviceName;
     const serviceTime = booking?.serviceTime;
-    const price = booking?.servicesDetail?.serviceTypeId?.price;
+    const price = booking?.price;
 
     setBookingDetails({
       bookingId: bookingId,  

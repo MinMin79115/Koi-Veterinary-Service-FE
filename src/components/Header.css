@@ -251,29 +251,33 @@
     bottom: 9px;
   }
 }
-/* 
-@media (max-width: 480px) {
-  .logo a {
-    font-size: 1rem;
-  }
 
-  .auth-button {
-    font-size: 1rem;
-  }
+.ant-dropdown {
+  min-width: 120px;
+}
 
-  .auth-user.user-icon {
-    font-size: 2.5rem;
-  }
+.ant-dropdown-menu {
+  background: linear-gradient(135deg, #ff9966, #ff5e62);
+  border-radius: 8px;
+  padding: 8px 0;
+}
 
-  .menu-toggle {
-    margin: 0.5rem;
-  }
+.ant-dropdown-menu-item {
+  padding: 8px 16px;
+}
 
-  .auth-nav {
-    margin-left: 0;
-  }
+.ant-dropdown-menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
 
-  .logo img {
-    width: 15%;
-  }
-} */
+.ant-dropdown-menu-item a {
+  color: white !important;
+  text-decoration: none;
+  display: block;
+  width: 100%;
+}
+
+/* Add divider between menu items */
+.ant-dropdown-menu-item:not(:last-child) {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}

@@ -27,7 +27,7 @@ const BookingPage  = () => {
     veterinarianId: '',
     serviceTime: '',
   });
-  const [totalPrice, setTotalPrice] = useState('')
+  const [totalPrice, setTotalPrice] = useState(0)
   const [selectedHour, setSelectedHour] = useState('')
   const [timeSlot, setTimeSlot] = useState('')
   const [selectedDateTime, setSelectedDateTime] = useState('')
@@ -154,6 +154,7 @@ const BookingPage  = () => {
             }
         });
         console.log('Booking submitted:', response.data);
+        response.data.price = totalPrice
         dispatch(booking({...response.data}))
         toast.success('Booking submitted successfully!');
         setSelectedService('');
@@ -178,7 +179,6 @@ const BookingPage  = () => {
     const [doctorId, doctorName, slotId] = doctorInfo.split(',');
     setTimeSlot(timeSlot);
     setSelectedHour(timeSlot);
-    sessionStorage.setItem('hours', timeSlot);
     setSelectedSlot(slotId);
     console.log(selectedSlot);
     setSelectedDoctor(doctorName);
@@ -236,8 +236,9 @@ const BookingPage  = () => {
       const [serviceName, servicesDetailId, serviceTypeName, totalPrice] = selectedService.split(' || ');
       setTotalPrice(totalPrice)
       if(serviceTypeName === 'At_Home'){
-        setBonusAtHome('10,000 VNĐ -> 10% raise each km (if above 10km)');
-        secureLocalStorage.setItem('bonusAtHome', '10,000 VNĐ -> 10% raise each km (if above 10km) \n Pay bonus at home');
+        setBonusAtHome('+50,000 VND spent for moving !');
+        setTotalPrice(parseInt(totalPrice) + 50000)
+        secureLocalStorage.setItem('bonusAtHome', '+50,000 VND spent for moving !');
       }else{
         setBonusAtHome('')
         secureLocalStorage.removeItem('bonusAtHome');
@@ -260,7 +261,7 @@ const BookingPage  = () => {
         ...prevValues,
         servicesDetailId: '',
       }));
-      setTotalPrice('')
+      setTotalPrice(0)
       setIsInterviewService(false);
     }
   }
@@ -272,6 +273,7 @@ const BookingPage  = () => {
     }else{
       setSelectedHour(value.format('HH:mm'))
       setTimeSlot(value.format('HH:mm'))
+      sessionStorage.setItem('hours', timeForrmat + " " +value.format('HH:mm'))
     }
     setSelectedDateTime(timeForrmat);
     setSelectedSlot('')

@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import koiLogo from '../assets/koi-logo.png'; // Import the image
+import koiLogo from '../assets/koi-logo.png';
 import './Header.css';
 import { FaRegUserCircle } from "react-icons/fa";
 import { logout } from '../redux/features/userSlider';
 import { bookingReset } from '../redux/features/bookingSlider';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { Dropdown } from 'antd';
 
 const Header = () => {
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
-    setIsLoggedIn(!!user); // Set true if token exists
-    console.log(user);
+    if(user !== null){
+      setIsLoggedIn(true)
+    }else{
+      setIsLoggedIn(false)
+    }
   }, [user]);
 
   const handleLogout = () => {
-    // Dispatch logout action to clear Redux state
+    sessionStorage.clear();
     dispatch(logout());
     dispatch(bookingReset());
   };
@@ -30,10 +33,22 @@ const Header = () => {
     setIsMenuOpen(false);
   };
 
+  // Add dropdown menu items
+  const items = [
+    {
+      key: '1',
+      label: <Link to="/customer-profile">Profile</Link>,
+    },
+    {
+      key: '2',
+      label: <Link to="/login" onClick={handleLogout}>Logout</Link>,
+    },
+  ];
+
   return (
     <header className="header">
       <div className="header-content">
-        <div className="logo" >
+        <div className="logo">
           <img src={koiLogo} alt="KOI Fish Care Logo" />
           <h1><Link className="h1-logo" to="/">Koi Fish Care</Link></h1>
         </div>
@@ -42,18 +57,21 @@ const Header = () => {
             <li><Link onClick={handleLinkClick} to="/">Home</Link></li>
             <li><Link onClick={handleLinkClick} to="/services">Services</Link></li>
             <li><Link onClick={handleLinkClick} to="/contact">Contact</Link></li>
-            <li>{user?.role === 'CUSTOMER' || user?.role === 'VETERINARIAN' ? <Link onClick={handleLinkClick} to="/booking-detail">History</Link> : <Link onClick={handleLinkClick} to="/booking-management">History</Link>}</li>
+            <li>
+              {user?.role === 'CUSTOMER' || user?.role === 'VETERINARIAN' ? 
+                <Link onClick={handleLinkClick} to="/booking-detail">History</Link> : 
+                <Link onClick={handleLinkClick} to="/booking-management">History</Link>}
+            </li>
           </ul>
         </nav>
         <div className="auth-nav">
-          {user ? (
+          {isLoggedIn ? (
             <>
-              <Link to="/customer-profile#profile" className='auth-user user-icon'>
-                <i>
-                  <FaRegUserCircle />
-                </i>
-              </Link>
-              <Link to='/login' onClick={handleLogout} className='auth-button '>Logout</Link>
+              <Dropdown menu={{ items }} placement="bottomRight">
+                <Link className='auth-user user-icon'>
+                  <i><FaRegUserCircle /></i>
+                </Link>
+              </Dropdown>
             </>
           ) : (
             <>
