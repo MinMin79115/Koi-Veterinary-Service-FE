@@ -89,7 +89,7 @@ function PaymentDetail() {
                 <div className="row mb-3">
                   <div className="col-sm-4 col-md-2" style={{fontWeight: 'bold'}}>Price:</div>
                   <div className="col-sm-4 col-md-6">
-                    {parseFloat(bookingDetails?.price || 0).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                    {(bookingDetails?.price).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
                   </div>
                 </div>
               </div>
