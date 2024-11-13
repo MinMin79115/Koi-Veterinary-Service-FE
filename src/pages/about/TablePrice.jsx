@@ -3,85 +3,84 @@ import { Link } from 'react-router-dom';
 import { CheckCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Navigation, Autoplay } from 'swiper/modules';
+import { useSelector } from 'react-redux';
+import api from '../../config/axios';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import './TablePrice.css';
 
 const TablePrice = () => {
+  const token = useSelector((state) => state.user.accessToken);
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const priceData = [
-    {
-      type: 'Online Consulting',
-      price: '50.000',
-      features: [
-        'Online Consultation',
-        'Video Call Support',
-        'Digital Prescription',
-        'Follow-up Chat',
-        '24/7 Emergency Support'
-      ],
-      location: 'online'
-    },
-    {
-      type: 'Koi Fish Disease Treatment',
-      price: '150.000',
-      features: [
-        'Professional Examination',
-        'Disease Diagnosis',
-        'Treatment Plan',
-        'Medication Prescription',
-        'Follow-up Care'
-      ],
-      location: 'at_center'
-    },
-    {
-      type: 'Evaluate Koi Fish Pond Quality',
-      price: '200.000',
-      features: [
-        'Water Quality Testing',
-        'Filtration System Check',
-        'pH Level Analysis',
-        'Environmental Assessment',
-        'Improvement Recommendations'
-      ],
-      location: 'at_center'
+  const fetchServices = async () => {
+    try {
+      const response = await api.get('services/type', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
+      // Transform the API data into the required format
+      const transformedServices = response.data.reduce((acc, service) => {
+        const serviceType = {
+          type: service.service_type,
+          price: service.price.toLocaleString('vi-VN'),
+          features: getFeaturesByType(service.service_type),
+          location: service.service_type.toLowerCase().replace(' ', '_'),
+          hasDistanceNote: service.service_type === 'At_Home'
+        };
+        
+        acc.push(serviceType);
+        return acc;
+      }, []);
+
+      setServices(transformedServices);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching services:', error.response?.data);
+      setLoading(false);
     }
-  ];
+  };
+
+  const getFeaturesByType = (type) => {
+    switch (type) {
+      case 'Online':
+        return [
+          'Online Consultation',
+          'Video Call Support',
+          'Digital Prescription',
+          'Follow-up Chat',
+          '24/7 Emergency Support'
+        ];
+      case 'At_Center':
+        return [
+          'Professional Examination',
+          'Disease Diagnosis',
+          'Treatment Plan',
+          'Medication Prescription',
+          'Follow-up Care'
+        ];
+      case 'At_Home':
+        return [
+          'Professional Examination',
+          'Disease Diagnosis',
+          'Treatment Plan',
+          'Medication Prescription',
+          'Follow-up Care',
+          'Home Visit Service',
+          'Convenient Location'
+        ];
+      default:
+        return [];
+    }
+  };
 
   useEffect(() => {
-    const allServices = priceData.flatMap(service => {
-      if (service.location === 'online') {
-        return [service];
-      }
-      
-      const centerService = {
-        ...service,
-        type: `${service.type} (At Center)`
-      };
-      
-      const homeService = {
-        ...service,
-        type: `${service.type} (At Home)`,
-        price: service.price,
-        features: [
-          ...service.features,
-          'Home Visit Service',
-          'Convenient Location',
-          'Additional fee based on distance'
-        ],
-        location: 'at_home',
-        hasDistanceNote: true
-      };
-
-      return [centerService, homeService];
-    });
-
-    setServices(allServices);
-    setLoading(false);
-  }, []);
+    fetchServices();
+  }, [token]);
 
   if (loading) {
     return <div className="loading">Loading...</div>;
@@ -99,7 +98,6 @@ const TablePrice = () => {
           modules={[Pagination, Navigation, Autoplay]}
           autoplay={{
             delay: 3000,
-            // disableOnInteraction: false,
           }}
           spaceBetween={30}
           slidesPerView={2}
@@ -124,7 +122,7 @@ const TablePrice = () => {
             <SwiperSlide key={index}>
               <div className="price-card">
                 <div className="card-header">
-                  <h3 className="service-type">{service.type}</h3>
+                  <h3 className="service-type">{service.type.replace('_', ' ')}</h3>
                   <div className="price-amount">
                     <span className="currency">VND </span>
                     {service.price}
@@ -132,7 +130,7 @@ const TablePrice = () => {
                   {service.hasDistanceNote && (
                     <div className="distance-note">
                       <InfoCircleOutlined />
-                      <span>Additional fee: +10% per kilometer from center</span>
+                      <span>Additional fee: +50,000 VNĐ for moving.</span>
                     </div>
                   )}
                 </div>
