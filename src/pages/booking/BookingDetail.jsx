@@ -136,8 +136,8 @@ const BookingDetail = () => {
 
   const columns = [
     {
-      title: 'isPay',
-      dataIndex: 'isPay',
+      title: 'isPaid',
+      dataIndex: 'isPaid',
       key: 'isPay',
       width: '10%',
       align: 'center',
