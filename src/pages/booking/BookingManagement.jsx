@@ -108,6 +108,7 @@ const BookingPage = () => {
         });
         if (checkBooking) {
             toast.warning(`Have some booking is expired! (Over 5 minutes not paid)`, {
+            toast.warning(`Have some booking is expired! (Over 10 minutes not paid)`, {
                 position: "top-center",
                 autoClose: true,
             })
