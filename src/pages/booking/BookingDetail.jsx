@@ -136,6 +136,15 @@ const BookingDetail = () => {
 
   const columns = [
     {
+      title: 'isPay',
+      dataIndex: 'isPay',
+      key: 'isPay',
+      width: '10%',
+      align: 'center',
+      className: 'column-border',
+      hidden: user?.role === 'VETERINARIAN' || user?.role === 'CUSTOMER'
+    },
+    {
       title: 'Rated',
       dataIndex: 'hasRating',
       key: 'hasRating',
@@ -441,6 +450,21 @@ const BookingDetail = () => {
     });
 
     return filtered;
+  };
+
+  const canCancel = (booking) => {
+    // Check if booking is PENDING and not paid
+    if (booking.status !== 'PENDING' || booking.status === 'PAID') return false;
+    
+    // Get current time and booking time
+    const now = new Date();
+    const bookingTime = new Date(booking.date);
+    
+    // Calculate time difference in hours
+    const timeDiff = (bookingTime - now) / (1000 * 60 * 60);
+    
+    // Can cancel if more than 2 hours before booking time
+    return timeDiff > 2;
   };
 
   return (
