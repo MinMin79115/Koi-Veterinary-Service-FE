@@ -91,6 +91,7 @@ const BookingDetail = () => {
           price: booking.servicesDetail?.serviceTypeId?.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
           note: booking.note,
           createdAt: booking.bookingTime,
+          time: booking.serviceTime,
           isPaid: bills.some(bill => bill.id === booking.bookingId),
           hasRating: feedbacks.some(feedback => feedback.bookingId.bookingId === booking.bookingId) ? "true" : "false"
         }));
