@@ -128,6 +128,15 @@ const BookingPage = () => {
 
     const columns = [
         {
+      title: 'isPaid',
+      dataIndex: 'isPaid',
+      key: 'isPay',
+      width: '10%',
+      align: 'center',
+      className: 'column-border',
+    hidden: user?.role === 'CUSTOMER' || user?.role === 'VETERINARIAN' || user?.role === 'STAFF'
+    },
+        {
             title: 'ID',
             dataIndex: 'id',
             key: 'id',
