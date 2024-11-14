@@ -381,6 +381,7 @@ const BookingPage  = () => {
                           onChange={handleDateTimeChange}
                           value={selectedDateTime}
                           className="form-control"
+                          required
                         />
                       </Form.Item>
                       <label htmlFor="veterinarianId" className="form-label">Doctors:</label>
@@ -418,6 +419,7 @@ const BookingPage  = () => {
                           onChange={handleDateTimeChange}
                           value={selectedDateTime}
                           className="form-control"
+                          required
                         />
                       </Form.Item>
                     <Form.Item>
