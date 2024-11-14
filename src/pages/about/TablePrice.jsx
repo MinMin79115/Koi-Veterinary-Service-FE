@@ -11,17 +11,12 @@ import 'swiper/css/navigation';
 import './TablePrice.css';
 
 const TablePrice = () => {
-  const token = useSelector((state) => state.user.accessToken);
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchServices = async () => {
     try {
-      const response = await api.get('services/type', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      const response = await api.get('services/type',);
       
       // Transform the API data into the required format
       const transformedServices = response.data.reduce((acc, service) => {
