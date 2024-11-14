@@ -75,7 +75,7 @@ const TablePrice = () => {
 
   useEffect(() => {
     fetchServices();
-  }, [token]);
+  }, []);
 
   if (loading) {
     return <div className="loading">Loading...</div>;
